@@ -63,17 +63,21 @@
 .tk-hero__art {
   position: absolute;
   top: 50%;
-  right: -26px;
+  right: -34px;
   transform: translateY(-50%);
-  width: min(44%, 400px);
+  /* the artwork is square with the coin filling ~80% of it, so 125% of
+     the block height puts the coin itself at roughly the block height */
+  height: 125%;
+  aspect-ratio: 1 / 1;
   z-index: 0;
   pointer-events: none;
 }
 .tk-hero__art img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
   max-width: none;
+  object-fit: contain;
   opacity: .62;
 }
 
@@ -298,7 +302,7 @@
 }
 @media (max-width: 1100px) {
   .tk-hero { padding-right: 44px; }
-  .tk-hero__art { right: -60px; width: 320px; opacity: .38; }
+  .tk-hero__art { right: -70px; height: 105%; opacity: .38; }
 }
 @media (max-width: 900px) {
   .tk-hero { padding: 30px 24px; }
