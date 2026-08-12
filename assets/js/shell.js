@@ -154,7 +154,9 @@ function renderShell() {
   topbar.innerHTML = `
     <div class="seg">
       <button class="active">Casino</button>
-      <button>Sports</button>
+      <button class="is-locked" disabled aria-disabled="true" title="Sportsbook — coming soon">
+        ${icon("lock", 2)}<span>Sports</span>
+      </button>
     </div>
     <div class="topbar__spacer"></div>
     <button class="icon-btn glass" title="Search">${icon("search", 2)}</button>
@@ -269,7 +271,8 @@ function renderFooter() {
         "<p>Gambling can be addictive. Play responsibly and only stake what you can " +
         "afford to lose.</p>" +
         '<p class="sfoot__copy">&copy; 2026 pepe.fail. All rights reserved.</p>' +
-        '<span class="sfoot__age">18+</span>' +
+        '<img class="sfoot__age" src="' + B + 'assets/img/age-badge.png" ' +
+        'alt="Gambling for 21 years old and above only. Gambling can be addictive — know when to stop." />' +
       "</div>" +
       cols +
     "</div>";

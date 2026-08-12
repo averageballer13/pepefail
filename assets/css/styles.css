@@ -131,6 +131,15 @@ h1, h2, h3, .display {
   background: var(--grad-gold); color: #201800;
   box-shadow: var(--glow-gold);
 }
+/* Sportsbook is not built yet: shown, greyed, and inert */
+.seg button.is-locked {
+  display: inline-flex; align-items: center; gap: 6px;
+  color: var(--text-mute);
+  opacity: .55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.seg button.is-locked svg { width: 14px; height: 14px; }
 .topbar__spacer { flex: 1; }
 
 /* Wallet area: shell.js drops one or two buttons in here, so it has to lay
@@ -521,13 +530,9 @@ h1, h2, h3, .display {
 }
 
 .sfoot__age {
-  display: inline-grid; place-items: center;
-  width: 42px; height: 42px;
-  margin-top: 6px;
-  border: 2px solid var(--line-2);
-  border-radius: 50%;
-  color: var(--text-mute);
-  font-weight: 800; font-size: 13px;
+  display: block;
+  width: 100%; max-width: 300px; height: auto;
+  margin-top: 14px;
 }
 
 .sfoot__col h3 {

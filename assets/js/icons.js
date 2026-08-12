@@ -24,6 +24,7 @@ const ICONS = {
   sparkle: '<path d="M12 3c.6 4.4 1.6 5.4 5.8 6-4.2.6-5.2 1.6-5.8 6-.6-4.4-1.6-5.4-5.8-6 4.2-.6 5.2-1.6 5.8-6Z"/>',
   plinko: '<circle cx="12" cy="5" r="1.1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="10" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="10" r="1.1" fill="currentColor" stroke="none"/><circle cx="5" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="19" cy="15" r="1.1" fill="currentColor" stroke="none"/><path d="M4 20h16"/>',
   grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.3h16M4 14.6h16M9.3 4v16M14.6 4v16"/>',
+  lock: '<rect x="4.8" y="10.5" width="14.4" height="9.5" rx="2.2"/><path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.6 0v2.7"/><circle cx="12" cy="15.2" r="1.5" fill="currentColor" stroke="none"/>',
   chart: '<path d="M4 4v16h16"/><path d="m7 15 3.5-3.5 3 3L20 8"/><path d="M20 12V8h-4"/>',
   tophat: '<path d="M8 4h8v9H8z"/><path d="M4 13.5h16v1.8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1.8Z"/><path d="M8.5 9.5h7"/>',
   cactus: '<path d="M12 21V7"/><path d="M12 13.5H9.2A2.2 2.2 0 0 1 7 11.3V9.2"/><path d="M12 11h2.8A2.2 2.2 0 0 0 17 8.8V6.8"/><path d="M9.5 21h5"/><path d="M12 7a2 2 0 0 0-2-2 2 2 0 0 1 2-2 2 2 0 0 1 2 2 2 2 0 0 0-2 2Z" fill="currentColor" stroke="none"/>',

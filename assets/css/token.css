@@ -6,11 +6,8 @@
 /* =========================== HERO =========================== */
 .tk-hero {
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  gap: 32px;
-  align-items: center;
   padding: 44px 44px;
+  padding-right: min(46%, 420px);   /* room for the coin bleeding in */
   margin-bottom: 34px;
   border: 1px solid var(--line-2);
   border-radius: 18px;
@@ -19,6 +16,7 @@
     linear-gradient(120deg, var(--panel-2), var(--bg-800));
   overflow: hidden;
 }
+.tk-hero__body { position: relative; z-index: 1; }
 
 .tk-badge {
   display: inline-flex; align-items: center; gap: 7px;
@@ -58,11 +56,22 @@
   max-width: 560px;
 }
 
-.tk-hero__art { justify-self: center; }
+/* The coin is decoration: oversized, pinned to the right edge and clipped
+   by the block, so the crop reads as deliberate rather than as a mistake. */
+.tk-hero__art {
+  position: absolute;
+  top: 50%;
+  right: -70px;
+  transform: translateY(-50%);
+  z-index: 0;
+  pointer-events: none;
+}
 .tk-hero__art img {
-  width: 220px; height: 220px;
-  object-fit: contain;
-  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.55));
+  display: block;
+  width: 560px;
+  max-width: none;
+  height: auto;
+  opacity: .62;
 }
 
 /* --- Contract address --- */
@@ -284,8 +293,12 @@
   .tk-step::after { display: none; }
   .tk-tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+@media (max-width: 1100px) {
+  .tk-hero { padding-right: 44px; }
+  .tk-hero__art img { width: 420px; opacity: .3; }
+}
 @media (max-width: 900px) {
-  .tk-hero { grid-template-columns: 1fr; padding: 30px 24px; }
+  .tk-hero { padding: 30px 24px; }
   .tk-hero__art { display: none; }
   .tk-hero__title { font-size: 40px; }
   .tk-grid--3, .tk-grid--2 { grid-template-columns: 1fr; }
