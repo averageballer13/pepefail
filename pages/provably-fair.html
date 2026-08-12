@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provably Fair — pepe.fail</title>
+  <meta name="description" content="How pepe.fail proves a result was not tampered with, and how you can check it yourself." />
+  <link rel="icon" type="image/png" href="../assets/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/glass.css" />
+  <link rel="stylesheet" href="../assets/css/anim.css" />
+  <link rel="stylesheet" href="../assets/css/modal.css" />
+  <link rel="stylesheet" href="../assets/css/legal.css" />
+</head>
+<body>
+  <div class="app">
+    <main class="main">
+      <div class="main__inner legal">
+
+        <div class="legal__head">
+          <h1 class="legal__title">Provably Fair</h1>
+          <div class="legal__meta">
+            <span>Last updated: August 2026</span>
+          </div>
+          <p class="legal__lead">
+            "Trust us" is not a guarantee. Provably fair means you can check every result
+            yourself, after the fact, without taking our word for anything.
+          </p>
+        </div>
+
+        <div class="legal__tldr">
+          <span class="ico" data-ico="bomb"></span>
+          <div>
+            <h2>Status: not live yet</h2>
+            <p>
+              The games on the site are interface builds. Verification is not switched on,
+              so nothing here can be checked yet. This page describes the system we are
+              implementing — when it is live, this box will say so and the verifier will
+              be on this page.
+            </p>
+          </div>
+        </div>
+
+        <section>
+          <h2 class="legal__h"><em>1.</em>The problem it solves</h2>
+          <p>
+            An online casino generates the random numbers that decide whether you win. If
+            it wanted to, it could generate them after seeing your bet. You would never
+            know. Licensing and audits are one answer to this. Cryptography is a better
+            one, because it does not require anyone to be honest.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="legal__h"><em>2.</em>How it works</h2>
+          <p>Three values decide every round:</p>
+          <ul>
+            <li><strong>Server seed</strong> — a random secret we generate. Before you bet, we show you its SHA-256 hash. The hash proves the seed already existed without revealing it.</li>
+            <li><strong>Client seed</strong> — a value from your browser. You can change it at any time, so we cannot know it in advance.</li>
+            <li><strong>Nonce</strong> — a counter that increases with every bet, so no two rounds are identical.</li>
+          </ul>
+          <p>
+            The result is derived by hashing these together. Because we published the
+            server seed hash <em>before</em> you bet, we cannot change the seed afterwards
+            without the hash no longer matching. And because you control the client seed,
+            we cannot pick a server seed that produces a particular outcome for you.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="legal__h"><em>3.</em>Checking a result</h2>
+          <ul>
+            <li><strong>Before betting</strong> — note the server seed hash shown in the game.</li>
+            <li><strong>Set your own client seed</strong> — any string. Changing it is what makes the guarantee yours rather than ours.</li>
+            <li><strong>Play.</strong> The nonce increases with each round.</li>
+            <li><strong>Rotate the seed</strong> — when you ask for a new server seed, we reveal the old one in full.</li>
+            <li><strong>Verify</strong> — hash the revealed seed and confirm it matches the hash you were shown. Then recompute the outcomes yourself with the seed, your client seed and the nonce.</li>
+          </ul>
+          <p>
+            If the hash does not match, we tampered with something and you have the proof.
+            That is the entire point.
+          </p>
+        </section>
+
+        <section>
+          <h2 class="legal__h"><em>4.</em>What it does not do</h2>
+          <p>
+            Provably fair proves a result was not manipulated. It does not remove the house
+            edge, and it does not make you more likely to win.
+          </p>
+          <ul>
+            <li>Every game keeps its published edge. Verification does not change the odds.</li>
+            <li>A verified loss is still a loss. Fair is not the same as favourable.</li>
+            <li>It says nothing about whether we can pay out. That depends on the bankroll, which is why the <a href="../token.html">token page</a> covers it separately.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2 class="legal__h"><em>5.</em>House edge by game</h2>
+          <p>
+            The edge is published on each game page, next to the RTP. We do not vary it
+            per player, per session or per wallet. If that ever changes, it will be
+            announced before it takes effect.
+          </p>
+        </section>
+
+        <div class="legal__contact">
+          <span class="ico" data-ico="chat"></span>
+          <div>
+            <h3>Found a result that does not verify?</h3>
+            <p>Send it to us with the seeds and the nonce. We will publish the answer.</p>
+          </div>
+          <a class="btn btn--gold" href="https://x.com/pepebetsupport" target="_blank" rel="noopener noreferrer">@pepebetsupport</a>
+        </div>
+
+        <div class="foot"></div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>window.PAGE = { active: "fair", base: "../" };</script>
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/shell.js"></script>
+  <script src="../assets/js/games-data.js"></script>
+  <script src="../assets/js/modal.js"></script>
+  <script src="../assets/js/wallet.js"></script>
+  <script src="../assets/js/anim.js"></script>
+  <script>hydrateIcons();</script>
+</body>
+</html>

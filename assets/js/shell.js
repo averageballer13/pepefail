@@ -34,15 +34,17 @@ const NAV_GROUPS = [
 
 const NAV_FOOT = [
   { k: "rewards", ic: "shield", t: "Rewards", href: B + "pages/promotions.html" },
+  { k: "token", ic: "coin", t: "$FAIL Token", href: B + "token.html", mod: "token" },
 ];
 
 /* --- Single nav entry --- */
 function navItem(n) {
   const active = n.k === PAGE.active ? " active" : "";
+  const mod = n.mod ? " nav__item--" + n.mod : "";
   const pill = n.pill
     ? `<span class="badge-pill${n.pillMod ? " badge-pill--" + n.pillMod : ""}">${n.pill}</span>`
     : "";
-  return `<a class="nav__item${active}" href="${n.href}">${icon(n.ic)}<span>${n.t}</span>${pill}</a>`;
+  return `<a class="nav__item${mod}${active}" href="${n.href}">${icon(n.ic)}<span>${n.t}</span>${pill}</a>`;
 }
 
 /* ===================================================================
@@ -164,15 +166,6 @@ function renderShell() {
   const sidebar = document.createElement("aside");
   sidebar.className = "sidebar";
   sidebar.innerHTML = `
-    <a class="token-cta${PAGE.active === "token" ? " active" : ""}" href="${B}token.html">
-      <span class="token-cta__ico">${icon("coin", 2)}</span>
-      <span class="token-cta__txt">
-        <b>$FAIL</b>
-        <i>Token</i>
-      </span>
-      <span class="token-cta__go">${icon("arrowR", 2)}</span>
-    </a>
-
     <div class="promo-card">
       <div class="promo-card__ico">${icon("ticket")}</div>
       <div class="promo-card__amount">$0</div>
@@ -204,10 +197,13 @@ function renderShell() {
   app.prepend(topbar);
   app.prepend(brand);
 
-  /* Floating support button */
-  const fab = document.createElement("button");
+  /* Floating support button — support runs on X, there is no ticket desk */
+  const fab = document.createElement("a");
   fab.className = "fab";
-  fab.title = "Support";
+  fab.title = "Support — @pepebetsupport on X";
+  fab.href = "https://x.com/pepebetsupport";
+  fab.target = "_blank";
+  fab.rel = "noopener noreferrer";
   fab.innerHTML = icon("headset", 2);
   document.body.appendChild(fab);
 }
@@ -224,25 +220,23 @@ const FOOT_COLS = [
       { t: "Originals", href: B + "casino.html#originals" },
       { t: "Blackjack", href: B + "games/blackjack.html" },
       { t: "Rewards", href: B + "pages/promotions.html" },
-      { t: "Support", href: "#" },
+      { t: "$FAIL Token", href: B + "token.html" },
     ],
   },
   {
-    t: "About us",
+    t: "Legal",
     links: [
-      { t: "Responsible Gaming", href: "#" },
-      { t: "Privacy Policy", href: "#" },
-      { t: "Terms and Conditions", href: "#" },
-      { t: "Provably Fair", href: "#" },
+      { t: "Terms and Conditions", href: B + "pages/terms.html" },
+      { t: "Privacy Policy", href: B + "pages/privacy.html" },
+      { t: "Responsible Gaming", href: B + "pages/responsible.html" },
+      { t: "Provably Fair", href: B + "pages/provably-fair.html" },
     ],
   },
   {
     t: "Community",
     links: [
-      { t: "X", href: "https://x.com/pepefail", ext: true },
-      { t: "Discord", href: "#" },
-      { t: "Telegram", href: "#" },
-      { t: "Instagram", href: "#" },
+      { t: "X — @pepefail", href: "https://x.com/pepefail", ext: true },
+      { t: "Support — @pepebetsupport", href: "https://x.com/pepebetsupport", ext: true },
     ],
   },
 ];
