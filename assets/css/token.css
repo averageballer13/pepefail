@@ -56,21 +56,23 @@
   max-width: 560px;
 }
 
-/* The coin fills the block from top to bottom and sits just past the right
-   edge. The block clips it, so it never spills outside its own border. */
+/* The coin sits at the right edge, roughly as tall as the block and shown
+   whole — only its glow is trimmed by the block border.
+   Sized by width: the artwork is 3:2 with the coin centred, so width is
+   what actually controls how big the coin reads. */
 .tk-hero__art {
   position: absolute;
-  top: 0; bottom: 0; right: -46px;
-  width: min(52%, 480px);
-  display: grid;
-  place-items: center;
+  top: 50%;
+  right: -26px;
+  transform: translateY(-50%);
+  width: min(44%, 400px);
   z-index: 0;
   pointer-events: none;
 }
 .tk-hero__art img {
   display: block;
-  height: 132%;
-  width: auto;
+  width: 100%;
+  height: auto;
   max-width: none;
   opacity: .62;
 }
@@ -296,7 +298,7 @@
 }
 @media (max-width: 1100px) {
   .tk-hero { padding-right: 44px; }
-  .tk-hero__art { right: -70px; opacity: .45; }
+  .tk-hero__art { right: -60px; width: 320px; opacity: .38; }
 }
 @media (max-width: 900px) {
   .tk-hero { padding: 30px 24px; }
