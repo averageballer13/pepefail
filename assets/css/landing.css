@@ -13,9 +13,24 @@ body {
   background: var(--bg-900);
 }
 
+/* =========================== FALLING PROPS ===========================
+   Background canvas for assets/js/fx-fall.js. Sits behind everything,
+   never intercepts pointer events, and is skipped by the script under
+   prefers-reduced-motion (the canvas then simply stays empty). */
+.fx-fall {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
 /* =========================== LAYOUT =========================== */
 .landing {
   position: relative;
+  z-index: 1;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;

@@ -17,6 +17,8 @@
 </head>
 <body>
 
+  <canvas class="fx-fall" data-fall aria-hidden="true"></canvas>
+
   <main class="landing">
     <div class="landing__inner">
 
@@ -56,6 +58,7 @@
   <script src="assets/js/icons.js"></script>
   <script src="assets/js/modal.js"></script>
   <script src="assets/js/wallet.js"></script>
+  <script src="assets/js/fx-fall.js"></script>
   <script>
     document.getElementById("createWallet").addEventListener("click", function () {
       if (window.PepeWallet && typeof window.PepeWallet.startCreateFlow === "function") {
