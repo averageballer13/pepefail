@@ -5,16 +5,8 @@
 hydrateIcons();
 bindScrollers();
 
-/* Hero card icons */
-const hcCasino = document.getElementById("hcCasino");
-const hcLive = document.getElementById("hcLive");
-if (hcCasino) hcCasino.insertAdjacentHTML("afterbegin", icon("chip", 1.9));
-if (hcLive) hcLive.insertAdjacentHTML("afterbegin", icon("cards", 1.9));
-
 /* Carousels */
 fillRow("originals", ORIGINALS);
-fillRow("slots", SLOTS);
-fillRow("live", LIVE_GAMES);
 
 /* ===================================================================
    Wallet entry points

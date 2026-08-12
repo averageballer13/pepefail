@@ -3,6 +3,7 @@
    ac = accent : "gold" (default) or "orange"
    =================================================================== */
 
+/* Only games that have a real page of their own. */
 const ORIGINALS = [
   { n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "games/plinko.html" },
   { n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines.html" },
@@ -10,8 +11,7 @@ const ORIGINALS = [
   { n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "games/crash.html" },
   { n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo.html" },
   { n: "Wheel", p: "pepe.fail", ic: "wheel", tag: "ORIGINAL", ac: "orange", href: "games/wheel.html" },
-  { n: "Hilo", p: "pepe.fail", ic: "cards", tag: "ORIGINAL", ac: "gold", href: "games/dice.html" },
-  { n: "Keno", p: "pepe.fail", ic: "grid", tag: "ORIGINAL", ac: "gold", href: "games/dice.html" },
+  { n: "Blackjack", p: "pepe.fail", ic: "spade", tag: "ORIGINAL", ac: "gold", href: "games/blackjack.html" },
 ];
 
 const SLOTS = [

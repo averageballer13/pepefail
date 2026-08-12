@@ -199,8 +199,80 @@ function renderShell() {
   document.body.appendChild(fab);
 }
 
+/* ===================================================================
+   SITE FOOTER
+   Pages carry an empty <div class="foot"></div>; it is replaced here so
+   the footer only lives in one place.
+   =================================================================== */
+const FOOT_COLS = [
+  {
+    t: "Platform",
+    links: [
+      { t: "Originals", href: B + "casino.html#originals" },
+      { t: "Blackjack", href: B + "games/blackjack.html" },
+      { t: "Rewards", href: B + "pages/promotions.html" },
+      { t: "Support", href: "#" },
+    ],
+  },
+  {
+    t: "About us",
+    links: [
+      { t: "Responsible Gaming", href: "#" },
+      { t: "Privacy Policy", href: "#" },
+      { t: "Terms and Conditions", href: "#" },
+      { t: "Provably Fair", href: "#" },
+    ],
+  },
+  {
+    t: "Community",
+    links: [
+      { t: "X", href: "https://x.com/pepefail", ext: true },
+      { t: "Discord", href: "#" },
+      { t: "Telegram", href: "#" },
+      { t: "Instagram", href: "#" },
+    ],
+  },
+];
+
+function renderFooter() {
+  const slot = document.querySelector(".foot");
+  if (!slot) return;
+
+  const cols = FOOT_COLS.map(function (c) {
+    const links = c.links
+      .map(function (l) {
+        const ext = l.ext ? ' target="_blank" rel="noopener noreferrer"' : "";
+        return '<li><a href="' + l.href + '"' + ext + ">" + l.t + "</a></li>";
+      })
+      .join("");
+    return '<div class="sfoot__col"><h3>' + c.t + "</h3><ul>" + links + "</ul></div>";
+  }).join("");
+
+  const foot = document.createElement("footer");
+  foot.className = "sfoot";
+  foot.innerHTML =
+    '<div class="sfoot__grid">' +
+      '<div class="sfoot__brand">' +
+        '<a class="sfoot__logo" href="' + B + 'casino.html">' +
+          '<img src="' + B + 'assets/img/logo.png" alt="" />' +
+          '<span>pepe<b>.fail</b></span>' +
+        "</a>" +
+        "<p>pepe.fail is a decentralised casino on Solana. Funds stay in your own " +
+        "non-custodial wallet — there is no operator account holding your balance.</p>" +
+        "<p>Gambling can be addictive. Play responsibly and only stake what you can " +
+        "afford to lose.</p>" +
+        '<p class="sfoot__copy">&copy; 2026 pepe.fail. All rights reserved.</p>' +
+        '<span class="sfoot__age">18+</span>' +
+      "</div>" +
+      cols +
+    "</div>";
+
+  slot.replaceWith(foot);
+}
+
 renderShell();
 renderAuth();
+renderFooter();
 
 /* wallet.js loads after this file, so re-render once every script has run,
    then on every wallet state change. */

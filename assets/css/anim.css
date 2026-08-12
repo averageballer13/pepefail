@@ -50,9 +50,20 @@
 
 .game:hover,
 .game:focus-visible {
-  transform: translateY(-3px);
-  border-color: var(--line-2);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 200, 40, 0.28);
+}
+
+/* The icon leans in slightly with the card. */
+.game__icon {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.game:hover .game__icon,
+.game:focus-visible .game__icon {
+  transform: scale(1.06);
 }
 
 .game:active {
@@ -72,6 +83,46 @@
 .game__art::after {
   transition: none;
 }
+
+/* =========================== BUTTONS ===========================
+   A short lift on hover and a press on click. No sheen, no scale. */
+.btn {
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out),
+    filter var(--dur-base) var(--ease-out);
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(1px); }
+
+.icon-btn,
+.section__nav button {
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-out);
+}
+.icon-btn:hover,
+.section__nav button:hover { transform: translateY(-1px); }
+.icon-btn:active,
+.section__nav button:active { transform: translateY(1px); }
+
+/* =========================== PANELS ===========================
+   Sidebar figures and the bottom CTA answer the pointer too. */
+.stat,
+.promo-card,
+.cta-strip {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out);
+}
+.stat:hover,
+.promo-card:hover { transform: translateY(-2px); border-color: var(--line-2); }
+.cta-strip:hover { border-color: rgba(255, 200, 40, 0.28); }
 
 /* =========================== OTHER SURFACES ===========================
    Same treatment: explicit properties instead of `all`. */
@@ -192,6 +243,21 @@ input:focus-visible,
   .game:focus-visible,
   .game:active,
   .game__play,
+  .game__icon,
+  .game:hover .game__icon,
+  .btn,
+  .btn:hover,
+  .btn:active,
+  .icon-btn:hover,
+  .icon-btn:active,
+  .section__nav button:hover,
+  .section__nav button:active,
+  .stat,
+  .stat:hover,
+  .promo-card,
+  .promo-card:hover,
+  .cta-strip,
+  .cta-strip:hover,
   .hero-card,
   .hero-card:hover,
   .pcard,

@@ -262,10 +262,10 @@ h1, h2, h3, .display {
 .main__inner { padding: 22px; max-width: 1500px; margin: 0 auto; }
 
 /* --- HERO --- */
-.hero { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; margin-bottom: 26px; }
+.hero { display: block; margin-bottom: 26px; }
 .hero__banner {
   position: relative; border-radius: 18px; overflow: hidden;
-  padding: 44px 40px; min-height: 290px;
+  padding: 52px 48px; min-height: 320px;
   display: flex; flex-direction: column; justify-content: center;
   background:
     linear-gradient(100deg, rgba(13,16,23,.96) 30%, rgba(13,16,23,.42) 70%),
@@ -446,8 +446,73 @@ h1, h2, h3, .display {
 .fab:hover { filter: brightness(1.08); transform: scale(1.05); }
 .fab svg { width: 24px; height: 24px; color: #201800; }
 
-.foot { color: var(--text-mute); font-size: 12px; text-align: center; padding: 20px 0 30px; line-height: 1.8; }
-.foot a { color: var(--text-dim); }
+/* ===================================================================
+   SITE FOOTER (markup injected by shell.js)
+   =================================================================== */
+.sfoot {
+  margin-top: 40px;
+  padding: 38px 0 44px;
+  border-top: 1px solid var(--line);
+}
+.sfoot__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) repeat(3, minmax(0, 1fr));
+  gap: 40px;
+}
+
+.sfoot__brand p {
+  color: var(--text-mute);
+  font-size: 12.5px;
+  line-height: 1.75;
+  margin-bottom: 12px;
+  max-width: 380px;
+}
+.sfoot__copy { color: var(--text-mute); }
+
+.sfoot__logo {
+  display: inline-flex; align-items: center; gap: 9px;
+  margin-bottom: 16px;
+}
+.sfoot__logo img { width: 30px; height: 30px; object-fit: contain; }
+.sfoot__logo span {
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 18px; letter-spacing: -0.04em;
+}
+.sfoot__logo b {
+  background: var(--grad-gold);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.sfoot__age {
+  display: inline-grid; place-items: center;
+  width: 42px; height: 42px;
+  margin-top: 6px;
+  border: 2px solid var(--line-2);
+  border-radius: 50%;
+  color: var(--text-mute);
+  font-weight: 800; font-size: 13px;
+}
+
+.sfoot__col h3 {
+  font-family: var(--font);
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .09em; text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.sfoot__col ul { list-style: none; }
+.sfoot__col li + li { margin-top: 10px; }
+.sfoot__col a {
+  color: var(--text-dim);
+  font-size: 13.5px; font-weight: 600;
+  transition: color .16s var(--ease-out, ease);
+}
+.sfoot__col a:hover { color: var(--gold); }
+
+@media (max-width: 900px) {
+  .sfoot__grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .sfoot__brand { grid-column: 1 / -1; }
+}
 
 /* ===================================================================
    PAGES DE JEU
