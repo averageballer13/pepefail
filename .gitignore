@@ -7,6 +7,9 @@ logo pepe.fail.png
 logo pepe.fail png.png
 banner pepe.fail.png
 
+# Sources haute résolution : seules les versions détourées sont déployées
+assets/img/Coin icon1.png
+
 # Système
 .DS_Store
 Thumbs.db
