@@ -54,6 +54,28 @@
           </div>
         </section>
 
+        <!-- ===== CHART =====
+             Holds the Pump.fun embed once the coin is live. Until then it
+             shows a placeholder rather than an empty iframe. -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="chart"></span>Live chart</h2>
+            <span class="tk-chip" id="chartState">Awaiting launch</span>
+          </div>
+
+          <div class="tk-chart" id="tkChart">
+            <div class="tk-chart__wait">
+              <span class="tk-chart__ico" data-ico="chart"></span>
+              <h3>The chart goes live with the coin</h3>
+              <p>
+                Price, volume and market cap stream straight from Pump.fun the moment
+                $FAIL is tradable. Nothing is simulated here in the meantime.
+              </p>
+              <div class="tk-chart__grid" aria-hidden="true"></div>
+            </div>
+          </div>
+        </section>
+
         <!-- ===== WHY THE TOKEN EXISTS ===== -->
         <section class="section">
           <div class="section__head">

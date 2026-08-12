@@ -188,6 +188,34 @@ function renderRank() {
         ? "<span>" + E.fmt(R.xp()) + " / " + E.fmt(nxt.at) + " XP</span><span>" + nxt.n + "</span>"
         : "<span>" + E.fmt(R.xp()) + " XP</span><span>Max rank</span>") +
     "</div>";
+
+  bindRankGlow(host);
+}
+
+/* The glow tracks the pointer across the bar. The position is written to
+   a custom property so the highlight is painted by CSS — no layout work
+   on a move event. */
+function bindRankGlow(host) {
+  const track = host.querySelector(".rankbar__track");
+  const fill = host.querySelector(".rankbar__fill");
+  if (!track || !fill) return;
+
+  let queued = false;
+  let pending = 0;
+
+  track.addEventListener("pointermove", function (e) {
+    const r = track.getBoundingClientRect();
+    pending = ((e.clientX - r.left) / r.width) * 100;
+    if (queued) return;
+    queued = true;
+    window.requestAnimationFrame(function () {
+      queued = false;
+      /* the highlight lives inside the fill, so map onto the fill's width */
+      const w = fill.getBoundingClientRect().width;
+      const x = w > 0 ? ((pending / 100) * r.width / w) * 100 : 50;
+      fill.style.setProperty("--mx", x.toFixed(1) + "%");
+    });
+  });
 }
 
 function openWallet(tab) {

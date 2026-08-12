@@ -292,6 +292,22 @@ h1, h2, h3, .display {
   box-shadow: 0 0 10px rgba(111, 227, 255, .55), 0 0 20px rgba(31, 168, 221, .3);
   transition: width 420ms cubic-bezier(.25, .6, .2, 1);
 }
+/* pointer-tracked highlight; shell.js writes --mx on pointermove */
+.rankbar__fill::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 999px;
+  background: radial-gradient(26px 130% at var(--mx, 50%) 50%, rgba(255, 255, 255, .6), transparent 72%);
+  opacity: 0;
+  transition: opacity 200ms var(--ease-soft, ease);
+  pointer-events: none;
+}
+.rankbar:hover .rankbar__fill::before { opacity: 1; }
+.rankbar:hover .rankbar__fill {
+  box-shadow: 0 0 16px rgba(111, 227, 255, .8), 0 0 32px rgba(31, 168, 221, .45);
+}
+.rankbar__track { cursor: crosshair; }
+
 /* a slow highlight travelling inside the liquid, nothing outside it */
 .rankbar__fill::after {
   content: "";
@@ -317,6 +333,7 @@ h1, h2, h3, .display {
 @media (prefers-reduced-motion: reduce) {
   .rankbar__fill { transition: none; }
   .rankbar__fill::after { animation: none; opacity: .18; }
+  .rankbar__fill::before { transition: none; }
 }
 
 .nav { display: flex; flex-direction: column; gap: 2px; }

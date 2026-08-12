@@ -119,14 +119,18 @@
     { k: "legend", n: "Legend",       ic: "diamond", at: 10000 },
   ];
 
+  /* Everyone starts with a sliver on the bar. A rank meter sitting at a
+     flat zero reads as broken rather than as new. */
+  var START_XP = 1;
+
   var xp = readXp();
 
   function readXp() {
     try {
       var v = parseFloat(window.localStorage.getItem(XP_KEY));
-      return isFinite(v) && v >= 0 ? v : 0;
+      return isFinite(v) && v > START_XP ? v : START_XP;
     } catch (e) {
-      return 0;
+      return START_XP;
     }
   }
 
@@ -171,7 +175,11 @@
       return span <= 0 ? 1 : clamp((xp - cur.at) / span, 0, 1);
     },
 
-    reset: function () { xp = 0; saveXp(); document.dispatchEvent(new CustomEvent("pepe:rank", { detail: { xp: 0 } })); },
+    reset: function () {
+      xp = START_XP;
+      saveXp();
+      document.dispatchEvent(new CustomEvent("pepe:rank", { detail: { xp: xp } }));
+    },
   };
 
   /* =========================== PLAY HISTORY ===========================

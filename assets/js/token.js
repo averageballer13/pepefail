@@ -13,6 +13,27 @@ const TOKEN_CA = "";
 
 hydrateIcons();
 
+/* =========================== LIVE CHART ===========================
+   Swaps the placeholder for the Pump.fun embed as soon as TOKEN_CA is
+   set. Nothing else to change at launch. */
+(function () {
+  const host = document.getElementById("tkChart");
+  const state = document.getElementById("chartState");
+  const ca = TOKEN_CA.trim();
+  if (!host || !ca) return;
+
+  const frame = document.createElement("iframe");
+  frame.src = "https://pump.fun/coin/" + encodeURIComponent(ca) + "?embed=1";
+  frame.title = "$FAIL live chart";
+  frame.loading = "lazy";
+  frame.allow = "clipboard-write";
+  frame.referrerPolicy = "no-referrer";
+
+  host.innerHTML = "";
+  host.appendChild(frame);
+  if (state) state.textContent = "Live";
+})();
+
 /* =========================== CONTRACT ADDRESS =========================== */
 (function () {
   const value = document.getElementById("caValue");
