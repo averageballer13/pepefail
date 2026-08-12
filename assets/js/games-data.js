@@ -5,8 +5,8 @@
 
 /* Only games that have a real page of their own. */
 const ORIGINALS = [
-  { n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "games/plinko.html" },
-  { n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines.html" },
+  { n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "games/plinko.html", img: "assets/img/games/plinko.jpg" },
+  { n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines.html", img: "assets/img/games/mines.jpg" },
   { n: "Dice", p: "pepe.fail", ic: "dice", tag: "ORIGINAL", ac: "gold", href: "games/dice.html" },
   { n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "games/crash.html" },
   { n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo.html" },
@@ -40,18 +40,25 @@ const LIVE_GAMES = [
   { n: "Gold Bar Roulette", p: "Evolution", ic: "coin", tag: "LIVE", ac: "orange" },
 ];
 
-/* --- Builds a single game thumbnail --- */
+/* --- Builds a single game thumbnail ---
+   A game with `img` shows its poster; the others fall back to the icon
+   treatment, so both can sit in the same row while artwork is produced. */
 function gameCard(g, base) {
   const b = base || "";
   const href = g.href ? b + g.href : "#";
   const el = document.createElement("a");
   el.className = "game";
   el.href = href;
+
+  const art = g.img
+    ? `<img class="game__poster" src="${b + g.img}" alt="${g.n}" loading="lazy" />`
+    : `<div class="game__icon">${icon(g.ic)}</div>`;
+
   el.innerHTML = `
-    <div class="game__art game__art--${g.ac || "gold"}">
+    <div class="game__art game__art--${g.ac || "gold"}${g.img ? " has-poster" : ""}">
       ${g.tag ? `<span class="game__tag">${g.tag}</span>` : ""}
       ${g.hot ? `<span class="game__hot">${iconSolid("flame")}</span>` : ""}
-      <div class="game__icon">${icon(g.ic)}</div>
+      ${art}
       <div class="game__play"><button class="btn btn--gold">Play ▶</button></div>
     </div>
     <div class="game__meta">

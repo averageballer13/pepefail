@@ -434,10 +434,21 @@ h1, h2, h3, .display {
 }
 .game:hover { transform: translateY(-4px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 0 1px rgba(255,200,40,.25); }
 .game__art {
-  aspect-ratio: 3/4; position: relative;
+  aspect-ratio: 2/3; position: relative;
   display: grid; place-items: center;
+  overflow: hidden;
   background: radial-gradient(120% 100% at 50% 0%, #1c2233 0%, #0b0e15 70%);
 }
+
+/* --- Poster artwork: fills the tile, no icon halo behind it --- */
+.game__poster {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.game__art.has-poster { background: var(--bg-900); }
+.game__art.has-poster::after { content: none; }
 /* Halo derrière l'icône */
 .game__art::after {
   content: ""; position: absolute; width: 68%; aspect-ratio: 1; border-radius: 50%;
