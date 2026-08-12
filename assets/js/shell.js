@@ -88,7 +88,7 @@ function shortAddress(addr) {
   return a.length <= 10 ? a : a.slice(0, 4) + "…" + a.slice(-4);
 }
 
-/* Opens the log-in explainer modal (this mockup has no accounts). */
+/* Opens the log-in explainer modal — there are no accounts to sign into. */
 function openLogInModal() {
   if (!window.PepeModal) return;
   window.PepeModal.open({

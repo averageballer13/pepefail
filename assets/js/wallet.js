@@ -887,10 +887,7 @@
         escapeHtml(address) +
         "</div>" +
         copyButton("address", "Copy address") +
-        '<p class="pm-note" style="margin-top:12px">Solana (SOL) only. Assets sent from another network will not arrive.</p>' +
-        '<div class="pm-alert pm-alert--warn" style="margin-top:12px">' +
-        wIcon("alert") +
-        "<span>pepe.fail is a demonstration mock-up, not a real casino. Do not deposit real funds.</span></div>"
+        '<p class="pm-note" style="margin-top:12px">Solana (SOL) only. Assets sent from another network will not arrive.</p>'
     );
 
     bindCopy(handle, '[data-copy="address"]', function () {

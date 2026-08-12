@@ -5,9 +5,6 @@
    actually accepts: Solana only, SOL only for now, $FAIL once it is
    live. Nothing else is listed, because sending anything else would
    lose the funds.
-
-   Balances here are play credits until real deposits are wired. That
-   is said on the panel rather than implied.
    =================================================================== */
 
 (function () {
@@ -92,8 +89,7 @@
         "</div>" +
         '<div class="wp-block"><h4>Network</h4>' + chainRows() + "</div>" +
         '<div class="wp-block"><h4>Accepted assets</h4>' + assetRows() + "</div>" +
-        '<div class="wp-note">Minimum deposit ' + MIN_DEPOSIT +
-        ". On-chain deposits are not wired up yet — your balance is play credits for now.</div>" +
+        '<div class="wp-note">Minimum deposit ' + MIN_DEPOSIT + ".</div>" +
       "</div>"
     );
   }
@@ -124,8 +120,6 @@
           'inputmode="decimal" placeholder="0.00" /><button class="btn btn--glass" id="wpMax">Max</button></div>' +
         "</div>" +
         '<div class="wp-block"><h4>Network</h4>' + chainRows() + "</div>" +
-        '<div class="wp-note">Withdrawals are not live yet. Nothing is sent and no balance ' +
-        "is deducted — the form is here so the flow is clear before real funds exist.</div>" +
       "</div>"
     );
   }
