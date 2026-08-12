@@ -173,6 +173,157 @@
 .bj-msg.is-lose { color: var(--red); }
 .bj-msg.is-push { color: var(--text-dim); }
 
+/* =========================== BALANCE CHIP =========================== */
+.bal-chip {
+  display: inline-flex; align-items: center; gap: 9px;
+  height: 42px; padding: 0 6px 0 12px;
+  border-radius: 10px;
+  background: var(--bg-800);
+  border: 1px solid var(--line-2);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 15px; letter-spacing: -0.02em;
+  transition:
+    border-color var(--dur-base, 260ms) var(--ease-soft, ease),
+    background-color var(--dur-base, 260ms) var(--ease-soft, ease);
+}
+.bal-chip:hover { border-color: rgba(255, 210, 30, .45); background: var(--hover); }
+.bal-chip__ico { display: grid; place-items: center; width: 17px; height: 17px; color: var(--gold); }
+.bal-chip__ico svg { width: 100%; height: 100%; }
+.bal-chip__plus {
+  display: grid; place-items: center;
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--grad-gold);
+  color: #201800;
+}
+.bal-chip__plus svg { width: 15px; height: 15px; }
+
+@media (max-width: 900px) {
+  .bal-chip__v { display: none; }
+  .bal-chip { padding: 0 6px 0 8px; }
+}
+
+/* =========================== WALLET PANEL =========================== */
+.wp-tabs {
+  display: flex; gap: 8px;
+  margin-bottom: 18px;
+}
+.wp-tab {
+  flex: 1;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; border-radius: 10px;
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid var(--line-2);
+  color: var(--text-dim);
+  font-weight: 700; font-size: 13.5px;
+  transition: background-color .2s ease, color .2s ease, border-color .2s ease;
+}
+.wp-tab svg { width: 16px; height: 16px; }
+.wp-tab:hover { color: var(--text); }
+.wp-tab.is-on {
+  background: var(--grad-gold); color: #201800;
+  border-color: transparent;
+}
+
+.wp-lead { color: var(--text-dim); font-size: 13.5px; line-height: 1.7; margin-bottom: 16px; }
+
+.wp-block { margin-bottom: 18px; }
+.wp-block h4 {
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 9px;
+}
+
+.wp-addr {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px 10px 13px;
+  border-radius: 10px;
+  background: var(--bg-900);
+  border: 1px solid var(--line-2);
+}
+.wp-addr code {
+  flex: 1; min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wp-addr .btn { flex: none; height: 34px; padding: 0 15px; }
+
+.wp-warn {
+  display: flex; gap: 9px; align-items: flex-start;
+  margin-top: 10px; padding: 11px 12px;
+  border-radius: 9px;
+  background: rgba(255, 122, 0, .07);
+  border: 1px solid rgba(255, 122, 0, .22);
+  color: var(--orange-hi);
+  font-size: 12.5px; line-height: 1.6;
+}
+.wp-warn svg { width: 16px; height: 16px; flex: none; margin-top: 1px; }
+
+.wp-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 13px;
+  border-radius: 10px;
+  background: var(--bg-800);
+  border: 1px solid var(--line);
+}
+.wp-row + .wp-row { margin-top: 7px; }
+.wp-row__ico { display: grid; place-items: center; width: 20px; height: 20px; color: var(--gold); flex: none; }
+.wp-row__ico svg { width: 100%; height: 100%; }
+.wp-row__n {
+  display: flex; flex-direction: column; line-height: 1.3;
+  font-size: 13.5px; font-weight: 700;
+}
+.wp-row__n i { font-style: normal; font-size: 11.5px; font-weight: 600; color: var(--text-mute); }
+.wp-row__tag {
+  margin-left: auto;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 9px; border-radius: 6px;
+  background: rgba(74, 222, 128, .1);
+  color: var(--green);
+}
+.wp-row.is-off { opacity: .6; }
+.wp-row.is-off .wp-row__ico { color: var(--text-mute); }
+.wp-row.is-off .wp-row__tag { background: rgba(255, 255, 255, .06); color: var(--text-mute); }
+
+.wp-bal {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--bg-900);
+  border: 1px solid var(--line-2);
+}
+.wp-bal span { display: grid; place-items: center; width: 20px; height: 20px; color: var(--gold); }
+.wp-bal span svg { width: 100%; height: 100%; }
+.wp-bal b { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
+
+.wp-input {
+  width: 100%; height: 42px;
+  padding: 0 12px;
+  border-radius: 10px;
+  background: var(--bg-900);
+  border: 1px solid var(--line-2);
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  outline: none;
+  transition: border-color .18s ease;
+}
+.wp-input:focus { border-color: var(--gold); }
+.wp-input.is-bad { border-color: var(--red); }
+.wp-err { color: var(--red); font-size: 12px; margin-top: 7px; min-height: 16px; }
+
+.wp-amt { display: flex; gap: 9px; }
+.wp-amt .btn { flex: none; height: 42px; }
+
+.wp-note {
+  color: var(--text-mute);
+  font-size: 12px; line-height: 1.65;
+  padding-top: 4px;
+}
+
 /* =========================== EMPTY STATES =========================== */
 .row-empty {
   padding: 26px 22px;

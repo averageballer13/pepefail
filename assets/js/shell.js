@@ -113,42 +113,58 @@ function openLogInModal() {
   });
 }
 
-/* Renders either Log In + Create Wallet, or the connected wallet chip. */
+/* Balance chip + wallet control.
+   The balance is always shown: it is the number the player actually
+   cares about, and hiding it behind a menu is hostile. */
 function renderAuth() {
   const slot = document.getElementById("topbarAuth");
   if (!slot) return;
   slot.innerHTML = "";
 
-  const addr = walletAddress();
+  const E = window.PepeEngine;
 
-  if (addr) {
-    const chip = document.createElement("button");
-    chip.className = "btn btn--glass";
-    chip.title = "Open wallet";
-    chip.style.fontFamily = MONO_STACK;
-    chip.style.letterSpacing = ".01em";
-    chip.textContent = shortAddress(addr);
-    chip.addEventListener("click", function () {
-      if (window.PepeWallet) window.PepeWallet.open();
+  /* --- balance --- */
+  if (E) {
+    const bal = document.createElement("button");
+    bal.className = "bal-chip";
+    bal.title = "Balance — open wallet";
+    bal.innerHTML =
+      '<span class="bal-chip__ico">' + icon("coin", 2) + "</span>" +
+      '<span class="bal-chip__v" id="balValue">' + E.fmt(E.Bank.get()) + "</span>" +
+      '<span class="bal-chip__plus">' + icon("plus", 2) + "</span>";
+    bal.addEventListener("click", () => openWallet("deposit"));
+    slot.appendChild(bal);
+
+    document.addEventListener("pepe:balance", function () {
+      const el = document.getElementById("balValue");
+      if (el) el.textContent = E.fmt(E.Bank.get());
     });
-    slot.appendChild(chip);
-    return;
   }
 
-  const login = document.createElement("button");
-  login.className = "btn btn--glass";
-  login.textContent = "Log In";
-  login.addEventListener("click", openLogInModal);
+  /* --- wallet --- */
+  const addr = walletAddress();
+  const btn = document.createElement("button");
 
-  const create = document.createElement("button");
-  create.className = "btn btn--gold";
-  create.textContent = "Create Wallet";
-  create.addEventListener("click", function () {
-    if (window.PepeWallet) window.PepeWallet.startCreateFlow();
+  if (addr) {
+    btn.className = "btn btn--glass";
+    btn.title = "Manage wallet";
+    btn.style.fontFamily = MONO_STACK;
+    btn.style.letterSpacing = ".01em";
+    btn.textContent = shortAddress(addr);
+  } else {
+    btn.className = "btn btn--gold";
+    btn.textContent = "Create Wallet";
+  }
+  btn.addEventListener("click", function () {
+    if (addr) openWallet("deposit");
+    else if (window.PepeWallet) window.PepeWallet.startCreateFlow();
   });
+  slot.appendChild(btn);
+}
 
-  slot.appendChild(login);
-  slot.appendChild(create);
+function openWallet(tab) {
+  if (window.PepeWalletPanel) window.PepeWalletPanel.open(tab);
+  else if (window.PepeWallet) window.PepeWallet.open();
 }
 
 /* ===================================================================
@@ -176,8 +192,7 @@ function renderShell() {
     <div class="topbar__spacer"></div>
     <button class="icon-btn glass" title="Search">${icon("search", 2)}</button>
     <button class="icon-btn glass" title="Rewards">${icon("gift", 2)}</button>
-    <div class="topbar__auth" id="topbarAuth"></div>
-    <button class="icon-btn glass" title="Chat">${icon("chat", 2)}</button>`;
+    <div class="topbar__auth" id="topbarAuth"></div>`;
 
   /* Sidebar */
   const sidebar = document.createElement("aside");

@@ -53,11 +53,12 @@
 
   <script>window.PAGE = { active: "vip", base: "../" };</script>
   <script src="../assets/js/icons.js"></script>
-  <script src="../assets/js/shell.js"></script>
   <script src="../assets/js/engine.js"></script>
+  <script src="../assets/js/shell.js"></script>
   <script src="../assets/js/games-data.js"></script>
   <script src="../assets/js/modal.js"></script>
   <script src="../assets/js/wallet.js"></script>
+  <script src="../assets/js/wallet-panel.js"></script>
   <script src="../assets/js/anim.js"></script>
   <script>
     hydrateIcons();
@@ -99,21 +100,6 @@
       '</div>';
     }).join("");
 
-    /* The bonus button routes to the wallet flow when it is available */
-    document.getElementById("claimBonus").addEventListener("click", function () {
-      if (window.PepeWallet && typeof window.PepeWallet.startCreateFlow === "function") {
-        window.PepeWallet.startCreateFlow();
-      } else if (window.PepeModal && typeof window.PepeModal.open === "function") {
-        window.PepeModal.open({
-          title: "Welcome Bonus",
-          subtitle: "Casino",
-          size: "sm",
-          trust: true,
-          body: '<p style="color:var(--text-dim);font-size:14px;line-height:1.6;margin:0">Create a demo wallet first to claim this bonus.</p>',
-          actions: [{ label: "Got it", variant: "glass", onClick: function () { window.PepeModal.close(); } }]
-        });
-      }
-    });
   </script>
 </body>
 </html>
