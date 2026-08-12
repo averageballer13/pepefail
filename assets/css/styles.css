@@ -235,11 +235,23 @@ h1, h2, h3, .display {
 .nav__item .chev { margin-left: auto; transition: 0.2s; opacity: .6; width: 15px; height: 15px; }
 
 .nav__group { margin-top: 4px; }
-.nav__sub { display: flex; flex-direction: column; overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
-.nav__group.open .nav__sub { max-height: 360px; }
+
+/* Sub-items sit clearly inside the group: indented, smaller, and hung off
+   a thin rail that lines up under the parent icon. */
+.nav__sub {
+  display: flex; flex-direction: column;
+  overflow: hidden; max-height: 0;
+  margin: 0 0 0 21px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+  transition: max-height 0.3s ease;
+}
+.nav__group.open .nav__sub { max-height: 420px; }
 .nav__group.open > .nav__item .chev { transform: rotate(180deg); }
-.nav__sub .nav__item { padding-left: 14px; font-size: 13.5px; }
+.nav__sub .nav__item { padding: 8px 10px; font-size: 13.5px; gap: 9px; }
 .nav__sub .nav__item svg { width: 16px; height: 16px; }
+/* the rail already marks the group, so the active bar hugs the item */
+.nav__sub .nav__item.active::before { left: -13px; }
 
 .nav__divider { height: 1px; background: var(--line); margin: 12px 6px; }
 

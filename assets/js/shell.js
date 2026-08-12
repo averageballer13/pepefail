@@ -15,14 +15,19 @@ const NAV_MAIN = [
   { k: "recent", ic: "clock", t: "Recently Played", href: B + "pages/recent.html" },
 ];
 
+/* One group, listing every game mode that has a page of its own.
+   There is no per-category landing page: the group is the menu. */
 const NAV_GROUPS = [
   {
     k: "casino", ic: "chip", t: "Casino", open: true,
     items: [
-      { k: "slots", ic: "slot", t: "Slots", href: B + "pages/slots.html" },
-      { k: "live", ic: "cards", t: "Live Games", href: B + "pages/live.html" },
+      { k: "plinko", ic: "plinko", t: "Plinko", href: B + "games/plinko.html" },
+      { k: "mines", ic: "bomb", t: "Mines", href: B + "games/mines.html" },
+      { k: "dice", ic: "dice", t: "Dice", href: B + "games/dice.html" },
+      { k: "crash", ic: "rocket", t: "Crash", href: B + "games/crash.html" },
+      { k: "limbo", ic: "chart", t: "Limbo", href: B + "games/limbo.html" },
+      { k: "wheel", ic: "wheel", t: "Wheel", href: B + "games/wheel.html" },
       { k: "blackjack", ic: "spade", t: "Blackjack", href: B + "games/blackjack.html" },
-      { k: "roulette", ic: "wheel", t: "Roulette", href: B + "pages/live.html" },
     ],
   },
 ];
