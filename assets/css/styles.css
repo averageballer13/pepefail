@@ -133,6 +133,10 @@ h1, h2, h3, .display {
 }
 .topbar__spacer { flex: 1; }
 
+/* Wallet area: shell.js drops one or two buttons in here, so it has to lay
+   them out itself — without this they stack and spill out of the topbar. */
+.topbar__auth { display: flex; align-items: center; gap: 10px; flex: none; }
+
 .icon-btn {
   width: 42px; height: 42px;
   display: grid; place-items: center;
@@ -800,6 +804,11 @@ h1, h2, h3, .display {
 @media (max-width: 1080px) {
   .hero { grid-template-columns: 1fr; }
   .hero__cards { grid-template-rows: none; grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 1040px) {
+  /* the search and gift shortcuts are the first thing to go when the
+     topbar runs out of room — the wallet buttons matter more */
+  .topbar .icon-btn:not(:last-child) { display: none; }
 }
 @media (max-width: 820px) {
   .app { grid-template-columns: 1fr; grid-template-areas: "brand" "topbar" "main"; grid-template-rows: var(--topbar-h) var(--topbar-h) 1fr; }
