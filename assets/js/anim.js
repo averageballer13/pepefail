@@ -20,6 +20,87 @@
        never intersect it and would stay invisible forever.
    =================================================================== */
 
+/* ===================================================================
+   PAGE TRANSITION
+
+   Pages fade in on arrival and fade out before navigating away, so a
+   click does not slam the next screen into place.
+
+   The hiding class goes on <html> from script, never from the stylesheet:
+   if this file fails to load, nothing is ever hidden.
+   =================================================================== */
+(function () {
+  "use strict";
+
+  var root = document.documentElement;
+
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  root.classList.add("pg-anim");
+
+  function ready() {
+    root.classList.add("pg-ready");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", ready);
+  } else {
+    ready();
+  }
+  /* belt and braces: never leave the page hidden */
+  window.setTimeout(ready, 700);
+  window.addEventListener("pageshow", function (e) {
+    /* restored from the back/forward cache with .pg-leaving still set */
+    root.classList.remove("pg-leaving");
+    ready();
+  });
+
+  /* --- Fade out before following an internal link --- */
+  var LEAVE_MS = 190;
+  var leaving = false;
+
+  function isPlainLeftClick(e) {
+    return e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+  }
+
+  document.addEventListener("click", function (e) {
+    if (leaving || !isPlainLeftClick(e) || e.defaultPrevented) return;
+
+    var a = e.target.closest && e.target.closest("a[href]");
+    if (!a) return;
+
+    /* leave anything we do not own to the browser */
+    if (a.target && a.target !== "_self") return;
+    if (a.hasAttribute("download")) return;
+
+    var href = a.getAttribute("href");
+    if (!href || href[0] === "#") return;
+    if (/^(mailto:|tel:|javascript:)/i.test(href)) return;
+
+    var url;
+    try {
+      url = new URL(a.href, location.href);
+    } catch (err) {
+      return;
+    }
+    if (url.origin !== location.origin) return;
+    /* same page, different anchor: let the browser jump */
+    if (url.pathname === location.pathname && url.search === location.search) return;
+
+    e.preventDefault();
+    leaving = true;
+    root.classList.add("pg-leaving");
+    window.setTimeout(function () {
+      location.href = url.href;
+    }, LEAVE_MS);
+  });
+})();
+
+/* ===================================================================
+   SCROLL REVEAL
+   =================================================================== */
 (function () {
   "use strict";
 

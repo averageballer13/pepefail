@@ -4,7 +4,7 @@
 
    Rules of this file:
    - only transform and opacity are animated;
-   - state transitions stay between 120ms and 260ms;
+   - state changes ease in over ~250ms rather than snapping;
    - nothing loops, nothing moves without a user action
      (the single exception is the loading skeleton);
    - the pre-reveal state (opacity: 0) is NEVER set here on its own:
@@ -14,9 +14,33 @@
 
 :root {
   --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
-  --dur-fast: 140ms;
-  --dur-base: 180ms;
-  --dur-reveal: 220ms;
+  /* soft settle: slower tail, so hovers read as gliding rather than snapping */
+  --ease-soft: cubic-bezier(0.25, 0.6, 0.2, 1);
+  --dur-fast: 200ms;
+  --dur-base: 260ms;
+  --dur-reveal: 300ms;
+  --dur-page: 260ms;
+}
+
+/* =========================== PAGE TRANSITION ===========================
+   anim.js sets .pg-ready on <html> as soon as it runs, and .pg-leaving
+   just before navigating away. Without the script nothing is hidden, so
+   a JS failure can never leave a blank page. */
+html.pg-anim body {
+  opacity: 0.001;
+}
+html.pg-anim.pg-ready body {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--dur-page) var(--ease-soft),
+    transform var(--dur-page) var(--ease-soft);
+}
+html.pg-anim.pg-leaving body {
+  opacity: 0.001;
+  transition:
+    opacity 190ms var(--ease-soft),
+    transform 190ms var(--ease-soft);
 }
 
 /* =========================== SCROLL REVEAL ===========================
@@ -59,11 +83,41 @@
 
 /* The icon leans in slightly with the card. */
 .game__icon {
-  transition: transform var(--dur-base) var(--ease-out);
+  transition: transform var(--dur-base) var(--ease-soft);
 }
 .game:hover .game__icon,
 .game:focus-visible .game__icon {
   transform: scale(1.06);
+}
+
+/* Poster tiles: the artwork breathes instead of the icon. */
+.game__poster {
+  transition: transform 320ms var(--ease-soft);
+}
+.game:hover .game__poster,
+.game:focus-visible .game__poster {
+  transform: scale(1.04);
+}
+
+/* The caption drifts left as the card lifts. The provider line trails the
+   title slightly, which is what makes the move read as motion rather than
+   as a jump. */
+.game__name,
+.game__prov {
+  transition:
+    transform 300ms var(--ease-soft),
+    color 300ms var(--ease-soft);
+}
+.game__prov { transition-delay: 40ms; }
+
+.game:hover .game__name,
+.game:focus-visible .game__name {
+  transform: translateX(-4px);
+  color: var(--gold);
+}
+.game:hover .game__prov,
+.game:focus-visible .game__prov {
+  transform: translateX(-4px);
 }
 
 .game:active {
@@ -85,31 +139,44 @@
 }
 
 /* =========================== BUTTONS ===========================
-   A short lift on hover and a press on click. No sheen, no scale. */
+   Hover eases in over ~260ms; the press is deliberately quicker, because
+   a click has to feel answered immediately. */
 .btn {
   transition:
-    transform var(--dur-fast) var(--ease-out),
-    box-shadow var(--dur-base) var(--ease-out),
-    background-color var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out),
-    color var(--dur-base) var(--ease-out),
-    filter var(--dur-base) var(--ease-out);
+    transform var(--dur-base) var(--ease-soft),
+    box-shadow var(--dur-base) var(--ease-soft),
+    background-color var(--dur-base) var(--ease-soft),
+    border-color var(--dur-base) var(--ease-soft),
+    color var(--dur-base) var(--ease-soft),
+    filter var(--dur-base) var(--ease-soft);
 }
-.btn:hover { transform: translateY(-1px); }
-.btn:active { transform: translateY(1px); }
+.btn:hover { transform: translateY(-2px); }
+.btn:active {
+  transform: translateY(1px);
+  transition-duration: 80ms;
+}
 
 .icon-btn,
-.section__nav button {
+.section__nav button,
+.nav__item,
+.section__all,
+.sfoot__col a {
   transition:
-    transform var(--dur-fast) var(--ease-out),
-    background-color var(--dur-base) var(--ease-out),
-    border-color var(--dur-base) var(--ease-out),
-    color var(--dur-base) var(--ease-out);
+    transform var(--dur-base) var(--ease-soft),
+    background-color var(--dur-base) var(--ease-soft),
+    border-color var(--dur-base) var(--ease-soft),
+    color var(--dur-base) var(--ease-soft);
 }
 .icon-btn:hover,
-.section__nav button:hover { transform: translateY(-1px); }
+.section__nav button:hover { transform: translateY(-2px); }
 .icon-btn:active,
-.section__nav button:active { transform: translateY(1px); }
+.section__nav button:active { transform: translateY(1px); transition-duration: 80ms; }
+
+/* Menu rows and footer links slide a touch on hover, same language as the
+   game captions. */
+.nav__item:hover { transform: translateX(2px); }
+.sfoot__col a:hover { transform: translateX(2px); }
+.section__all:hover { transform: translateX(2px); }
 
 /* =========================== PANELS ===========================
    Sidebar figures and the bottom CTA answer the pointer too. */
@@ -245,6 +312,16 @@ input:focus-visible,
   .game__play,
   .game__icon,
   .game:hover .game__icon,
+  .game__poster,
+  .game:hover .game__poster,
+  .game__name,
+  .game__prov,
+  .game:hover .game__name,
+  .game:hover .game__prov,
+  .nav__item:hover,
+  .sfoot__col a,
+  .sfoot__col a:hover,
+  .section__all:hover,
   .btn,
   .btn:hover,
   .btn:active,
