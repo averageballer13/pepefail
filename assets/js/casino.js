@@ -29,45 +29,7 @@ function startWallet() {
   return false;
 }
 
-/* Sign-up style buttons: explain the mockup, then offer the wallet flow. */
-function openSignupModal() {
-  if (!window.PepeModal || typeof window.PepeModal.open !== "function") {
-    startWallet();
-    return;
-  }
-  window.PepeModal.open({
-    title: "Join pepe.fail",
-    subtitle: "No email, no password — just a wallet.",
-    size: "sm",
-    trust: true,
-    body:
-      '<p style="color:var(--text-dim);font-size:14px;line-height:1.6;margin:0">' +
-      "This site is a demonstration mockup. Nothing here uses real money. " +
-      "Create a demo wallet to keep your balance and history on this device." +
-      "</p>",
-    actions: [
-      {
-        label: "Create Wallet",
-        variant: "gold",
-        onClick: function () {
-          window.PepeModal.close();
-          startWallet();
-        },
-      },
-      {
-        label: "Not now",
-        variant: "glass",
-        onClick: function () {
-          window.PepeModal.close();
-        },
-      },
-    ],
-  });
-}
-
-const heroWallet = document.getElementById("heroWallet");
-if (heroWallet) heroWallet.addEventListener("click", startWallet);
-
-document.querySelectorAll("[data-signup]").forEach(function (btn) {
-  btn.addEventListener("click", openSignupModal);
+["heroWallet", "ctaWallet"].forEach(function (id) {
+  const btn = document.getElementById(id);
+  if (btn) btn.addEventListener("click", startWallet);
 });

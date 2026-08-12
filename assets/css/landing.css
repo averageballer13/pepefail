@@ -55,15 +55,11 @@ body {
 }
 
 /* =========================== BRAND =========================== */
+/* Raw transparent PNG: no frame, no radius, no shadow. */
 .landing__logo {
   width: 120px;
   height: 120px;
-  border-radius: 28px;
-  object-fit: cover;
-  border: 1px solid var(--line-2);
-  box-shadow:
-    0 22px 48px rgba(0, 0, 0, 0.55),
-    0 0 44px rgba(255, 200, 40, 0.10);
+  object-fit: contain;
 }
 
 .landing__wordmark {
@@ -180,7 +176,7 @@ body {
 /* =========================== RESPONSIVE =========================== */
 @media (max-width: 640px) {
   .landing { gap: 40px; padding: 56px 20px 24px; }
-  .landing__logo { width: 104px; height: 104px; border-radius: 24px; }
+  .landing__logo { width: 104px; height: 104px; }
   .landing__eyebrow { margin-top: 44px; }
   .landing__sub { font-size: 14.5px; }
 }

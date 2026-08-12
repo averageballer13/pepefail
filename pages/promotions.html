@@ -42,7 +42,7 @@
         </div>
 
         <div class="foot">
-          pepe.fail — Demonstration mockup only. Not a real casino, no real-money gambling.<br>
+          © 2026 pepe.fail — Casino<br>
           Play responsibly · 18+
         </div>
 
@@ -62,12 +62,12 @@
 
     /* Promotion cards */
     const PROMOS = [
-      { ic: "trophy", t: "Daily Race", s: "Climb the leaderboard every day and share the prize pool.", amt: "$25,000", timer: "01:01:10", ac: "" },
-      { ic: "trophy", t: "Weekly Race", s: "One week, one leaderboard, one big pool to share.", amt: "$100,000", timer: "3d", ac: "orange" },
-      { ic: "diamond", t: "Monthly Race", s: "The biggest race of the month for the most active players.", amt: "$500,000", timer: "20d", ac: "" },
-      { ic: "ticket", t: "Weekly Draw", s: "One ticket for every $100 wagered. Drawn every Sunday.", amt: "$20,000", timer: "4d", ac: "orange" },
-      { ic: "target", t: "Challenges", s: "Daily objectives on your favorite games, instant payouts.", amt: "$5,000", timer: "Active", ac: "" },
-      { ic: "coin", t: "Rakeback", s: "Get a share of every bet back, win or lose.", amt: "Up to 20%", timer: "Always on", ac: "orange" },
+      { ic: "trophy", t: "Daily Race", s: "Climb the leaderboard every day and share the prize pool.", amt: "$0", timer: "Soon", ac: "" },
+      { ic: "trophy", t: "Weekly Race", s: "One week, one leaderboard, one big pool to share.", amt: "$0", timer: "Soon", ac: "orange" },
+      { ic: "diamond", t: "Monthly Race", s: "The biggest race of the month for the most active players.", amt: "$0", timer: "Soon", ac: "" },
+      { ic: "ticket", t: "Weekly Draw", s: "One ticket for every bet you place. Drawn every Sunday.", amt: "$0", timer: "Soon", ac: "orange" },
+      { ic: "target", t: "Challenges", s: "Daily objectives on your favorite games, instant payouts.", amt: "$0", timer: "Soon", ac: "" },
+      { ic: "coin", t: "Rakeback", s: "Get a share of every bet back, win or lose.", amt: "$0", timer: "Soon", ac: "orange" },
     ];
 
     document.getElementById("promos").innerHTML = PROMOS.map(function (p) {
@@ -82,11 +82,11 @@
 
     /* VIP ladder */
     const VIPS = [
-      { n: "Tadpole", w: "$0", ic: "chip" },
-      { n: "Frog", w: "$10K", ic: "frog" },
-      { n: "Golden Frog", w: "$100K", ic: "star", cur: true },
-      { n: "King Pepe", w: "$1M", ic: "crown" },
-      { n: "Legend", w: "$10M", ic: "diamond" },
+      { n: "Tadpole", w: "$0", ic: "chip", cur: true },
+      { n: "Frog", w: "$0", ic: "frog" },
+      { n: "Golden Frog", w: "$0", ic: "star" },
+      { n: "King Pepe", w: "$0", ic: "crown" },
+      { n: "Legend", w: "$0", ic: "diamond" },
     ];
 
     document.getElementById("vips").innerHTML = VIPS.map(function (v) {
@@ -104,7 +104,7 @@
       } else if (window.PepeModal && typeof window.PepeModal.open === "function") {
         window.PepeModal.open({
           title: "Welcome Bonus",
-          subtitle: "Demonstration mockup — no real money involved.",
+          subtitle: "Casino",
           size: "sm",
           trust: true,
           body: '<p style="color:var(--text-dim);font-size:14px;line-height:1.6;margin:0">Create a demo wallet first to claim this bonus.</p>',

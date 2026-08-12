@@ -71,7 +71,7 @@ function openLogInModal() {
   if (!window.PepeModal) return;
   window.PepeModal.open({
     title: "Log In",
-    subtitle: "Demo mockup — no real accounts",
+    subtitle: "Casino",
     body:
       "<p>pepe.fail runs entirely in your browser. There is no account to sign into — " +
       "create a local wallet instead and your balance stays on this device.</p>",
@@ -162,15 +162,14 @@ function renderShell() {
   sidebar.innerHTML = `
     <div class="promo-card">
       <div class="promo-card__ico">${icon("ticket")}</div>
-      <div class="promo-card__badge">4d</div>
-      <div class="promo-card__amount">$20,000</div>
+      <div class="promo-card__amount">$0</div>
       <div class="promo-card__label">WEEKLY DRAW</div>
     </div>
 
     <div class="stats">
-      <div class="stat"><div class="stat__k">Daily</div><div class="stat__v">$25K</div></div>
-      <div class="stat"><div class="stat__k">Weekly</div><div class="stat__v">$100K</div></div>
-      <div class="stat"><div class="stat__k">Monthly</div><div class="stat__v">$500K</div></div>
+      <div class="stat"><div class="stat__k">Daily</div><div class="stat__v">$0</div></div>
+      <div class="stat"><div class="stat__k">Weekly</div><div class="stat__v">$0</div></div>
+      <div class="stat"><div class="stat__k">Monthly</div><div class="stat__v">$0</div></div>
     </div>
 
     <nav class="nav">
