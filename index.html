@@ -1,123 +1,67 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pepe.fail — Casino</title>
+  <title>pepe.fail — Provably fair casino on Solana</title>
+  <meta name="description" content="pepe.fail is a provably fair casino on Solana. Your funds stay in your own wallet until you place a bet." />
   <link rel="icon" type="image/png" href="assets/img/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/glass.css" />
+  <link rel="stylesheet" href="assets/css/anim.css" />
+  <link rel="stylesheet" href="assets/css/modal.css" />
+  <link rel="stylesheet" href="assets/css/landing.css" />
 </head>
 <body>
-  <div class="app">
-    <main class="main">
-      <div class="main__inner">
 
-        <!-- HERO -->
-        <section class="hero">
-          <div class="hero__banner">
-            <h1 class="hero__title">Jouez sans <b>Limites</b> avec la Frog</h1>
-            <p class="hero__sub">Machines à sous, jeux originaux et paris sportifs. Rejoignez la horde et tentez votre chance.</p>
-            <div class="hero__cta">
-              <button class="btn btn--orange btn--lg">S'inscrire →</button>
-              <span class="hero__or">ou</span>
-              <div class="pay-pills">
-                <span style="background:#f7931a;color:#2a1400">₿</span>
-                <span style="background:#627eea;color:#fff">Ξ</span>
-                <span style="background:#26a17b;color:#fff">₮</span>
-                <span style="background:#2775ca;color:#fff">$</span>
-              </div>
-            </div>
-          </div>
+  <main class="landing">
+    <div class="landing__inner">
 
-          <div class="hero__cards">
-            <a class="hero-card hero-card--casino" href="pages/slots.html">
-              <div class="hero-card__grid"></div>
-              <div class="hero-card__body">
-                <div class="hero-card__title" id="hcCasino">Casino <span class="hero-card__arrow">→</span></div>
-              </div>
-            </a>
-            <a class="hero-card hero-card--sport" href="pages/live.html">
-              <div class="hero-card__grid"></div>
-              <div class="hero-card__body">
-                <div class="hero-card__title" id="hcSport">Jeux en Direct <span class="hero-card__arrow">→</span></div>
-              </div>
-            </a>
-          </div>
-        </section>
+      <img class="landing__logo" data-rise src="assets/img/logo.png" alt="pepe.fail" width="120" height="120" />
 
-        <!-- VICTOIRES EN DIRECT -->
-        <section class="section">
-          <div class="live-wrap">
-            <div class="live-badge"><span class="live-dot"></span>Victoires<br>en Direct</div>
-            <div class="live-track" id="liveTrack"></div>
-          </div>
-        </section>
+      <div class="landing__wordmark" data-rise>PEPE<span>.FAIL</span></div>
 
-        <!-- ORIGINAUX -->
-        <section class="section">
-          <div class="section__head">
-            <h2 class="section__title"><span class="ico" data-ico="diamond"></span>Jeux Originaux</h2>
-            <a class="section__all" href="pages/nouveautes.html">Voir tout</a>
-            <div class="section__nav">
-              <button data-scroll="originals" data-dir="-1" data-ico="arrowL"></button>
-              <button data-scroll="originals" data-dir="1" data-ico="arrowR"></button>
-            </div>
-          </div>
-          <div class="game-row" id="originals"></div>
-        </section>
+      <p class="landing__eyebrow" data-rise>Provably fair casino on Solana</p>
 
-        <!-- MACHINES À SOUS -->
-        <section class="section">
-          <div class="section__head">
-            <h2 class="section__title"><span class="ico" data-ico="slot"></span>Machines à sous</h2>
-            <a class="section__all" href="pages/slots.html">Voir tout</a>
-            <div class="section__nav">
-              <button data-scroll="slots" data-dir="-1" data-ico="arrowL"></button>
-              <button data-scroll="slots" data-dir="1" data-ico="arrowR"></button>
-            </div>
-          </div>
-          <div class="game-row" id="slots"></div>
-        </section>
+      <h1 class="landing__title" data-rise>Bet on-chain.<br /><span>Verify every roll.</span></h1>
 
-        <!-- CTA -->
-        <div class="cta-strip">
-          <img src="assets/img/logo.png" alt="" />
-          <div>
-            <div class="cta-strip__t">Rejoignez la horde de la Frog dorée</div>
-            <div class="cta-strip__s">Bonus de bienvenue jusqu'à 200% + 100 tours gratuits.</div>
-          </div>
-          <button class="btn btn--gold btn--lg">Réclamer mon bonus</button>
-        </div>
+      <p class="landing__sub" data-rise>
+        Your funds stay in your own wallet until the moment you place a bet.
+        No deposits to trust, no custody, no withdrawal queue.
+      </p>
 
-        <!-- JEUX EN DIRECT -->
-        <section class="section">
-          <div class="section__head">
-            <h2 class="section__title"><span class="ico" data-ico="cards"></span>Jeux en Direct</h2>
-            <a class="section__all" href="pages/live.html">Voir tout</a>
-            <div class="section__nav">
-              <button data-scroll="live" data-dir="-1" data-ico="arrowL"></button>
-              <button data-scroll="live" data-dir="1" data-ico="arrowR"></button>
-            </div>
-          </div>
-          <div class="game-row" id="live"></div>
-        </section>
-
-        <div class="foot">
-          pepe.fail — Maquette de démonstration. Aucun jeu d'argent réel.<br>
-          Jouez de manière responsable · 18+ · <a href="#">Conditions</a> · <a href="#">Confidentialité</a>
-        </div>
-
+      <div class="landing__actions" data-rise>
+        <button class="btn btn--gold btn--lg" type="button" id="createWallet">Create Wallet</button>
+        <a class="btn btn--glass btn--lg" href="casino.html">Enter Casino</a>
       </div>
-    </main>
-  </div>
 
-  <script>window.PAGE = { active: "home", base: "" };</script>
+      <a class="landing__social" data-rise href="https://x.com/pepefail" target="_blank" rel="noopener noreferrer">
+        <svg class="landing__x" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+          <path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.65l-5.22-6.82-5.96 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23zm-1.16 17.52h1.83L7.08 4.13H5.12z" />
+        </svg>
+        <span>@pepefail</span>
+      </a>
+
+    </div>
+
+    <footer class="landing__foot" data-rise>
+      &copy; 2026 pepe.fail — demo mockup, no real-money gambling.
+    </footer>
+  </main>
+
+  <script>window.PAGE = { active: "landing", base: "" };</script>
   <script src="assets/js/icons.js"></script>
-  <script src="assets/js/shell.js"></script>
-  <script src="assets/js/games-data.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/modal.js"></script>
+  <script src="assets/js/wallet.js"></script>
+  <script>
+    document.getElementById("createWallet").addEventListener("click", function () {
+      if (window.PepeWallet && typeof window.PepeWallet.startCreateFlow === "function") {
+        window.PepeWallet.startCreateFlow();
+      }
+    });
+  </script>
 </body>
 </html>

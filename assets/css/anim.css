@@ -1,0 +1,223 @@
+/* ===================================================================
+   pepe.fail — motion layer
+   Loaded AFTER styles.css (and after glass.css).
+
+   Rules of this file:
+   - only transform and opacity are animated;
+   - state transitions stay between 120ms and 260ms;
+   - nothing loops, nothing moves without a user action
+     (the single exception is the loading skeleton);
+   - the pre-reveal state (opacity: 0) is NEVER set here on its own:
+     it only applies together with the .is-revealing class that
+     anim.js adds, so content stays visible if the script fails.
+   =================================================================== */
+
+:root {
+  --ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --dur-fast: 140ms;
+  --dur-base: 180ms;
+  --dur-reveal: 220ms;
+}
+
+/* =========================== SCROLL REVEAL ===========================
+   .is-revealing  : set by anim.js right before observing the element.
+   .is-revealed   : set when the element enters the scroll container.
+   Both classes are removed once the transition is over, which leaves
+   the element in its plain, untouched state. */
+[data-reveal].is-revealing {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--dur-reveal) var(--ease-out),
+    transform var(--dur-reveal) var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal].is-revealing.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* =========================== GAME CARDS ===========================
+   Replaces the `transition: 0.2s` shorthand (which resolves to
+   `transition: all`) with an explicit property list. */
+.game {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.game:hover,
+.game:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--line-2);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+
+.game:active {
+  transform: translateY(-1px);
+}
+
+.game__play {
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.game:focus-visible .game__play {
+  opacity: 1;
+}
+
+/* The halo behind the icon is a static background: it must not react
+   to hover, and it never pulses. */
+.game__art::after {
+  transition: none;
+}
+
+/* =========================== OTHER SURFACES ===========================
+   Same treatment: explicit properties instead of `all`. */
+.hero-card,
+.pcard,
+.vip,
+.tile {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    border-color var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.hero-card:hover,
+.pcard:hover {
+  transform: translateY(-3px);
+}
+
+.vip:hover,
+.tile:hover {
+  transform: translateY(-2px);
+}
+
+.hero-card:active,
+.pcard:active,
+.vip:active,
+.tile:active {
+  transform: translateY(-1px);
+}
+
+/* Controls: colour/border feedback only, no movement. */
+.nav__item,
+.icon-btn,
+.seg button,
+.bet__tabs button,
+.chips button,
+.filters button,
+.section__nav button,
+.input-wrap .mini,
+.section__all {
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.nav__item svg {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+/* =========================== FOCUS =========================== */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* =========================== LOADING =========================== */
+.is-loading {
+  background: var(--bg-700);
+  border-color: transparent;
+  box-shadow: none;
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
+  animation: pepe-skeleton 1.4s ease-in-out infinite;
+}
+
+.is-loading > * {
+  visibility: hidden;
+}
+
+/* Standalone placeholder block (text line, thumbnail, panel...). */
+.skeleton {
+  display: block;
+  background: var(--bg-700);
+  border-radius: var(--radius-sm);
+  animation: pepe-skeleton 1.4s ease-in-out infinite;
+}
+
+.skeleton--text {
+  height: 12px;
+  margin-bottom: 8px;
+}
+
+.skeleton--title {
+  height: 20px;
+  margin-bottom: 12px;
+}
+
+.skeleton--card {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--radius);
+}
+
+@keyframes pepe-skeleton {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* =========================== REDUCED MOTION ===========================
+   Everything becomes static, layout untouched. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal].is-revealing,
+  [data-reveal].is-revealing.is-revealed {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .game,
+  .game:hover,
+  .game:focus-visible,
+  .game:active,
+  .game__play,
+  .hero-card,
+  .hero-card:hover,
+  .pcard,
+  .pcard:hover,
+  .vip,
+  .vip:hover,
+  .tile,
+  .tile:hover,
+  .nav__item,
+  .icon-btn,
+  .seg button,
+  .bet__tabs button,
+  .chips button,
+  .filters button,
+  .section__nav button,
+  .input-wrap .mini,
+  .section__all {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .is-loading,
+  .skeleton,
+  .live-dot,
+  .win-card {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}

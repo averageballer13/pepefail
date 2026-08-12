@@ -1,17 +1,17 @@
 /* ===================================================================
-   pepe.fail — catalogue de jeux + fabrique de vignettes (partagé)
-   ac = accent : "gold" (défaut) ou "orange"
+   pepe.fail — game catalogue + shared thumbnail factory
+   ac = accent : "gold" (default) or "orange"
    =================================================================== */
 
 const ORIGINALS = [
-  { n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "jeux/plinko.html" },
-  { n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "jeux/mines.html" },
-  { n: "Dice", p: "pepe.fail", ic: "dice", tag: "ORIGINAL", ac: "gold", href: "jeux/dice.html" },
-  { n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "jeux/crash.html" },
-  { n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "jeux/limbo.html" },
-  { n: "Wheel", p: "pepe.fail", ic: "wheel", tag: "ORIGINAL", ac: "orange", href: "jeux/wheel.html" },
-  { n: "Hilo", p: "pepe.fail", ic: "cards", tag: "ORIGINAL", ac: "gold", href: "jeux/dice.html" },
-  { n: "Keno", p: "pepe.fail", ic: "grid", tag: "ORIGINAL", ac: "gold", href: "jeux/dice.html" },
+  { n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "games/plinko.html" },
+  { n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines.html" },
+  { n: "Dice", p: "pepe.fail", ic: "dice", tag: "ORIGINAL", ac: "gold", href: "games/dice.html" },
+  { n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "games/crash.html" },
+  { n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo.html" },
+  { n: "Wheel", p: "pepe.fail", ic: "wheel", tag: "ORIGINAL", ac: "orange", href: "games/wheel.html" },
+  { n: "Hilo", p: "pepe.fail", ic: "cards", tag: "ORIGINAL", ac: "gold", href: "games/dice.html" },
+  { n: "Keno", p: "pepe.fail", ic: "grid", tag: "ORIGINAL", ac: "gold", href: "games/dice.html" },
 ];
 
 const SLOTS = [
@@ -33,14 +33,14 @@ const LIVE_GAMES = [
   { n: "Frog Baccarat", p: "pepe.fail", ic: "cards", tag: "LIVE", ac: "gold" },
   { n: "Lightning Roulette", p: "Evolution", ic: "wheel", tag: "LIVE", hot: true, ac: "orange" },
   { n: "Crazy Time", p: "Evolution", ic: "star", tag: "LIVE", hot: true, ac: "gold" },
-  { n: "Blackjack VIP", p: "Evolution", ic: "spade", tag: "LIVE", ac: "gold" },
+  { n: "Blackjack VIP", p: "pepe.fail", ic: "spade", tag: "LIVE", ac: "gold", href: "games/blackjack.html" },
   { n: "Mega Wheel", p: "Pragmatic", ic: "wheel", tag: "LIVE", ac: "orange" },
   { n: "Dream Catcher", p: "Evolution", ic: "sparkle", tag: "LIVE", ac: "gold" },
   { n: "Monopoly Live", p: "Evolution", ic: "tophat", tag: "LIVE", ac: "gold" },
   { n: "Gold Bar Roulette", p: "Evolution", ic: "coin", tag: "LIVE", ac: "orange" },
 ];
 
-/* --- Fabrique une vignette de jeu --- */
+/* --- Builds a single game thumbnail --- */
 function gameCard(g, base) {
   const b = base || "";
   const href = g.href ? b + g.href : "#";
@@ -52,7 +52,7 @@ function gameCard(g, base) {
       ${g.tag ? `<span class="game__tag">${g.tag}</span>` : ""}
       ${g.hot ? `<span class="game__hot">${iconSolid("flame")}</span>` : ""}
       <div class="game__icon">${icon(g.ic)}</div>
-      <div class="game__play"><button class="btn btn--gold">Jouer ▶</button></div>
+      <div class="game__play"><button class="btn btn--gold">Play ▶</button></div>
     </div>
     <div class="game__meta">
       <div class="game__name">${g.n}</div>
@@ -61,7 +61,7 @@ function gameCard(g, base) {
   return el;
 }
 
-/* --- Remplit un conteneur --- */
+/* --- Fills a container with thumbnails --- */
 function fillRow(id, list, base) {
   const row = document.getElementById(id);
   if (!row) return;
@@ -69,18 +69,19 @@ function fillRow(id, list, base) {
   list.forEach((g) => row.appendChild(gameCard(g, base)));
 }
 
-/* --- Injecte les icônes marquées data-ico --- */
+/* --- Injects the icons flagged with data-ico --- */
 function hydrateIcons() {
   document.querySelectorAll("[data-ico]").forEach((el) => {
     el.innerHTML = icon(el.dataset.ico, el.dataset.sw || 1.9);
   });
 }
 
-/* --- Flèches de carrousel --- */
+/* --- Carousel arrows --- */
 function bindScrollers() {
   document.querySelectorAll("[data-scroll]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const row = document.getElementById(btn.dataset.scroll);
+      if (!row) return;
       row.scrollBy({ left: 360 * Number(btn.dataset.dir), behavior: "smooth" });
     });
   });

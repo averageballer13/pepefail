@@ -1,42 +1,42 @@
 /* ===================================================================
-   pepe.fail — pages catégories (UI uniquement)
-   Chaque page définit window.CAT = "<clé>" avant de charger ce script.
+   pepe.fail — category pages (UI only)
+   Each page sets window.CAT = "<key>" before loading this script.
    =================================================================== */
 
 const CATS = {
   slots: {
-    title: "Machines à sous",
+    title: "Slots",
     ic: "slot",
-    sub: "Des centaines de machines à sous des meilleurs studios.",
-    filters: ["Tout", "Populaires", "Nouveautés", "Jackpots", "Megaways", "Bonus Buy"],
+    sub: "Hundreds of slots from the best studios.",
+    filters: ["All", "Popular", "New", "Jackpots", "Megaways", "Bonus Buy"],
     list: () => SLOTS.concat(SLOTS.slice(0, 6)),
   },
   live: {
-    title: "Jeux en Direct",
+    title: "Live Games",
     ic: "cards",
-    sub: "Croupiers en direct, 24h/24 — roulette, blackjack et jeux TV.",
-    filters: ["Tout", "Roulette", "Blackjack", "Baccarat", "Game Shows"],
+    sub: "Live dealers around the clock — roulette, blackjack and game shows.",
+    filters: ["All", "Roulette", "Blackjack", "Baccarat", "Game Shows"],
     list: () => LIVE_GAMES.concat(LIVE_GAMES.slice(0, 4)),
   },
   nouveautes: {
-    title: "Nouvelles Sorties",
+    title: "New Releases",
     ic: "sparkle",
-    sub: "Les derniers jeux ajoutés sur pepe.fail.",
-    filters: ["Tout", "Cette semaine", "Ce mois-ci", "Originaux"],
+    sub: "The latest games added to pepe.fail.",
+    filters: ["All", "This Week", "This Month", "Originals"],
     list: () => ORIGINALS.concat(SLOTS.slice(0, 8)),
   },
   favoris: {
-    title: "Favoris",
+    title: "Favorites",
     ic: "star",
-    sub: "Les jeux que vous avez épinglés.",
-    filters: ["Tout", "Originaux", "Machines à sous", "En Direct"],
+    sub: "The games you pinned.",
+    filters: ["All", "Originals", "Slots", "Live"],
     list: () => ORIGINALS.slice(0, 6).concat(SLOTS.slice(0, 4)),
   },
   recent: {
-    title: "Joué Récemment",
+    title: "Recently Played",
     ic: "clock",
-    sub: "Reprenez là où vous vous étiez arrêté.",
-    filters: ["Tout", "Aujourd'hui", "Cette semaine"],
+    sub: "Pick up where you left off.",
+    filters: ["All", "Today", "This Week"],
     list: () => ORIGINALS.slice(0, 4).concat(SLOTS.slice(2, 10)),
   },
 };

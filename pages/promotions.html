@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/glass.css" />
+  <link rel="stylesheet" href="../assets/css/anim.css" />
+  <link rel="stylesheet" href="../assets/css/modal.css" />
 </head>
 <body>
   <div class="app">
@@ -17,30 +20,30 @@
 
         <div class="page-head">
           <h1><span style="display:inline-grid;place-items:center;width:34px;height:34px;vertical-align:-6px;color:var(--gold);margin-right:6px" data-ico="gift"></span>Promotions</h1>
-          <p>Courses, défis et récompenses — il y a toujours quelque chose à gagner sur pepe.fail.</p>
+          <p>Races, challenges and rewards — there is always something to win on pepe.fail.</p>
         </div>
 
         <div class="promo-grid" id="promos"></div>
 
         <section class="section">
           <div class="section__head">
-            <h2 class="section__title"><span class="ico" data-ico="crown"></span>Paliers VIP</h2>
+            <h2 class="section__title"><span class="ico" data-ico="crown"></span>VIP Tiers</h2>
           </div>
           <div class="vip-row" id="vips"></div>
         </section>
 
         <div class="cta-strip" style="margin-top:30px">
-          <img src="../assets/img/logo.png" alt="" />
+          <img src="../assets/img/logo.png" alt="pepe.fail" />
           <div>
-            <div class="cta-strip__t">Bonus de bienvenue</div>
-            <div class="cta-strip__s">Jusqu'à 200% sur votre premier dépôt + 100 tours gratuits.</div>
+            <div class="cta-strip__t">Welcome Bonus</div>
+            <div class="cta-strip__s">Up to 200% on your first deposit + 100 free spins.</div>
           </div>
-          <button class="btn btn--gold btn--lg">Réclamer</button>
+          <button class="btn btn--gold btn--lg" id="claimBonus">Claim</button>
         </div>
 
         <div class="foot">
-          pepe.fail — Maquette de démonstration. Aucun jeu d'argent réel.<br>
-          Jouez de manière responsable · 18+
+          pepe.fail — Demonstration mockup only. Not a real casino, no real-money gambling.<br>
+          Play responsibly · 18+
         </div>
 
       </div>
@@ -51,16 +54,20 @@
   <script src="../assets/js/icons.js"></script>
   <script src="../assets/js/shell.js"></script>
   <script src="../assets/js/games-data.js"></script>
+  <script src="../assets/js/modal.js"></script>
+  <script src="../assets/js/wallet.js"></script>
+  <script src="../assets/js/anim.js"></script>
   <script>
     hydrateIcons();
 
+    /* Promotion cards */
     const PROMOS = [
-      { ic: "trophy", t: "Course Quotidienne", s: "Grimpez au classement chaque jour et partagez la cagnotte.", amt: "$25 000", timer: "01:01:10", ac: "" },
-      { ic: "trophy", t: "Course Hebdomadaire", s: "Une semaine, un classement, une grosse cagnotte à partager.", amt: "$100 000", timer: "3j", ac: "orange" },
-      { ic: "diamond", t: "Course Mensuelle", s: "La plus grosse course du mois pour les joueurs les plus actifs.", amt: "$500 000", timer: "20j", ac: "" },
-      { ic: "ticket", t: "Tirage Hebdo", s: "Un ticket gagné tous les $100 misés. Tirage chaque dimanche.", amt: "$20 000", timer: "4j", ac: "orange" },
-      { ic: "target", t: "Défis", s: "Des objectifs quotidiens sur vos jeux préférés, des gains instantanés.", amt: "$5 000", timer: "Actif", ac: "" },
-      { ic: "coin", t: "Rakeback", s: "Récupérez un pourcentage de chaque mise, quel que soit le résultat.", amt: "Jusqu'à 20%", timer: "Permanent", ac: "orange" },
+      { ic: "trophy", t: "Daily Race", s: "Climb the leaderboard every day and share the prize pool.", amt: "$25,000", timer: "01:01:10", ac: "" },
+      { ic: "trophy", t: "Weekly Race", s: "One week, one leaderboard, one big pool to share.", amt: "$100,000", timer: "3d", ac: "orange" },
+      { ic: "diamond", t: "Monthly Race", s: "The biggest race of the month for the most active players.", amt: "$500,000", timer: "20d", ac: "" },
+      { ic: "ticket", t: "Weekly Draw", s: "One ticket for every $100 wagered. Drawn every Sunday.", amt: "$20,000", timer: "4d", ac: "orange" },
+      { ic: "target", t: "Challenges", s: "Daily objectives on your favorite games, instant payouts.", amt: "$5,000", timer: "Active", ac: "" },
+      { ic: "coin", t: "Rakeback", s: "Get a share of every bet back, win or lose.", amt: "Up to 20%", timer: "Always on", ac: "orange" },
     ];
 
     document.getElementById("promos").innerHTML = PROMOS.map(function (p) {
@@ -73,21 +80,38 @@
       '</div>';
     }).join("");
 
+    /* VIP ladder */
     const VIPS = [
-      { n: "Têtard", w: "$0", ic: "chip" },
-      { n: "Grenouille", w: "$10K", ic: "frog" },
-      { n: "Frog d'Or", w: "$100K", ic: "star", cur: true },
-      { n: "Roi Pepe", w: "$1M", ic: "crown" },
-      { n: "Légende", w: "$10M", ic: "diamond" },
+      { n: "Tadpole", w: "$0", ic: "chip" },
+      { n: "Frog", w: "$10K", ic: "frog" },
+      { n: "Golden Frog", w: "$100K", ic: "star", cur: true },
+      { n: "King Pepe", w: "$1M", ic: "crown" },
+      { n: "Legend", w: "$10M", ic: "diamond" },
     ];
 
     document.getElementById("vips").innerHTML = VIPS.map(function (v) {
       return '<div class="vip ' + (v.cur ? "cur" : "") + '">' +
         '<div class="vip__ico">' + icon(v.ic) + '</div>' +
         '<div class="vip__n">' + v.n + '</div>' +
-        '<div class="vip__w">' + v.w + ' misés</div>' +
+        '<div class="vip__w">' + v.w + ' wagered</div>' +
       '</div>';
     }).join("");
+
+    /* The bonus button routes to the wallet flow when it is available */
+    document.getElementById("claimBonus").addEventListener("click", function () {
+      if (window.PepeWallet && typeof window.PepeWallet.startCreateFlow === "function") {
+        window.PepeWallet.startCreateFlow();
+      } else if (window.PepeModal && typeof window.PepeModal.open === "function") {
+        window.PepeModal.open({
+          title: "Welcome Bonus",
+          subtitle: "Demonstration mockup — no real money involved.",
+          size: "sm",
+          trust: true,
+          body: '<p style="color:var(--text-dim);font-size:14px;line-height:1.6;margin:0">Create a demo wallet first to claim this bonus.</p>',
+          actions: [{ label: "Got it", variant: "glass", onClick: function () { window.PepeModal.close(); } }]
+        });
+      }
+    });
   </script>
 </body>
 </html>

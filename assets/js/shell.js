@@ -1,59 +1,63 @@
 /* ===================================================================
-   pepe.fail — shell partagé (brand + topbar + sidebar)
-   Chaque page définit window.PAGE = { active: "<clé>", base: "" | "../" }
-   avant de charger ce script.
+   pepe.fail — shared shell (brand + topbar + sidebar)
+   Every page sets window.PAGE = { active: "<key>", base: "" | "../" }
+   before loading this script.
    =================================================================== */
 const PAGE = window.PAGE || { active: "home", base: "" };
 const B = PAGE.base || "";
 
-/* --- Arborescence de navigation --- */
+/* Monospace stack used for the truncated wallet address. */
+const MONO_STACK = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+
+/* --- Navigation tree --- */
 const NAV_MAIN = [
-  { k: "home", ic: "home", t: "Accueil", href: B + "index.html" },
-  { k: "favoris", ic: "star", t: "Favoris", href: B + "pages/favoris.html" },
-  { k: "recent", ic: "clock", t: "Joué Récemment", href: B + "pages/recent.html" },
-  { k: "new", ic: "sparkle", t: "Nouvelles Sorties", href: B + "pages/nouveautes.html" },
+  { k: "home", ic: "home", t: "Home", href: B + "casino.html" },
+  { k: "favoris", ic: "star", t: "Favorites", href: B + "pages/favoris.html" },
+  { k: "recent", ic: "clock", t: "Recently Played", href: B + "pages/recent.html" },
+  { k: "new", ic: "sparkle", t: "New Releases", href: B + "pages/nouveautes.html" },
 ];
 
 const NAV_GROUPS = [
   {
     k: "casino", ic: "chip", t: "Casino", open: true,
     items: [
-      { k: "slots", ic: "slot", t: "Machines à sous", href: B + "pages/slots.html" },
-      { k: "live", ic: "cards", t: "Jeux en Direct", href: B + "pages/live.html" },
-      { k: "blackjack", ic: "spade", t: "Blackjack", href: B + "pages/live.html" },
+      { k: "slots", ic: "slot", t: "Slots", href: B + "pages/slots.html" },
+      { k: "live", ic: "cards", t: "Live Games", href: B + "pages/live.html" },
+      { k: "blackjack", ic: "spade", t: "Blackjack", href: B + "games/blackjack.html" },
       { k: "roulette", ic: "wheel", t: "Roulette", href: B + "pages/live.html" },
     ],
   },
   {
-    k: "originaux", ic: "diamond", t: "Originaux", open: true,
+    k: "originals", ic: "diamond", t: "Originals", open: true,
     items: [
-      { k: "plinko", ic: "plinko", t: "Plinko", href: B + "jeux/plinko.html" },
-      { k: "mines", ic: "bomb", t: "Mines", href: B + "jeux/mines.html" },
-      { k: "dice", ic: "dice", t: "Dice", href: B + "jeux/dice.html" },
-      { k: "crash", ic: "rocket", t: "Crash", href: B + "jeux/crash.html" },
-      { k: "limbo", ic: "chart", t: "Limbo", href: B + "jeux/limbo.html" },
-      { k: "wheel", ic: "wheel", t: "Wheel", href: B + "jeux/wheel.html" },
+      { k: "plinko", ic: "plinko", t: "Plinko", href: B + "games/plinko.html" },
+      { k: "mines", ic: "bomb", t: "Mines", href: B + "games/mines.html" },
+      { k: "dice", ic: "dice", t: "Dice", href: B + "games/dice.html" },
+      { k: "crash", ic: "rocket", t: "Crash", href: B + "games/crash.html" },
+      { k: "limbo", ic: "chart", t: "Limbo", href: B + "games/limbo.html" },
+      { k: "wheel", ic: "wheel", t: "Wheel", href: B + "games/wheel.html" },
     ],
   },
   {
     k: "promos", ic: "gift", t: "Promotions", open: true,
     items: [
-      { k: "vip", ic: "crown", t: "VIP", href: B + "pages/promotions.html", pill: "EXCLUSIF", pillMod: "gold" },
-      { k: "cq", ic: "trophy", t: "Course Quotidienne", href: B + "pages/promotions.html", pill: "01:01", pillMod: "live" },
-      { k: "ch", ic: "trophy", t: "Course Hebdo", href: B + "pages/promotions.html", pill: "3j" },
-      { k: "cm", ic: "diamond", t: "Course Mensuelle", href: B + "pages/promotions.html", pill: "20j" },
-      { k: "defis", ic: "target", t: "Défis", href: B + "pages/promotions.html" },
+      { k: "vip", ic: "crown", t: "VIP", href: B + "pages/promotions.html", pill: "EXCLUSIVE", pillMod: "gold" },
+      { k: "cq", ic: "trophy", t: "Daily Race", href: B + "pages/promotions.html", pill: "01:01", pillMod: "live" },
+      { k: "ch", ic: "trophy", t: "Weekly Race", href: B + "pages/promotions.html", pill: "3d" },
+      { k: "cm", ic: "diamond", t: "Monthly Race", href: B + "pages/promotions.html", pill: "20d" },
+      { k: "challenges", ic: "target", t: "Challenges", href: B + "pages/promotions.html" },
     ],
   },
 ];
 
 const NAV_FOOT = [
-  { k: "rewards", ic: "shield", t: "Récompenses", href: B + "pages/promotions.html" },
+  { k: "rewards", ic: "shield", t: "Rewards", href: B + "pages/promotions.html" },
   { k: "blog", ic: "book", t: "Blog", href: B + "pages/promotions.html" },
+  { k: "landing", ic: "sparkle", t: "Landing", href: B + "index.html" },
 ];
 
-/* --- Rendu d'un élément de nav --- */
-function navItem(n, sub) {
+/* --- Single nav entry --- */
+function navItem(n) {
   const active = n.k === PAGE.active ? " active" : "";
   const pill = n.pill
     ? `<span class="badge-pill${n.pillMod ? " badge-pill--" + n.pillMod : ""}">${n.pill}</span>`
@@ -61,13 +65,103 @@ function navItem(n, sub) {
   return `<a class="nav__item${active}" href="${n.href}">${icon(n.ic)}<span>${n.t}</span>${pill}</a>`;
 }
 
-/* --- Construction du shell --- */
+/* ===================================================================
+   WALLET AREA (topbar right side)
+   =================================================================== */
+
+/* Returns the current wallet address, or null when no wallet exists. */
+function walletAddress() {
+  const w = window.PepeWallet;
+  if (!w || typeof w.get !== "function") return null;
+  let acc = null;
+  try {
+    acc = w.get();
+  } catch (e) {
+    return null;
+  }
+  if (!acc) return null;
+  if (typeof acc === "string") return acc;
+  return acc.address || acc.publicKey || null;
+}
+
+/* First 4 + last 4 characters. */
+function shortAddress(addr) {
+  const a = String(addr);
+  return a.length <= 10 ? a : a.slice(0, 4) + "…" + a.slice(-4);
+}
+
+/* Opens the log-in explainer modal (this mockup has no accounts). */
+function openLogInModal() {
+  if (!window.PepeModal) return;
+  window.PepeModal.open({
+    title: "Log In",
+    subtitle: "Demo mockup — no real accounts",
+    body:
+      "<p>pepe.fail runs entirely in your browser. There is no account to sign into — " +
+      "create a local wallet instead and your balance stays on this device.</p>",
+    size: "sm",
+    trust: true,
+    actions: [
+      {
+        label: "Create Wallet",
+        variant: "gold",
+        onClick: function () {
+          window.PepeModal.close();
+          if (window.PepeWallet) window.PepeWallet.startCreateFlow();
+        },
+      },
+      { label: "Close", variant: "glass", onClick: function () { window.PepeModal.close(); } },
+    ],
+  });
+}
+
+/* Renders either Log In + Create Wallet, or the connected wallet chip. */
+function renderAuth() {
+  const slot = document.getElementById("topbarAuth");
+  if (!slot) return;
+  slot.innerHTML = "";
+
+  const addr = walletAddress();
+
+  if (addr) {
+    const chip = document.createElement("button");
+    chip.className = "btn btn--glass";
+    chip.title = "Open wallet";
+    chip.style.fontFamily = MONO_STACK;
+    chip.style.letterSpacing = ".01em";
+    chip.textContent = shortAddress(addr);
+    chip.addEventListener("click", function () {
+      if (window.PepeWallet) window.PepeWallet.open();
+    });
+    slot.appendChild(chip);
+    return;
+  }
+
+  const login = document.createElement("button");
+  login.className = "btn btn--glass";
+  login.textContent = "Log In";
+  login.addEventListener("click", openLogInModal);
+
+  const create = document.createElement("button");
+  create.className = "btn btn--gold";
+  create.textContent = "Create Wallet";
+  create.addEventListener("click", function () {
+    if (window.PepeWallet) window.PepeWallet.startCreateFlow();
+  });
+
+  slot.appendChild(login);
+  slot.appendChild(create);
+}
+
+/* ===================================================================
+   SHELL MARKUP
+   =================================================================== */
 function renderShell() {
   /* Brand */
   const brand = document.createElement("div");
   brand.className = "brand";
   brand.innerHTML = `
-    <a href="${B}index.html" style="display:flex;align-items:center;gap:10px">
+    <a href="${B}casino.html" style="display:flex;align-items:center;gap:10px">
       <img class="brand__logo" src="${B}assets/img/logo.png" alt="pepe.fail" />
       <div class="brand__name">pepe<b>.fail</b></div>
     </a>`;
@@ -81,11 +175,10 @@ function renderShell() {
       <button>Sports</button>
     </div>
     <div class="topbar__spacer"></div>
-    <button class="icon-btn" title="Rechercher">${icon("search", 2)}</button>
-    <button class="icon-btn" title="Cadeaux">${icon("gift", 2)}</button>
-    <button class="btn btn--ghost">Connexion</button>
-    <button class="btn btn--orange">S'inscrire</button>
-    <button class="icon-btn" title="Chat">${icon("chat", 2)}</button>`;
+    <button class="icon-btn glass" title="Search">${icon("search", 2)}</button>
+    <button class="icon-btn glass" title="Rewards">${icon("gift", 2)}</button>
+    <div class="topbar__auth" id="topbarAuth"></div>
+    <button class="icon-btn glass" title="Chat">${icon("chat", 2)}</button>`;
 
   /* Sidebar */
   const sidebar = document.createElement("aside");
@@ -93,15 +186,15 @@ function renderShell() {
   sidebar.innerHTML = `
     <div class="promo-card">
       <div class="promo-card__ico">${icon("ticket")}</div>
-      <div class="promo-card__badge">4j</div>
-      <div class="promo-card__amount">$20 000</div>
-      <div class="promo-card__label">TIRAGE HEBDO</div>
+      <div class="promo-card__badge">4d</div>
+      <div class="promo-card__amount">$20,000</div>
+      <div class="promo-card__label">WEEKLY DRAW</div>
     </div>
 
     <div class="stats">
-      <div class="stat"><div class="stat__k">Quotidien</div><div class="stat__v">$25K</div></div>
-      <div class="stat"><div class="stat__k">Hebdo</div><div class="stat__v">$100K</div></div>
-      <div class="stat"><div class="stat__k">Mensuel</div><div class="stat__v">$500K</div></div>
+      <div class="stat"><div class="stat__k">Daily</div><div class="stat__v">$25K</div></div>
+      <div class="stat"><div class="stat__k">Weekly</div><div class="stat__v">$100K</div></div>
+      <div class="stat"><div class="stat__k">Monthly</div><div class="stat__v">$500K</div></div>
     </div>
 
     <nav class="nav">
@@ -111,7 +204,7 @@ function renderShell() {
         return `
         <div class="nav__group${g.open || hasActive ? " open" : ""}" data-group>
           <a class="nav__item" data-toggle>${icon(g.ic)}<span>${g.t}</span><span class="chev">${icon("chevron", 2)}</span></a>
-          <div class="nav__sub">${g.items.map((i) => navItem(i, true)).join("")}</div>
+          <div class="nav__sub">${g.items.map((i) => navItem(i)).join("")}</div>
         </div>`;
       }).join("")}
       <div class="nav__divider"></div>
@@ -123,7 +216,7 @@ function renderShell() {
   app.prepend(topbar);
   app.prepend(brand);
 
-  /* Bouton support flottant */
+  /* Floating support button */
   const fab = document.createElement("button");
   fab.className = "fab";
   fab.title = "Support";
@@ -132,8 +225,16 @@ function renderShell() {
 }
 
 renderShell();
+renderAuth();
 
-/* --- Interactions du shell --- */
+/* wallet.js loads after this file, so re-render once every script has run,
+   then on every wallet state change. */
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", renderAuth);
+}
+document.addEventListener("pepe:wallet", renderAuth);
+
+/* --- Shell interactions --- */
 document.querySelectorAll("[data-group] [data-toggle]").forEach((t) => {
   t.addEventListener("click", () => t.closest("[data-group]").classList.toggle("open"));
 });

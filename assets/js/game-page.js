@@ -1,15 +1,20 @@
 /* ===================================================================
-   pepe.fail — moteur des pages de jeu (UI uniquement)
-   Chaque page définit window.GAME = "<clé>" avant de charger ce script.
+   pepe.fail — game page engine (UI only)
+   Every page sets window.GAME = "<key>" before loading this script.
    =================================================================== */
 
-/* --- Bloc de contrôle réutilisable --- */
+/* --- Reusable control blocks --- */
+/* Preset chips: secondary controls, so every button is glass and the
+   selected one carries .active on top. */
 function fieldSelect(label, options, activeIdx) {
+  const sel = activeIdx || 0;
   return `
   <div class="field">
     <div class="field__label">${label}</div>
     <div class="chips" data-chipgroup>
-      ${options.map((o, i) => `<button class="${i === (activeIdx || 0) ? "active" : ""}">${o}</button>`).join("")}
+      ${options
+        .map((o, i) => `<button class="glass${i === sel ? " active" : ""}">${o}</button>`)
+        .join("")}
     </div>
   </div>`;
 }
@@ -21,110 +26,117 @@ function fieldInput(label, value, right, mini) {
     <div class="input-wrap">
       <span class="cur">${icon("coin")}</span>
       <input type="text" value="${value}" />
-      ${mini ? `<button class="mini">½</button><button class="mini">2×</button>` : ""}
+      ${mini ? `<button class="mini glass">½</button><button class="mini glass">2×</button>` : ""}
     </div>
   </div>`;
 }
 
 /* ===================================================================
-   CONFIGURATION DES JEUX
+   GAME CONFIGURATION
+   ac = accent of the primary action button: "gold" or "orange"
    =================================================================== */
 const GAMES = {
   plinko: {
     name: "Plinko",
     ic: "plinko",
     sub: "pepe.fail Originals",
-    stats: [["99%", "RTP"], ["1000×", "Gain max"]],
+    ac: "gold",
+    stats: [["99%", "RTP"], ["1000×", "Max Win"]],
     controls: () =>
-      fieldInput("Montant de la mise", "1.00", "$1.00", true) +
-      fieldSelect("Risque", ["Faible", "Moyen", "Élevé"], 1) +
-      fieldSelect("Lignes", ["8", "10", "12", "16"], 3),
-    payout: ["Gain potentiel", "1000.00×"],
-    action: "Lancer la bille",
+      fieldInput("Bet Amount", "1.00", "$1.00", true) +
+      fieldSelect("Risk", ["Low", "Medium", "High"], 1) +
+      fieldSelect("Rows", ["8", "10", "12", "16"], 3),
+    payout: ["Potential Win", "1000.00×"],
+    action: "Drop Ball",
     stage: stagePlinko,
-    hint: "Cliquez pour lâcher une bille — plus elle tombe sur les bords, plus le multiplicateur est élevé.",
+    hint: "Drop a ball and let it bounce — the closer it lands to the edges, the higher the multiplier.",
   },
 
   mines: {
     name: "Mines",
     ic: "bomb",
     sub: "pepe.fail Originals",
-    stats: [["99%", "RTP"], ["24 610×", "Gain max"]],
+    ac: "orange",
+    stats: [["99%", "RTP"], ["24,610×", "Max Win"]],
     controls: () =>
-      fieldInput("Montant de la mise", "1.00", "$1.00", true) +
-      fieldSelect("Nombre de mines", ["1", "3", "5", "10"], 1) +
-      fieldInput("Gains", "0.00", "0.00×", false),
-    payout: ["Prochain gain", "1.08×"],
-    action: "Parier",
+      fieldInput("Bet Amount", "1.00", "$1.00", true) +
+      fieldSelect("Mines", ["1", "3", "5", "10"], 1) +
+      fieldInput("Profit", "0.00", "0.00×", false),
+    payout: ["Next Payout", "1.08×"],
+    action: "Bet",
     stage: stageMines,
-    hint: "Retournez les cases sans tomber sur une mine, puis encaissez quand vous voulez.",
+    hint: "Reveal tiles without hitting a mine, then cash out whenever you want.",
   },
 
   dice: {
     name: "Dice",
     ic: "dice",
     sub: "pepe.fail Originals",
-    stats: [["99%", "RTP"], ["9900×", "Gain max"]],
+    ac: "gold",
+    stats: [["99%", "RTP"], ["9900×", "Max Win"]],
     controls: () =>
-      fieldInput("Montant de la mise", "1.00", "$1.00", true) +
-      fieldInput("Gain sur victoire", "1.98", "1.98×", false) +
-      fieldSelect("Rouler", ["Sous", "Au-dessus"], 1),
-    payout: ["Chance de gain", "49.50%"],
-    action: "Lancer les dés",
+      fieldInput("Bet Amount", "1.00", "$1.00", true) +
+      fieldInput("Profit on Win", "1.98", "1.98×", false) +
+      fieldSelect("Roll", ["Under", "Over"], 1),
+    payout: ["Win Chance", "49.50%"],
+    action: "Roll Dice",
     stage: stageDice,
-    hint: "Déplacez le curseur pour ajuster votre seuil — plus le risque est élevé, plus le gain l'est aussi.",
+    hint: "Drag the slider to set your threshold — the more risk you take, the bigger the payout.",
   },
 
   crash: {
     name: "Crash",
     ic: "rocket",
     sub: "pepe.fail Originals",
-    stats: [["99%", "RTP"], ["1 000 000×", "Gain max"]],
+    ac: "orange",
+    stats: [["99%", "RTP"], ["1,000,000×", "Max Win"]],
     controls: () =>
-      fieldInput("Montant de la mise", "1.00", "$1.00", true) +
-      fieldInput("Retrait automatique", "2.00", "2.00×", false) +
-      fieldSelect("Mode", ["Manuel", "Auto"], 0),
-    payout: ["Gain potentiel", "2.00×"],
-    action: "Parier",
+      fieldInput("Bet Amount", "1.00", "$1.00", true) +
+      fieldInput("Auto Cashout", "2.00", "2.00×", false) +
+      fieldSelect("Mode", ["Manual", "Auto"], 0),
+    payout: ["Potential Win", "2.00×"],
+    action: "Bet",
     stage: stageCrash,
-    hint: "Encaissez avant que la fusée ne s'écrase — sinon la mise est perdue.",
+    hint: "Cash out before the rocket crashes — otherwise the bet is lost.",
   },
 
   limbo: {
     name: "Limbo",
     ic: "chart",
     sub: "pepe.fail Originals",
-    stats: [["99%", "RTP"], ["1 000 000×", "Gain max"]],
+    ac: "gold",
+    stats: [["99%", "RTP"], ["1,000,000×", "Max Win"]],
     controls: () =>
-      fieldInput("Montant de la mise", "1.00", "$1.00", true) +
-      fieldInput("Multiplicateur cible", "2.00", "2.00×", false),
-    payout: ["Chance de gain", "49.50%"],
-    action: "Parier",
+      fieldInput("Bet Amount", "1.00", "$1.00", true) +
+      fieldInput("Target Multiplier", "2.00", "2.00×", false),
+    payout: ["Win Chance", "49.50%"],
+    action: "Bet",
     stage: stageLimbo,
-    hint: "Choisissez un multiplicateur cible — le tirage doit le dépasser pour gagner.",
+    hint: "Pick a target multiplier — the draw has to beat it for the bet to win.",
   },
 
   wheel: {
     name: "Wheel",
     ic: "wheel",
     sub: "pepe.fail Originals",
-    stats: [["99%", "RTP"], ["50×", "Gain max"]],
+    ac: "orange",
+    stats: [["99%", "RTP"], ["50×", "Max Win"]],
     controls: () =>
-      fieldInput("Montant de la mise", "1.00", "$1.00", true) +
-      fieldSelect("Risque", ["Faible", "Moyen", "Élevé"], 1) +
+      fieldInput("Bet Amount", "1.00", "$1.00", true) +
+      fieldSelect("Risk", ["Low", "Medium", "High"], 1) +
       fieldSelect("Segments", ["10", "20", "30", "50"], 1),
-    payout: ["Gain potentiel", "9.90×"],
-    action: "Faire tourner",
+    payout: ["Potential Win", "9.90×"],
+    action: "Spin",
     stage: stageWheel,
-    hint: "Faites tourner la roue et misez sur le segment gagnant.",
+    hint: "Spin the wheel and land on a paying segment.",
   },
 };
 
 /* ===================================================================
-   RENDUS DE SCÈNE
+   STAGE RENDERERS
    =================================================================== */
 
-/* --- PLINKO : pyramide de picots + rangée de multiplicateurs --- */
+/* --- PLINKO: peg pyramid + multiplier row --- */
 function stagePlinko() {
   let rows = "";
   for (let r = 3; r <= 13; r++) {
@@ -141,7 +153,7 @@ function stagePlinko() {
   return `<div class="plinko"><div class="pegs">${rows}</div><div class="mults">${cells}</div></div>`;
 }
 
-/* --- MINES : grille 5×5 --- */
+/* --- MINES: 5×5 grid --- */
 function stageMines() {
   const revealed = { 6: "gem", 8: "gem", 12: "gem", 17: "mine", 21: "gem" };
   let tiles = "";
@@ -153,7 +165,7 @@ function stageMines() {
   return `<div class="mines-grid">${tiles}</div>`;
 }
 
-/* --- DICE : résultat + curseur --- */
+/* --- DICE: result readout + slider --- */
 function stageDice() {
   return `
   <div class="dice-area">
@@ -169,7 +181,7 @@ function stageDice() {
   </div>`;
 }
 
-/* --- CRASH : courbe ascendante --- */
+/* --- CRASH: rising curve --- */
 function stageCrash() {
   return `
   <div class="crash-area">
@@ -205,7 +217,7 @@ function stageCrash() {
   </div>`;
 }
 
-/* --- LIMBO : gros multiplicateur --- */
+/* --- LIMBO: oversized multiplier --- */
 function stageLimbo() {
   return `
   <div class="dice-area">
@@ -217,7 +229,7 @@ function stageLimbo() {
   </div>`;
 }
 
-/* --- WHEEL : roue SVG segmentée --- */
+/* --- WHEEL: segmented SVG wheel --- */
 function stageWheel() {
   const N = 20;
   const COLORS = ["#ffd21e", "#ff7a00", "#242c40", "#ffb020", "#171c2a"];
@@ -244,14 +256,17 @@ function stageWheel() {
   </div>`;
 }
 
+/* Blackjack ships in its own file and registers here. */
+if (window.BLACKJACK_GAME) GAMES.blackjack = window.BLACKJACK_GAME;
+
 /* ===================================================================
-   MONTAGE DE LA PAGE
+   PAGE MOUNT
    =================================================================== */
 (function mountGamePage() {
   const g = GAMES[window.GAME];
   if (!g) return;
 
-  /* En-tête */
+  /* Header */
   document.getElementById("gameHead").innerHTML = `
     <div class="gh__ico">${icon(g.ic)}</div>
     <div>
@@ -262,40 +277,40 @@ function stageWheel() {
       ${g.stats.map(([v, k]) => `<div class="gh__stat"><b>${v}</b><span>${k}</span></div>`).join("")}
     </div>`;
 
-  /* Panneau de mise */
+  /* Bet panel — inactive tabs are glass, the action button keeps its accent */
   document.getElementById("bet").innerHTML = `
     <div class="bet__tabs">
-      <button class="active">Manuel</button>
-      <button>Auto</button>
+      <button class="active">Manual</button>
+      <button class="glass">Auto</button>
     </div>
     ${g.controls()}
     <div class="payout"><span>${g.payout[0]}</span><b>${g.payout[1]}</b></div>
-    <button class="btn btn--orange btn--lg btn--block">${g.action}</button>`;
+    <button class="btn btn--${g.ac || "orange"} btn--lg btn--block">${g.action}</button>`;
 
-  /* Scène */
+  /* Stage */
   document.getElementById("stage").innerHTML =
     g.stage() + `<div class="stage__hint">${g.hint}</div>`;
 
   document.title = `${g.name} — pepe.fail`;
 
-  /* --- Interactions légères (UI seulement) --- */
+  /* Moves .active to the clicked button and keeps the others glass. */
+  function selectOne(buttons, picked) {
+    buttons.forEach((b) => {
+      b.classList.toggle("active", b === picked);
+      b.classList.toggle("glass", b !== picked);
+    });
+  }
+
+  /* --- Light UI-only interactions --- */
   document.querySelectorAll("[data-chipgroup]").forEach((grp) => {
-    grp.querySelectorAll("button").forEach((b) => {
-      b.addEventListener("click", () => {
-        grp.querySelectorAll("button").forEach((x) => x.classList.remove("active"));
-        b.classList.add("active");
-      });
-    });
+    const buttons = Array.from(grp.querySelectorAll("button"));
+    buttons.forEach((b) => b.addEventListener("click", () => selectOne(buttons, b)));
   });
 
-  document.querySelectorAll(".bet__tabs button").forEach((b) => {
-    b.addEventListener("click", () => {
-      document.querySelectorAll(".bet__tabs button").forEach((x) => x.classList.remove("active"));
-      b.classList.add("active");
-    });
-  });
+  const tabs = Array.from(document.querySelectorAll(".bet__tabs button"));
+  tabs.forEach((b) => b.addEventListener("click", () => selectOne(tabs, b)));
 
-  /* Mines : retourner une case au clic */
+  /* Mines: toggle a tile on click */
   document.querySelectorAll(".tile").forEach((t) => {
     t.addEventListener("click", () => {
       if (t.classList.contains("gem") || t.classList.contains("mine")) {

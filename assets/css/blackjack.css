@@ -1,0 +1,344 @@
+/* ===================================================================
+   pepe.fail — Blackjack table
+   Loaded after styles.css / glass.css / anim.css / modal.css.
+   Only the blackjack stage is styled here; nothing global is touched.
+
+   Motion rules of this file:
+   - cards are dealt in 180ms with a 70ms stagger (transform + opacity);
+   - the face-down card flips in 260ms, and only when asked to;
+   - nothing loops, nothing moves on its own.
+   =================================================================== */
+
+.bj {
+  --bj-card-w: clamp(52px, 6.2vw, 74px);
+  --bj-overlap: calc(var(--bj-card-w) * 0.3);
+  --bj-ease: var(--ease-out, cubic-bezier(0.2, 0.7, 0.3, 1));
+
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 16px;
+}
+
+/* =========================== FELT =========================== */
+.bj-felt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 22px 20px 26px;
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 78% at 50% 4%, rgba(255, 255, 255, 0.035), transparent 62%),
+    radial-gradient(90% 60% at 50% 100%, rgba(255, 200, 40, 0.035), transparent 70%),
+    var(--panel);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* =========================== SEATS =========================== */
+.bj-seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.bj-seat--player {
+  margin-top: auto;
+}
+
+.bj-seat__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bj-seat__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.bj-seat__bet {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-dim);
+}
+
+/* Total pill */
+.bj-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  min-width: 40px;
+  justify-content: center;
+  padding: 4px 9px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--bg-800);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.bj-badge i {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--text-mute);
+}
+
+.bj-badge--player {
+  border-color: rgba(255, 210, 30, 0.28);
+  color: var(--gold);
+}
+
+.bj-badge--win {
+  border-color: rgba(255, 210, 30, 0.45);
+  background: rgba(255, 210, 30, 0.08);
+  color: var(--gold-hi);
+}
+
+.bj-badge--bust {
+  border-color: rgba(255, 77, 109, 0.4);
+  background: rgba(255, 77, 109, 0.08);
+  color: var(--red);
+}
+
+/* =========================== TABLE PRINT =========================== */
+.bj-rule {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--text-mute);
+}
+
+.bj-rule::before,
+.bj-rule::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-2), transparent);
+}
+
+.bj-rule span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* =========================== HANDS =========================== */
+.bj-hands {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 30px;
+}
+
+.bj-hand-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 10px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: border-color 160ms var(--bj-ease), background-color 160ms var(--bj-ease);
+}
+
+.bj-hand-wrap.is-active {
+  border-color: rgba(255, 210, 30, 0.22);
+  background: rgba(255, 210, 30, 0.03);
+}
+
+.bj-hand-wrap.is-lose .bj-badge,
+.bj-hand-wrap.is-bust .bj-badge {
+  border-color: rgba(255, 77, 109, 0.4);
+  color: var(--red);
+}
+
+.bj-hand-wrap.is-win {
+  border-color: rgba(255, 210, 30, 0.35);
+  background: rgba(255, 210, 30, 0.05);
+}
+
+.bj-hand {
+  display: flex;
+  align-items: flex-start;
+  padding-left: var(--bj-overlap);
+}
+
+/* Cards of one hand overlap, the way a real hand is held. */
+.bj-hand .bj-card {
+  margin-left: calc(var(--bj-overlap) * -1);
+}
+
+/* =========================== CARDS =========================== */
+.bj-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: var(--bj-card-w);
+  aspect-ratio: 1 / 1.45;
+  border-radius: calc(var(--bj-card-w) * 0.1);
+  perspective: 900px;
+  animation: bj-deal 180ms var(--bj-ease) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@keyframes bj-deal {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.bj-card__inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+}
+
+.bj-card__inner > * {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* --- Face --- */
+.bj-face {
+  background: #f4f1ea;
+  color: #14181f;
+  border-radius: calc(var(--bj-card-w) * 0.1);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+    0 6px 14px rgba(0, 0, 0, 0.45);
+  font-family: "Segoe UI Symbol", "Apple Symbols", "Noto Sans Symbols 2", sans-serif;
+}
+
+.bj-face--red { color: var(--red); }
+
+.bj-face__corner {
+  position: absolute;
+  top: calc(var(--bj-card-w) * 0.07);
+  left: calc(var(--bj-card-w) * 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.bj-face__corner b {
+  font-family: var(--font-display), sans-serif;
+  font-size: calc(var(--bj-card-w) * 0.2);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.bj-face__corner i {
+  font-style: normal;
+  font-size: calc(var(--bj-card-w) * 0.15);
+  margin-top: calc(var(--bj-card-w) * 0.025);
+}
+
+.bj-face__corner--br {
+  top: auto;
+  left: auto;
+  right: calc(var(--bj-card-w) * 0.08);
+  bottom: calc(var(--bj-card-w) * 0.07);
+  transform: rotate(180deg);
+}
+
+.bj-face__pip {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--bj-card-w) * 0.46);
+  line-height: 1;
+}
+
+/* --- Back of a face-down card --- */
+.bj-back {
+  border-radius: calc(var(--bj-card-w) * 0.1);
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 210, 30, 0.11) 0 2px, transparent 2px 8px),
+    repeating-linear-gradient(-45deg, rgba(255, 210, 30, 0.07) 0 2px, transparent 2px 8px),
+    linear-gradient(180deg, #151b2c, #0c101b);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 210, 30, 0.3),
+    inset 0 0 0 4px rgba(8, 11, 18, 0.92),
+    inset 0 0 0 5px rgba(255, 210, 30, 0.16),
+    0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+/* --- Flip: back is up until the card is turned over --- */
+.bj-card--hole .bj-card__inner {
+  transform: rotateY(180deg);
+  transition: transform 260ms var(--bj-ease);
+}
+
+.bj-card--hole .bj-back {
+  transform: rotateY(180deg);
+}
+
+.bj-card--hole.is-flipped .bj-card__inner {
+  transform: rotateY(0deg);
+}
+
+/* =========================== STATUS =========================== */
+.bj-status {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text-dim);
+  min-height: 16px;
+}
+
+/* =========================== ACTION ROW =========================== */
+.bj-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.bj-actions .btn {
+  min-width: 96px;
+  height: 40px;
+  padding: 0 16px;
+}
+
+.bj-actions .btn:disabled {
+  opacity: 0.36;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.bj-actions .btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* =========================== NARROW SCREENS =========================== */
+@media (max-width: 900px) {
+  .bj-felt { padding: 18px 12px 22px; }
+  .bj-actions .btn { min-width: 0; flex: 1 1 30%; }
+}
+
+/* =========================== REDUCED MOTION =========================== */
+@media (prefers-reduced-motion: reduce) {
+  .bj-card { animation: none; }
+  .bj-card--hole .bj-card__inner,
+  .bj-hand-wrap { transition: none; }
+}

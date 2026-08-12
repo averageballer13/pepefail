@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recently Played — pepe.fail</title>
+  <title>Limbo — pepe.fail</title>
   <link rel="icon" type="image/png" href="../assets/img/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,25 +17,39 @@
   <div class="app">
     <main class="main">
       <div class="main__inner">
-        <div class="page-head" id="pageHead"></div>
-        <div class="filters" id="filters"></div>
-        <div class="game-grid" id="grid"></div>
+        <div class="gh" id="gameHead"></div>
+        <div class="game-page">
+          <div class="bet" id="bet"></div>
+          <div class="stage" id="stage"></div>
+        </div>
+
+        <section class="section" style="margin-top:30px">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="diamond"></span>More Originals</h2>
+            <a class="section__all" href="../casino.html">View all</a>
+          </div>
+          <div class="game-row" id="more"></div>
+        </section>
 
         <div class="foot">
-          pepe.fail — Demonstration mockup only. Not a real casino, no real-money gambling.<br>
+          pepe.fail — Demo mockup. No real-money gambling.<br>
           Play responsibly · 18+
         </div>
       </div>
     </main>
   </div>
 
-  <script>window.PAGE = { active: "recent", base: "../" }; window.CAT = "recent";</script>
+  <script>window.PAGE = { active: "limbo", base: "../" }; window.GAME = "limbo";</script>
   <script src="../assets/js/icons.js"></script>
   <script src="../assets/js/shell.js"></script>
   <script src="../assets/js/games-data.js"></script>
   <script src="../assets/js/modal.js"></script>
   <script src="../assets/js/wallet.js"></script>
   <script src="../assets/js/anim.js"></script>
-  <script src="../assets/js/category-page.js"></script>
+  <script src="../assets/js/game-page.js"></script>
+  <script>
+    hydrateIcons();
+    fillRow("more", ORIGINALS.filter(function (g) { return g.n.toLowerCase().indexOf("limbo") === -1; }), "../");
+  </script>
 </body>
 </html>

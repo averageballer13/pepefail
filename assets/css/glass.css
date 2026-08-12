@@ -1,0 +1,398 @@
+/* ===================================================================
+   pepe.fail — glass button system
+   Loaded AFTER styles.css. Overrides rely on source order + :not(),
+   never on !important.
+
+   Two tiers, on purpose:
+
+   TIER 1 "true glass"  — translucent fill + backdrop-filter.
+     Reserved for controls that sit on top of a gradient, an image or
+     the page radial glow, where there is actually something to blur.
+     Kept to a handful of elements per view (topbar, carousel arrows,
+     category filters, secondary buttons).
+
+   TIER 2 "flat glass"  — same fill and inner highlight, NO backdrop-filter.
+     Used for dense clusters nested inside an already opaque panel
+     (.bet, .seg, .input-wrap). Blurring a flat surface costs a
+     compositor layer and produces zero visible difference.
+
+   Gold / orange gradient controls are intentionally untouched.
+   =================================================================== */
+
+:root {
+  /* Neutral glass */
+  --glass-bg: rgba(255, 255, 255, 0.045);
+  --glass-bg-hover: rgba(255, 255, 255, 0.075);
+  --glass-bg-active: rgba(255, 255, 255, 0.03);
+  --glass-bd: rgba(255, 255, 255, 0.10);
+  --glass-bd-hover: rgba(255, 255, 255, 0.16);
+
+  /* Top inner highlight — the single detail that sells the material */
+  --glass-hi: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  --glass-hi-soft: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+
+  /* Gold-tinted glass — deliberately faint */
+  --glass-gold-bg: rgba(255, 210, 30, 0.07);
+  --glass-gold-bg-hover: rgba(255, 210, 30, 0.11);
+  --glass-gold-bd: rgba(255, 210, 30, 0.18);
+  --glass-gold-bd-hover: rgba(255, 210, 30, 0.28);
+  --glass-gold-hi: inset 0 1px 0 rgba(255, 232, 107, 0.14);
+
+  --glass-blur: blur(12px) saturate(140%);
+  --glass-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --glass-t: 160ms;
+}
+
+/* ===================================================================
+   1. .btn--glass — secondary button
+   =================================================================== */
+.btn--glass {
+  background-color: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-hi);
+  color: var(--text);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    border-color var(--glass-t) var(--glass-ease),
+    color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+.btn--glass:hover {
+  background-color: var(--glass-bg-hover);
+  border-color: var(--glass-bd-hover);
+}
+.btn--glass:active {
+  background-color: var(--glass-bg-active);
+  transform: translateY(1px);
+}
+
+/* ===================================================================
+   2. .btn--glass-gold — same material, faint brand tint
+   =================================================================== */
+.btn--glass-gold {
+  background-color: var(--glass-gold-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-gold-bd);
+  box-shadow: var(--glass-gold-hi);
+  color: var(--gold-hi);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    border-color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+.btn--glass-gold:hover {
+  background-color: var(--glass-gold-bg-hover);
+  border-color: var(--glass-gold-bd-hover);
+}
+.btn--glass-gold:active {
+  background-color: var(--glass-gold-bg);
+  transform: translateY(1px);
+}
+
+/* Icon sizing inside glass buttons, matching .btn metrics */
+.btn--glass > svg,
+.btn--glass-gold > svg {
+  width: 17px;
+  height: 17px;
+  flex: none;
+}
+
+/* ===================================================================
+   3. .glass — utility for arbitrary surfaces (modals, cards, landing)
+   .glass--flat drops the blur when the element sits on a flat panel
+   or when many instances share a view.
+   =================================================================== */
+.glass {
+  background-color: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-hi);
+  color: var(--text);
+}
+.glass--flat {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.glass--gold {
+  background-color: var(--glass-gold-bg);
+  border-color: var(--glass-gold-bd);
+  box-shadow: var(--glass-gold-hi);
+}
+/* Interactive variant of the utility */
+.glass.is-interactive {
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    border-color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+.glass.is-interactive:hover {
+  background-color: var(--glass-bg-hover);
+  border-color: var(--glass-bd-hover);
+}
+.glass.is-interactive:active {
+  background-color: var(--glass-bg-active);
+  transform: translateY(1px);
+}
+
+/* ===================================================================
+   4. Existing controls retro-fitted to glass
+   Each block matches or beats the specificity used in styles.css.
+   =================================================================== */
+
+/* --- 4a. Topbar icon buttons — TIER 1 (over the topbar / page glow) --- */
+.icon-btn {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-hi);
+  color: var(--text-dim);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    border-color var(--glass-t) var(--glass-ease),
+    color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+/* styles.css ships .icon-btn:hover at (0,2,0) — equal weight, we load later */
+.icon-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-bd-hover);
+  color: var(--gold);
+}
+.icon-btn:active {
+  background: var(--glass-bg-active);
+  transform: translateY(1px);
+}
+
+/* --- 4b. Carousel arrows — TIER 1 (at most 2 per section) --- */
+.section__nav button {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-hi);
+  color: var(--text-dim);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    border-color var(--glass-t) var(--glass-ease),
+    color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+.section__nav button:hover {
+  background: var(--glass-bg-hover);
+  /* neutral border instead of the previous gold ring — less shouty */
+  border-color: var(--glass-bd-hover);
+  color: var(--gold);
+}
+.section__nav button:active {
+  background: var(--glass-bg-active);
+  transform: translateY(1px);
+}
+
+/* --- 4c. Category filters, inactive only — TIER 1 (max ~6 per page) ---
+   .filters button.active keeps the gold gradient from styles.css. */
+.filters button:not(.active) {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-hi);
+  color: var(--text-dim);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    border-color var(--glass-t) var(--glass-ease),
+    color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+/* beats .filters button:hover (0,2,1) with (0,3,1) */
+.filters button:not(.active):hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-bd-hover);
+  color: var(--text);
+}
+.filters button:not(.active):active {
+  background: var(--glass-bg-active);
+  transform: translateY(1px);
+}
+
+/* --- 4d. Bet chips, inactive only — TIER 2 (up to 12, inside .bet) ---
+   beats ".chips button:hover, .chips button.active" (0,2,1) with (0,3,1) */
+.chips button:not(.active) {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-hi-soft);
+  color: var(--text-dim);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    border-color var(--glass-t) var(--glass-ease),
+    color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+.chips button:not(.active):hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-bd-hover);
+  color: var(--text);
+}
+.chips button:not(.active):active {
+  background: var(--glass-bg-active);
+  transform: translateY(1px);
+}
+
+/* --- 4e. ½ / 2× steppers — TIER 2 (inside the opaque .input-wrap) ---
+   Inset ring, not a border: these sit in a tight flex row and must not
+   grow by 2px. */
+.input-wrap .mini {
+  background: var(--glass-bg);
+  box-shadow: var(--glass-hi-soft), inset 0 0 0 1px var(--glass-bd);
+  color: var(--text-dim);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    box-shadow var(--glass-t) var(--glass-ease),
+    color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+.input-wrap .mini:hover {
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-hi-soft), inset 0 0 0 1px var(--glass-bd-hover);
+  color: var(--gold);
+}
+.input-wrap .mini:active {
+  background: var(--glass-bg-active);
+  transform: translateY(1px);
+}
+
+/* --- 4f. .btn--dark → glass — TIER 1 --- */
+.btn--dark {
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-bd);
+  box-shadow: var(--glass-hi);
+  color: var(--text);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    border-color var(--glass-t) var(--glass-ease),
+    transform 120ms var(--glass-ease);
+}
+.btn--dark:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-bd-hover);
+}
+.btn--dark:active {
+  background: var(--glass-bg-active);
+  transform: translateY(1px);
+}
+
+/* --- 4g. Inactive tabs — TIER 2 (nested in an opaque track) ---
+   .seg button.active and .bet__tabs button.active keep the gold gradient.
+   The edge is drawn with an inset ring rather than a real border so the
+   active (border-less) segment keeps exactly the same box metrics. */
+.seg button:not(.active),
+.bet__tabs button:not(.active) {
+  background: var(--glass-bg);
+  box-shadow: var(--glass-hi-soft), inset 0 0 0 1px var(--glass-bd);
+  color: var(--text-dim);
+  transition:
+    background-color var(--glass-t) var(--glass-ease),
+    box-shadow var(--glass-t) var(--glass-ease),
+    color var(--glass-t) var(--glass-ease);
+}
+.seg button:not(.active):hover,
+.bet__tabs button:not(.active):hover {
+  background: var(--glass-bg-hover);
+  box-shadow: var(--glass-hi-soft), inset 0 0 0 1px var(--glass-bd-hover);
+  color: var(--text);
+}
+
+/* ===================================================================
+   5. Focus ring — one rule for every glass control
+   =================================================================== */
+.btn--glass:focus-visible,
+.btn--glass-gold:focus-visible,
+.glass.is-interactive:focus-visible,
+.icon-btn:focus-visible,
+.section__nav button:focus-visible,
+.filters button:focus-visible,
+.chips button:focus-visible,
+.input-wrap .mini:focus-visible,
+.btn--dark:focus-visible,
+.seg button:focus-visible,
+.bet__tabs button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ===================================================================
+   6. Fallback — no backdrop-filter support
+   Opaque surface, same borders and highlight so the layout is identical.
+   =================================================================== */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .btn--glass,
+  .glass,
+  .icon-btn,
+  .section__nav button,
+  .filters button:not(.active),
+  .btn--dark {
+    background-color: var(--bg-700);
+  }
+  .btn--glass:hover,
+  .glass.is-interactive:hover,
+  .icon-btn:hover,
+  .section__nav button:hover,
+  .filters button:not(.active):hover,
+  .btn--dark:hover {
+    background-color: var(--hover);
+  }
+  .btn--glass:active,
+  .glass.is-interactive:active,
+  .icon-btn:active,
+  .section__nav button:active,
+  .filters button:not(.active):active,
+  .btn--dark:active {
+    background-color: var(--bg-600);
+  }
+  .btn--glass-gold {
+    background-color: var(--bg-700);
+    background-image: linear-gradient(
+      rgba(255, 210, 30, 0.07),
+      rgba(255, 210, 30, 0.07)
+    );
+  }
+  .btn--glass-gold:hover {
+    background-color: var(--hover);
+  }
+}
+
+/* ===================================================================
+   7. Reduced motion
+   =================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .btn--glass,
+  .btn--glass-gold,
+  .glass.is-interactive,
+  .icon-btn,
+  .section__nav button,
+  .filters button:not(.active),
+  .chips button:not(.active),
+  .input-wrap .mini,
+  .btn--dark,
+  .seg button:not(.active),
+  .bet__tabs button:not(.active) {
+    transition-duration: 1ms;
+  }
+  .btn--glass:active,
+  .btn--glass-gold:active,
+  .glass.is-interactive:active,
+  .icon-btn:active,
+  .section__nav button:active,
+  .filters button:not(.active):active,
+  .chips button:not(.active):active,
+  .input-wrap .mini:active,
+  .btn--dark:active {
+    transform: none;
+  }
+}

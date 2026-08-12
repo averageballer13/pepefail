@@ -1,0 +1,468 @@
+/* ===================================================================
+   pepe.fail — modal system
+   Owns: .pm-* (pepe modal). Loaded after styles.css / glass.css / anim.css.
+   Also carries the content primitives used inside modals (fields, keys,
+   checkboxes, QR card) since modal content is built entirely in JS.
+   =================================================================== */
+
+.pm-lock { overflow: hidden !important; }
+
+/* =========================== OVERLAY =========================== */
+.pm-overlay {
+  --pm-ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --pm-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: rgba(4, 6, 11, 0.72);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 160ms var(--pm-ease);
+}
+.pm-overlay.is-open { opacity: 1; }
+
+/* =========================== PANEL =========================== */
+.pm-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  max-height: calc(100vh - 40px);
+  background: var(--panel);
+  border: 1px solid var(--line-2);
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), 0 4px 14px rgba(0, 0, 0, 0.4);
+  outline: none;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 200ms var(--pm-ease), transform 200ms var(--pm-ease);
+}
+.pm-overlay.is-open .pm-panel { opacity: 1; transform: none; }
+
+.pm-panel--sm { max-width: 380px; }
+.pm-panel--md { max-width: 440px; }
+.pm-panel--lg { max-width: 560px; }
+
+.pm-panel :focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* --- Close --- */
+.pm-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--text-mute);
+  background: transparent;
+  border: 1px solid transparent;
+  transition: color 160ms var(--pm-ease), background-color 160ms var(--pm-ease),
+              border-color 160ms var(--pm-ease);
+}
+.pm-close:hover {
+  color: var(--text);
+  background: var(--hover);
+  border-color: var(--line-2);
+}
+.pm-close svg { width: 16px; height: 16px; }
+
+/* --- Header --- */
+.pm-head { padding: 20px 52px 0 20px; }
+.pm-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+.pm-sub {
+  margin-top: 7px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+/* --- Body --- */
+.pm-body {
+  padding: 18px 20px 0;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.pm-body > :last-child { margin-bottom: 0; }
+
+/* --- Actions --- */
+.pm-actions {
+  display: flex;
+  gap: 8px;
+  padding: 18px 20px;
+}
+.pm-actions[hidden] { display: none; }
+.pm-actions .pm-btn { flex: 1; }
+
+/* --- Trust band --- */
+.pm-trust {
+  margin-top: 18px;
+  padding: 13px 20px;
+  display: grid;
+  gap: 9px;
+  background: var(--bg-800);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.pm-trust__row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.pm-trust__row svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  color: var(--text-mute);
+}
+
+/* --- Brand footer --- */
+.pm-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border-top: 1px solid var(--line);
+}
+.pm-brand img {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  object-fit: cover;
+  flex: none;
+}
+.pm-brand span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text-mute);
+}
+
+/* =========================== BUTTONS =========================== */
+.pm-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform 120ms var(--pm-ease), filter 160ms var(--pm-ease),
+              background-color 160ms var(--pm-ease), border-color 160ms var(--pm-ease),
+              opacity 160ms var(--pm-ease);
+}
+.pm-btn:active { transform: translateY(1px); }
+.pm-btn:disabled { opacity: 0.4; pointer-events: none; }
+.pm-btn svg { width: 16px; height: 16px; }
+
+.pm-btn--gold { background: var(--grad-gold); color: #201800; }
+.pm-btn--gold:hover { filter: brightness(1.05); }
+
+.pm-btn--orange { background: var(--grad-orange); color: #2a1400; }
+.pm-btn--orange:hover { filter: brightness(1.05); }
+
+.pm-btn--glass {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-2);
+  color: var(--text);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.pm-btn--glass:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+/* Busy state */
+.pm-btn.is-busy { pointer-events: none; opacity: 0.75; }
+.pm-btn.is-busy .pm-btn__label { opacity: 0.55; }
+.pm-spin {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  opacity: 0.8;
+  animation: pm-spin 620ms linear infinite;
+}
+@keyframes pm-spin { to { transform: rotate(360deg); } }
+
+/* Inline text button */
+.pm-linkbtn {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-mute);
+  border-radius: 6px;
+  padding: 2px 0;
+  transition: color 160ms var(--pm-ease);
+}
+.pm-linkbtn:hover { color: var(--text-dim); }
+.pm-linkbtn--danger:hover { color: var(--red); }
+
+/* =========================== FORM PRIMITIVES =========================== */
+.pm-field { margin-bottom: 14px; }
+.pm-field:last-child { margin-bottom: 0; }
+
+.pm-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.pm-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  background: var(--bg-800);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 160ms var(--pm-ease), box-shadow 160ms var(--pm-ease);
+}
+.pm-input::placeholder { color: var(--text-mute); }
+.pm-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(255, 210, 30, 0.1);
+}
+.pm-input.is-invalid { border-color: var(--red); }
+.pm-input.is-invalid:focus { box-shadow: 0 0 0 3px rgba(255, 77, 109, 0.12); }
+
+/* --- Password strength --- */
+.pm-strength { margin-top: 9px; }
+.pm-strength__bars { display: flex; gap: 4px; }
+.pm-strength__bars i {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--bg-600);
+  transition: background-color 160ms var(--pm-ease);
+}
+.pm-strength__label {
+  display: block;
+  margin-top: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-mute);
+}
+.pm-strength[data-level="1"] .pm-strength__bars i:nth-child(-n + 1),
+.pm-strength[data-level="2"] .pm-strength__bars i:nth-child(-n + 2) { background: var(--orange-lo); }
+.pm-strength[data-level="3"] .pm-strength__bars i:nth-child(-n + 3) { background: var(--gold-lo); }
+.pm-strength[data-level="4"] .pm-strength__bars i { background: var(--green); }
+
+/* --- Checkbox --- */
+.pm-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 12px;
+  background: var(--bg-800);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: border-color 160ms var(--pm-ease);
+}
+.pm-check:hover { border-color: var(--line-2); }
+.pm-check input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.pm-check__box {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin-top: 1px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-2);
+  border-radius: 5px;
+  background: var(--bg-700);
+  transition: background 140ms var(--pm-ease), border-color 140ms var(--pm-ease);
+}
+.pm-check__box svg {
+  width: 12px;
+  height: 12px;
+  color: #201800;
+  opacity: 0;
+  transition: opacity 120ms var(--pm-ease);
+}
+.pm-check input:checked + .pm-check__box {
+  background: var(--grad-gold);
+  border-color: transparent;
+}
+.pm-check input:checked + .pm-check__box svg { opacity: 1; }
+.pm-check input:focus-visible + .pm-check__box {
+  box-shadow: 0 0 0 3px rgba(255, 210, 30, 0.18);
+}
+
+/* =========================== CONTENT BLOCKS =========================== */
+.pm-note {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--text-mute);
+}
+.pm-note b { color: var(--text-dim); font-weight: 700; }
+
+.pm-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.pm-alert svg { width: 15px; height: 15px; flex: none; margin-top: 1px; }
+.pm-alert--error {
+  background: rgba(255, 77, 109, 0.09);
+  border: 1px solid rgba(255, 77, 109, 0.28);
+  color: #ffb3c1;
+}
+.pm-alert--warn {
+  background: rgba(255, 122, 0, 0.08);
+  border: 1px solid rgba(255, 122, 0, 0.26);
+  color: #ffcf9a;
+}
+.pm-alert[hidden] { display: none; }
+
+/* --- Monospace key / address --- */
+.pm-key {
+  padding: 12px;
+  background: var(--bg-900);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  font-family: var(--pm-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  word-break: break-all;
+  color: var(--text);
+  user-select: all;
+  -webkit-user-select: all;
+}
+.pm-key--lg { font-size: 14px; text-align: center; }
+
+.pm-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  height: 38px;
+  margin-top: 8px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-2);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 700;
+  transition: color 160ms var(--pm-ease), background-color 160ms var(--pm-ease),
+              border-color 160ms var(--pm-ease);
+}
+.pm-copy:hover { color: var(--text); background: rgba(255, 255, 255, 0.09); }
+.pm-copy svg { width: 15px; height: 15px; }
+.pm-copy.is-done { color: var(--green); border-color: rgba(74, 222, 128, 0.35); }
+
+/* --- QR card --- */
+.pm-qr {
+  width: 176px;
+  margin: 0 auto 14px;
+  padding: 10px;
+  background: #ffffff;
+  border-radius: 12px;
+}
+.pm-qr svg { display: block; width: 100%; height: auto; }
+
+/* --- Key/value rows --- */
+.pm-rows { display: grid; gap: 1px; background: var(--line); border-radius: 10px; overflow: hidden; }
+.pm-rows > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-800);
+  font-size: 12.5px;
+}
+.pm-rows dt, .pm-rows span:first-child { color: var(--text-mute); font-weight: 600; }
+.pm-rows dd, .pm-rows span:last-child { color: var(--text); font-weight: 700; font-family: var(--pm-mono); }
+
+/* --- Step indicator --- */
+.pm-steps { display: flex; gap: 5px; margin-bottom: 14px; }
+.pm-steps i {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--bg-600);
+  transition: background 160ms var(--pm-ease);
+}
+.pm-steps i.is-on { background: var(--grad-gold); }
+
+.pm-stack > * + * { margin-top: 12px; }
+
+/* =========================== RESPONSIVE =========================== */
+@media (max-width: 520px) {
+  .pm-overlay { padding: 12px; align-items: flex-end; }
+  .pm-panel { max-height: calc(100vh - 24px); }
+  .pm-actions { flex-direction: column-reverse; }
+  .pm-actions .pm-btn { width: 100%; }
+}
+
+/* =========================== REDUCED MOTION =========================== */
+@media (prefers-reduced-motion: reduce) {
+  .pm-overlay,
+  .pm-panel,
+  .pm-btn,
+  .pm-input,
+  .pm-copy,
+  .pm-close,
+  .pm-check,
+  .pm-check__box,
+  .pm-strength__bars i,
+  .pm-steps i {
+    transition-duration: 1ms;
+  }
+  .pm-panel { transform: none; }
+  .pm-spin { animation: none; }
+}
