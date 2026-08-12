@@ -12,9 +12,7 @@ const MONO_STACK = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 /* --- Navigation tree --- */
 const NAV_MAIN = [
   { k: "home", ic: "home", t: "Home", href: B + "casino.html" },
-  { k: "favoris", ic: "star", t: "Favorites", href: B + "pages/favoris.html" },
   { k: "recent", ic: "clock", t: "Recently Played", href: B + "pages/recent.html" },
-  { k: "new", ic: "sparkle", t: "New Releases", href: B + "pages/nouveautes.html" },
 ];
 
 const NAV_GROUPS = [
@@ -27,32 +25,10 @@ const NAV_GROUPS = [
       { k: "roulette", ic: "wheel", t: "Roulette", href: B + "pages/live.html" },
     ],
   },
-  {
-    k: "originals", ic: "diamond", t: "Originals", open: true,
-    items: [
-      { k: "plinko", ic: "plinko", t: "Plinko", href: B + "games/plinko.html" },
-      { k: "mines", ic: "bomb", t: "Mines", href: B + "games/mines.html" },
-      { k: "dice", ic: "dice", t: "Dice", href: B + "games/dice.html" },
-      { k: "crash", ic: "rocket", t: "Crash", href: B + "games/crash.html" },
-      { k: "limbo", ic: "chart", t: "Limbo", href: B + "games/limbo.html" },
-      { k: "wheel", ic: "wheel", t: "Wheel", href: B + "games/wheel.html" },
-    ],
-  },
-  {
-    k: "promos", ic: "gift", t: "Promotions", open: true,
-    items: [
-      { k: "vip", ic: "crown", t: "VIP", href: B + "pages/promotions.html", pill: "EXCLUSIVE", pillMod: "gold" },
-      { k: "cq", ic: "trophy", t: "Daily Race", href: B + "pages/promotions.html", pill: "01:01", pillMod: "live" },
-      { k: "ch", ic: "trophy", t: "Weekly Race", href: B + "pages/promotions.html", pill: "3d" },
-      { k: "cm", ic: "diamond", t: "Monthly Race", href: B + "pages/promotions.html", pill: "20d" },
-      { k: "challenges", ic: "target", t: "Challenges", href: B + "pages/promotions.html" },
-    ],
-  },
 ];
 
 const NAV_FOOT = [
   { k: "rewards", ic: "shield", t: "Rewards", href: B + "pages/promotions.html" },
-  { k: "blog", ic: "book", t: "Blog", href: B + "pages/promotions.html" },
   { k: "landing", ic: "sparkle", t: "Landing", href: B + "index.html" },
 ];
 

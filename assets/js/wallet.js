@@ -597,13 +597,29 @@
   ];
 
   /* --- Copy to clipboard --- */
+  /* navigator.clipboard.writeText never settles while the document is unfocused,
+     so fall back to the synchronous path instead of leaving the button silent. */
   function copyToClipboard(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      return navigator.clipboard.writeText(text).catch(function () {
-        return legacyCopy(text);
-      });
-    }
-    return legacyCopy(text);
+    var modern = navigator.clipboard && navigator.clipboard.writeText && document.hasFocus();
+    if (!modern) return legacyCopy(text);
+
+    return new Promise(function (resolve, reject) {
+      var settled = false;
+      var fallback = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        legacyCopy(text).then(resolve, reject);
+      };
+      var timer = setTimeout(fallback, 1000);
+
+      navigator.clipboard.writeText(text).then(function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve();
+      }, fallback);
+    });
   }
 
   function legacyCopy(text) {
