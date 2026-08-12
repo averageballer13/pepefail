@@ -246,8 +246,8 @@ function renderShell() {
       ${segTab({ ic: "rocket", t: "Crypto Futures", locked: true })}
     </div>
     <div class="topbar__spacer"></div>
-    <button class="icon-btn glass" title="Search">${icon("search", 2)}</button>
-    <button class="icon-btn glass" title="Rewards">${icon("gift", 2)}</button>
+    <button class="icon-btn glass" title="Search" data-open="search">${icon("search", 2)}</button>
+    <button class="icon-btn glass" title="Referrals" data-open="referrals">${icon("gift", 2)}</button>
     <div class="topbar__auth" id="topbarAuth"></div>`;
 
   /* Sidebar */
@@ -381,6 +381,23 @@ document.addEventListener("pepe:wallet", renderAuth);
 /* --- Shell interactions --- */
 document.querySelectorAll("[data-group] [data-toggle]").forEach((t) => {
   t.addEventListener("click", () => t.closest("[data-group]").classList.toggle("open"));
+});
+
+/* Topbar panels. Ctrl/Cmd+K opens search, like every other search field
+   a player already uses. */
+document.querySelectorAll("[data-open]").forEach((b) => {
+  b.addEventListener("click", () => {
+    const which = b.dataset.open;
+    if (which === "search" && window.PepeSearch) window.PepeSearch.open();
+    if (which === "referrals" && window.PepeReferrals) window.PepeReferrals.open();
+  });
+});
+
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    if (window.PepeSearch) window.PepeSearch.open();
+  }
 });
 
 document.querySelectorAll(".seg button").forEach((b) => {
