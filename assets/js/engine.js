@@ -105,6 +105,75 @@
     return RTP / chance;
   }
 
+  /* =========================== RANKS ===========================
+     Progress is earned on fees paid to the house, not on wins. Wagering
+     is what actually costs you, so it is what the ladder measures — and
+     it cannot be farmed by a lucky streak. */
+  var XP_KEY = "pepe.xp";
+
+  var RANKS = [
+    { k: "tadpole", n: "Tadpole",     ic: "chip",    at: 0 },
+    { k: "frog", n: "Frog",           ic: "frog",    at: 10 },
+    { k: "golden", n: "Golden Frog",  ic: "star",    at: 100 },
+    { k: "king", n: "King Pepe",      ic: "crown",   at: 1000 },
+    { k: "legend", n: "Legend",       ic: "diamond", at: 10000 },
+  ];
+
+  var xp = readXp();
+
+  function readXp() {
+    try {
+      var v = parseFloat(window.localStorage.getItem(XP_KEY));
+      return isFinite(v) && v >= 0 ? v : 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  function saveXp() {
+    try { window.localStorage.setItem(XP_KEY, String(xp)); } catch (e) {}
+  }
+
+  var Rank = {
+    xp: function () { return xp; },
+    ranks: RANKS,
+
+    /* A wager of `amount` hands the house `amount * edge` on average.
+       That is the fee, and that is the XP. */
+    wager: function (amount) {
+      if (!(amount > 0)) return;
+      var before = Rank.current().k;
+      xp = round2(xp + amount * HOUSE_EDGE);
+      saveXp();
+      var after = Rank.current().k;
+      document.dispatchEvent(
+        new CustomEvent("pepe:rank", { detail: { xp: xp, promoted: before !== after } })
+      );
+    },
+
+    current: function () {
+      var r = RANKS[0];
+      for (var i = 0; i < RANKS.length; i++) if (xp >= RANKS[i].at) r = RANKS[i];
+      return r;
+    },
+
+    next: function () {
+      for (var i = 0; i < RANKS.length; i++) if (xp < RANKS[i].at) return RANKS[i];
+      return null;
+    },
+
+    /* 0..1 through the current band; a maxed rank reads as full. */
+    progress: function () {
+      var cur = Rank.current();
+      var nxt = Rank.next();
+      if (!nxt) return 1;
+      var span = nxt.at - cur.at;
+      return span <= 0 ? 1 : clamp((xp - cur.at) / span, 0, 1);
+    },
+
+    reset: function () { xp = 0; saveXp(); document.dispatchEvent(new CustomEvent("pepe:rank", { detail: { xp: 0 } })); },
+  };
+
   /* =========================== PLAY HISTORY ===========================
      Recently played starts empty and only fills once a bet is actually
      settled — it reflects what you did, it is not a shop window. */
@@ -156,6 +225,7 @@
 
   window.PepeEngine = {
     History: History,
+    Rank: Rank,
     HOUSE_EDGE: HOUSE_EDGE,
     RTP: RTP,
     rnd: rnd,

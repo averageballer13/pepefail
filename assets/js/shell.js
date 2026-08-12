@@ -162,6 +162,34 @@ function renderAuth() {
   slot.appendChild(btn);
 }
 
+/* ===================================================================
+   RANK BAR
+   Progress is fees paid, so the bar only moves when you actually play.
+   =================================================================== */
+function renderRank() {
+  const host = document.getElementById("rankBar");
+  const E = window.PepeEngine;
+  if (!host || !E || !E.Rank) return;
+
+  const R = E.Rank;
+  const cur = R.current();
+  const nxt = R.next();
+  const pct = Math.round(R.progress() * 100);
+
+  host.innerHTML =
+    '<div class="rankbar__top">' +
+      '<span class="rankbar__ico">' + icon(cur.ic, 2) + "</span>" +
+      '<span class="rankbar__n">' + cur.n + "</span>" +
+      '<span class="rankbar__pct">' + pct + "%</span>" +
+    "</div>" +
+    '<div class="rankbar__track"><div class="rankbar__fill" style="width:' + pct + '%"></div></div>' +
+    '<div class="rankbar__foot">' +
+      (nxt
+        ? "<span>" + E.fmt(R.xp()) + " / " + E.fmt(nxt.at) + " XP</span><span>" + nxt.n + "</span>"
+        : "<span>" + E.fmt(R.xp()) + " XP</span><span>Max rank</span>") +
+    "</div>";
+}
+
 function openWallet(tab) {
   if (window.PepeWalletPanel) window.PepeWalletPanel.open(tab);
   else if (window.PepeWallet) window.PepeWallet.open();
@@ -199,16 +227,15 @@ function renderShell() {
   sidebar.className = "sidebar";
   sidebar.innerHTML = `
     <div class="promo-card">
-      <div class="promo-card__ico">${icon("ticket")}</div>
-      <div class="promo-card__amount">$0</div>
-      <div class="promo-card__label">WEEKLY DRAW</div>
+      <img class="promo-card__banner" src="${B}assets/img/draw-banner.jpg" alt="" />
+      <div class="promo-card__body">
+        <div class="promo-card__ico">${icon("ticket")}</div>
+        <div class="promo-card__amount">$0</div>
+        <div class="promo-card__label">WEEKLY DRAW</div>
+      </div>
     </div>
 
-    <div class="stats">
-      <div class="stat"><div class="stat__k">Daily</div><div class="stat__v">$0</div></div>
-      <div class="stat"><div class="stat__k">Weekly</div><div class="stat__v">$0</div></div>
-      <div class="stat"><div class="stat__k">Monthly</div><div class="stat__v">$0</div></div>
-    </div>
+    <div class="rankbar" id="rankBar"></div>
 
     <nav class="nav">
       ${NAV_MAIN.map((n) => navItem(n)).join("")}
@@ -312,7 +339,9 @@ function renderFooter() {
 
 renderShell();
 renderAuth();
+renderRank();
 renderFooter();
+document.addEventListener("pepe:rank", renderRank);
 
 /* wallet.js loads after this file, so re-render once every script has run,
    then on every wallet state change. */

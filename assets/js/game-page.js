@@ -763,6 +763,7 @@ if (window.BLACKJACK_GAME) GAMES.blackjack = window.BLACKJACK_GAME;
 
     stake = amount;
     Bank.sub(amount);
+    E.Rank.wager(amount);
     flash("", null);
 
     if (!counted) { History.played(window.GAME); counted = true; }

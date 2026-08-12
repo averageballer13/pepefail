@@ -212,9 +212,33 @@ h1, h2, h3, .display {
   background: linear-gradient(135deg, #1c2233, #10131c);
   border: 1px solid var(--line-2);
   border-radius: var(--radius);
-  padding: 13px 13px 13px 48px;
   margin-bottom: 14px;
   overflow: hidden;
+}
+
+/* Banner strip across the top of the card. Cropped rather than scaled:
+   the artwork is 2:1 and the strip is far wider than tall, so cover +
+   a slightly high focal point keeps the figure and the machine in frame. */
+.promo-card__banner {
+  display: block;
+  width: 100%;
+  height: 86px;
+  object-fit: cover;
+  object-position: center 42%;
+}
+/* fades the artwork into the card instead of ending on a hard line */
+.promo-card__banner + .promo-card__body::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: -26px;
+  height: 26px;
+  background: linear-gradient(to bottom, transparent, #171d2b);
+  pointer-events: none;
+}
+
+.promo-card__body {
+  position: relative;
+  padding: 13px 13px 13px 48px;
 }
 .promo-card__ico {
   position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
@@ -230,16 +254,70 @@ h1, h2, h3, .display {
   padding: 2px 8px; border-radius: 6px;
 }
 
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
-.stat {
-  background: var(--bg-800); border: 1px solid var(--line);
-  border-radius: var(--radius-sm); padding: 9px 6px; text-align: center;
+/* --- Rank progress ---------------------------------------------
+   The one cool-toned element in a gold interface, so progress reads
+   instantly as a different kind of thing from money. */
+.rankbar {
+  --slurp: #6fe3ff;
+  --slurp-deep: #1fa8dd;
+  background: var(--bg-800);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 11px 12px;
+  margin-bottom: 16px;
 }
-.stat__k { font-size: 9px; color: var(--text-mute); font-weight: 700; letter-spacing: .3px; text-transform: uppercase; }
-.stat__v { font-family: var(--font-display); font-size: 16px; font-weight: 800; margin-top: 2px; letter-spacing: -0.03em; }
-.stat:nth-child(1) .stat__v { color: var(--gold-hi); }
-.stat:nth-child(2) .stat__v { color: var(--gold); }
-.stat:nth-child(3) .stat__v { color: var(--orange-hi); }
+.rankbar__top { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.rankbar__ico { display: grid; place-items: center; width: 18px; height: 18px; flex: none; color: var(--slurp); }
+.rankbar__ico svg { width: 100%; height: 100%; }
+.rankbar__n { font-size: 13px; font-weight: 700; }
+.rankbar__pct {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 800; color: var(--slurp);
+}
+
+.rankbar__track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--bg-900);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5);
+  overflow: hidden;
+}
+.rankbar__fill {
+  position: relative;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--slurp-deep), var(--slurp));
+  box-shadow: 0 0 10px rgba(111, 227, 255, .55), 0 0 20px rgba(31, 168, 221, .3);
+  transition: width 420ms cubic-bezier(.25, .6, .2, 1);
+}
+/* a slow highlight travelling inside the liquid, nothing outside it */
+.rankbar__fill::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.42) 50%, transparent 80%);
+  background-size: 220% 100%;
+  animation: slurp-flow 3.4s linear infinite;
+}
+@keyframes slurp-flow {
+  from { background-position: 120% 0; }
+  to   { background-position: -120% 0; }
+}
+
+.rankbar__foot {
+  display: flex; justify-content: space-between; gap: 8px;
+  margin-top: 8px;
+  color: var(--text-mute);
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: .02em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rankbar__fill { transition: none; }
+  .rankbar__fill::after { animation: none; opacity: .18; }
+}
 
 .nav { display: flex; flex-direction: column; gap: 2px; }
 .nav__item {

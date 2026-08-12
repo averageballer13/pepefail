@@ -206,6 +206,7 @@
           } else if (act === "double") {
             if (!E.Bank.canBet(stake)) { say("Not enough balance to double", "lose"); return; }
             E.Bank.sub(stake);
+            E.Rank.wager(stake);   /* doubling is a second wager, so it earns XP too */
             stake = round2(stake * 2);
             player.push(draw());
             paint();
