@@ -11,9 +11,32 @@
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="stylesheet" href="assets/css/glass.css" />
   <link rel="stylesheet" href="assets/css/anim.css" />
+  <link rel="stylesheet" href="assets/css/play.css" />
   <link rel="stylesheet" href="assets/css/modal.css" />
+  <link rel="stylesheet" href="assets/css/loader.css" />
 </head>
 <body>
+
+  <!-- Entry loader: shown once per session, or when arriving from the
+       landing. The decision runs inline so a repeat visit never flashes. -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <img class="loader__logo" src="assets/img/logo.png" alt="" />
+    <div class="loader__word">pepe<b>.fail</b></div>
+    <div class="loader__track"><div class="loader__fill"></div></div>
+    <div class="loader__pct">0%</div>
+  </div>
+  <script>
+    (function () {
+      var KEY = "pepe.entered";
+      var fromLanding = /(^|\/)(index\.html)?$/.test(
+        (function () { try { return new URL(document.referrer).pathname; } catch (e) { return "x"; } })()
+      ) && document.referrer.indexOf(location.origin) === 0;
+      var first = false;
+      try { first = !sessionStorage.getItem(KEY); sessionStorage.setItem(KEY, "1"); } catch (e) {}
+      if (fromLanding || first) document.getElementById("loader").classList.add("is-on");
+    })();
+  </script>
+
   <div class="app">
     <main class="main">
       <div class="main__inner">
@@ -58,9 +81,11 @@
     </main>
   </div>
 
+  <script src="assets/js/loader.js"></script>
   <script>window.PAGE = { active: "home", base: "" };</script>
   <script src="assets/js/icons.js"></script>
   <script src="assets/js/shell.js"></script>
+  <script src="assets/js/engine.js"></script>
   <script src="assets/js/games-data.js"></script>
   <script src="assets/js/modal.js"></script>
   <script src="assets/js/wallet.js"></script>

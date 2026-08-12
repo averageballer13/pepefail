@@ -122,24 +122,40 @@ h1, h2, h3, .display {
   border: 1px solid var(--line);
   border-radius: 10px;
 }
-.seg button {
-  padding: 7px 20px; border-radius: 7px;
+.seg__tab {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 7px;
   font-weight: 700; font-size: 14px;
-  color: var(--text-dim); transition: 0.18s;
+  color: var(--text-dim);
+  white-space: nowrap;
 }
-.seg button.active {
+.seg__ico { display: grid; place-items: center; width: 18px; height: 18px; flex: none; }
+.seg__ico svg { width: 18px; height: 18px; }
+
+.seg__tab:hover { color: var(--text); background: var(--hover); }
+.seg__tab.active,
+.seg__tab.active:hover {
   background: var(--grad-gold); color: #201800;
   box-shadow: var(--glow-gold);
 }
-/* Sportsbook is not built yet: shown, greyed, and inert */
-.seg button.is-locked {
-  display: inline-flex; align-items: center; gap: 6px;
-  color: var(--text-mute);
-  opacity: .55;
-  cursor: not-allowed;
-  pointer-events: none;
+
+/* --- Locked sections: real icon by default, padlock on hover ---
+   Both live in the same 18px box, so the label never shifts. */
+.seg__tab.is-locked { color: var(--text-mute); cursor: not-allowed; }
+.seg__tab.is-locked:hover { background: var(--bg-700); color: var(--text-dim); }
+.seg__lock {
+  position: absolute;
+  left: 16px;
+  display: grid; place-items: center;
+  width: 18px; height: 18px;
+  opacity: 0;
+  color: var(--gold);
 }
-.seg button.is-locked svg { width: 14px; height: 14px; }
+.seg__lock svg { width: 15px; height: 15px; }
+.seg__tab.is-locked:hover .seg__ico { opacity: 0; }
+.seg__tab.is-locked:hover .seg__lock { opacity: 1; }
+/* the swap itself is animated in anim.css */
 .topbar__spacer { flex: 1; }
 
 /* Wallet area: shell.js drops one or two buttons in here, so it has to lay
@@ -820,6 +836,12 @@ h1, h2, h3, .display {
 @media (max-width: 1080px) {
   .hero { grid-template-columns: 1fr; }
   .hero__cards { grid-template-rows: none; grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 1240px) {
+  /* locked sections keep their icon but drop the label first */
+  .seg__tab.is-locked .seg__t { display: none; }
+  .seg__tab.is-locked { padding: 7px 12px; }
+  .seg__tab.is-locked .seg__lock { left: 12px; }
 }
 @media (max-width: 1040px) {
   /* the search and gift shortcuts are the first thing to go when the

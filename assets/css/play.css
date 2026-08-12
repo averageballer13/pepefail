@@ -1,0 +1,197 @@
+/* ===================================================================
+   pepe.fail — playable game chrome
+   Loaded after styles.css / glass.css / anim.css
+   =================================================================== */
+
+/* `hidden` has to actually hide: .btn and .bj-actions both set a display
+   value, and any display beats the attribute's default. */
+[hidden] { display: none !important; }
+
+/* --- Balance shown next to the bet label --- */
+.field__label [data-balance]::before {
+  content: "⌾ ";
+  color: var(--gold);
+}
+
+/* --- Round result under the payout row --- */
+.bet__result {
+  min-height: 20px;
+  margin: 8px 0 10px;
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 800; letter-spacing: -0.02em;
+  text-align: center;
+  opacity: 0;
+  transition: opacity var(--dur-base, 260ms) var(--ease-soft, ease);
+}
+.bet__result.is-win  { color: var(--green); opacity: 1; }
+.bet__result.is-lose { color: var(--red); opacity: 1; }
+
+/* --- Bet shortcuts --- */
+.input-wrap .mini { font-size: 11px; }
+
+/* =========================== DICE =========================== */
+.dice-result.is-win  { color: var(--green); }
+.dice-result.is-lose { color: var(--red); }
+
+.slider { position: relative; }
+.slider__fill {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  height: 8px; border-radius: 999px;
+  background: var(--grad-gold);
+  pointer-events: none;
+}
+.slider__knob { transition: left 120ms linear; }
+
+.history { display: flex; gap: 6px; flex-wrap: wrap; }
+.history b {
+  padding: 4px 9px; border-radius: 6px;
+  background: var(--bg-800); border: 1px solid var(--line);
+  font-size: 12px; font-weight: 700; color: var(--text-mute);
+}
+.history b.win { color: var(--green); border-color: rgba(74, 222, 128, .3); }
+
+/* =========================== LIMBO =========================== */
+.limbo-area {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; min-height: 320px;
+}
+.limbo-val {
+  font-family: var(--font-display);
+  font-size: 68px; font-weight: 800; letter-spacing: -0.04em;
+  color: var(--text);
+}
+.limbo-val.is-win  { color: var(--green); }
+.limbo-val.is-lose { color: var(--red); }
+.limbo-sub { color: var(--text-mute); font-size: 13px; font-weight: 600; }
+
+/* =========================== PLINKO =========================== */
+.plinko { position: relative; }
+.ball {
+  position: absolute; top: 0; left: 0;
+  width: 13px; height: 13px; margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: var(--grad-gold);
+  box-shadow: 0 0 12px rgba(255, 200, 40, .6);
+  opacity: 0;
+  transition: transform 95ms linear, opacity 140ms ease;
+  pointer-events: none;
+  z-index: 3;
+}
+.mult.is-hit {
+  transform: translateY(3px);
+  filter: brightness(1.5);
+}
+
+/* =========================== CRASH =========================== */
+.crash-mult.is-win  { color: var(--green); }
+.crash-mult.is-lose { color: var(--red); }
+
+/* =========================== WHEEL =========================== */
+.wheel-area { position: relative; display: grid; place-items: center; }
+.wheel-svg { transform-origin: 50% 50%; }
+.wheel-ptr {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 18px; height: 18px;
+  z-index: 2;
+}
+
+/* =========================== BLACKJACK =========================== */
+.bj-table {
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  padding: 26px 20px;
+  min-height: 360px;
+  border-radius: 14px;
+  background: radial-gradient(120% 90% at 50% 0%, #16203a 0%, var(--panel) 62%);
+  border: 1px solid var(--line);
+}
+.bj-side { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.bj-label {
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-mute);
+}
+.bj-label b {
+  display: inline-grid; place-items: center;
+  min-width: 26px; height: 22px; padding: 0 7px; margin-left: 7px;
+  border-radius: 6px;
+  background: var(--bg-900); border: 1px solid var(--line-2);
+  color: var(--gold);
+  font-size: 12px; letter-spacing: 0;
+}
+
+.bj-hand { display: flex; min-height: 96px; }
+.bj-hand .bj-card:not(:first-child) { margin-left: -22px; }
+
+.bj-card {
+  position: relative;
+  width: 68px; height: 96px; flex: none;
+  border-radius: 8px;
+  background: #f4f1ea;
+  color: #14181f;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
+  animation: bj-deal 180ms var(--ease-out, ease) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes bj-deal {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: none; }
+}
+.bj-card--red { color: var(--red); }
+
+.bj-card__c {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center; line-height: 1;
+  font-size: 13px; font-weight: 800;
+}
+.bj-card__c i { font-style: normal; font-size: 11px; }
+.bj-card__c--tl { top: 6px; left: 6px; }
+.bj-card__c--br { bottom: 6px; right: 6px; transform: rotate(180deg); }
+.bj-card__mid {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-size: 30px;
+}
+
+.bj-card--back {
+  background:
+    repeating-linear-gradient(45deg, rgba(255, 210, 30, .16) 0 4px, transparent 4px 8px),
+    linear-gradient(160deg, #1c2233, #0b0e15);
+  border: 1px solid rgba(255, 210, 30, .35);
+}
+
+.bj-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.bj-actions .btn { height: 40px; padding: 0 20px; }
+
+.bj-msg {
+  min-height: 22px;
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 800; letter-spacing: -0.02em;
+}
+.bj-msg.is-win  { color: var(--green); }
+.bj-msg.is-lose { color: var(--red); }
+.bj-msg.is-push { color: var(--text-dim); }
+
+/* =========================== EMPTY STATES =========================== */
+.row-empty {
+  padding: 26px 22px;
+  border: 1px dashed var(--line-2);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text-mute);
+  font-size: 13.5px; line-height: 1.7;
+  text-align: center;
+}
+.row-empty a { color: var(--gold); }
+.row-empty a:hover { text-decoration: underline; }
+.row-empty--page { padding: 44px 22px; font-size: 14.5px; }
+
+.game-row--empty { display: block; }
+.grid--empty { display: block; }
+
+@media (max-width: 560px) {
+  .bj-card { width: 56px; height: 80px; }
+  .bj-card__mid { font-size: 24px; }
+  .limbo-val { font-size: 48px; }
+}

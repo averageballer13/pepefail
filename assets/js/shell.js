@@ -47,6 +47,22 @@ function navItem(n) {
   return `<a class="nav__item${mod}${active}" href="${n.href}">${icon(n.ic)}<span>${n.t}</span>${pill}</a>`;
 }
 
+/* --- Topbar section tab.
+   Locked tabs keep their own icon and swap it for a padlock only while
+   the pointer is over them, so the row still reads at a glance.
+   aria-disabled rather than `disabled`, because a disabled button does
+   not reliably report hover — and the padlock is a hover state. --- */
+function segTab(o) {
+  const cls = "seg__tab" + (o.active ? " active" : "") + (o.locked ? " is-locked" : "");
+  const lock = o.locked ? `<span class="seg__lock">${icon("lock", 2)}</span>` : "";
+  const attrs = o.locked
+    ? ' aria-disabled="true" tabindex="-1" title="' + o.t + ' — coming soon"'
+    : "";
+  return `<button class="${cls}"${attrs}>
+      <span class="seg__ico">${icon(o.ic, 1.9)}</span>${lock}<span class="seg__t">${o.t}</span>
+    </button>`;
+}
+
 /* ===================================================================
    WALLET AREA (topbar right side)
    =================================================================== */
@@ -153,10 +169,9 @@ function renderShell() {
   topbar.className = "topbar";
   topbar.innerHTML = `
     <div class="seg">
-      <button class="active">Casino</button>
-      <button class="is-locked" disabled aria-disabled="true" title="Sportsbook — coming soon">
-        ${icon("lock", 2)}<span>Sports</span>
-      </button>
+      ${segTab({ ic: "cherries", t: "Casino", active: true })}
+      ${segTab({ ic: "basketball", t: "Sports", locked: true })}
+      ${segTab({ ic: "rocket", t: "Crypto Futures", locked: true })}
     </div>
     <div class="topbar__spacer"></div>
     <button class="icon-btn glass" title="Search">${icon("search", 2)}</button>
@@ -297,7 +312,8 @@ document.querySelectorAll("[data-group] [data-toggle]").forEach((t) => {
 });
 
 document.querySelectorAll(".seg button").forEach((b) => {
-  b.addEventListener("click", () => {
+  b.addEventListener("click", (e) => {
+    if (b.classList.contains("is-locked")) { e.preventDefault(); return; }
     document.querySelectorAll(".seg button").forEach((x) => x.classList.remove("active"));
     b.classList.add("active");
   });

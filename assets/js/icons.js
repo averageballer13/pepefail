@@ -25,6 +25,8 @@ const ICONS = {
   plinko: '<circle cx="12" cy="5" r="1.1" fill="currentColor" stroke="none"/><circle cx="8.5" cy="10" r="1.1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="10" r="1.1" fill="currentColor" stroke="none"/><circle cx="5" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1.1" fill="currentColor" stroke="none"/><circle cx="19" cy="15" r="1.1" fill="currentColor" stroke="none"/><path d="M4 20h16"/>',
   grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.3h16M4 14.6h16M9.3 4v16M14.6 4v16"/>',
   lock: '<rect x="4.8" y="10.5" width="14.4" height="9.5" rx="2.2"/><path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.6 0v2.7"/><circle cx="12" cy="15.2" r="1.5" fill="currentColor" stroke="none"/>',
+  cherries: '<circle cx="7.5" cy="17.5" r="3.5"/><circle cx="16.5" cy="18.5" r="2.9"/><path d="M7.5 14C8.6 9.6 11.4 6 15.5 4.2"/><path d="M16.5 15.6c-.5-3.6.2-6.4 1.6-8.6"/><path d="M15.5 4.2c1.6-.7 3.2-.4 4.4.7"/>',
+  basketball: '<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><path d="M5.6 5.6a12.7 12.7 0 0 0 12.8 12.8"/><path d="M18.4 5.6A12.7 12.7 0 0 1 5.6 18.4"/>',
   chart: '<path d="M4 4v16h16"/><path d="m7 15 3.5-3.5 3 3L20 8"/><path d="M20 12V8h-4"/>',
   tophat: '<path d="M8 4h8v9H8z"/><path d="M4 13.5h16v1.8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1.8Z"/><path d="M8.5 9.5h7"/>',
   cactus: '<path d="M12 21V7"/><path d="M12 13.5H9.2A2.2 2.2 0 0 1 7 11.3V9.2"/><path d="M12 11h2.8A2.2 2.2 0 0 0 17 8.8V6.8"/><path d="M9.5 21h5"/><path d="M12 7a2 2 0 0 0-2-2 2 2 0 0 1 2-2 2 2 0 0 1 2 2 2 2 0 0 0-2 2Z" fill="currentColor" stroke="none"/>',

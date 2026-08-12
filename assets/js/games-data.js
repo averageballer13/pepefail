@@ -1,44 +1,30 @@
 /* ===================================================================
-   pepe.fail — game catalogue + shared thumbnail factory
+   pepe.fail — game catalogue + thumbnail factory
+
+   One entry per game that actually exists and can be played. Nothing is
+   listed here as a placeholder: an empty row is honest, a row full of
+   games that open nothing is not.
+
    ac = accent : "gold" (default) or "orange"
    =================================================================== */
 
-/* Only games that have a real page of their own. */
 const ORIGINALS = [
-  { n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "games/plinko.html", img: "assets/img/games/plinko.jpg" },
-  { n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines.html", img: "assets/img/games/mines.jpg" },
-  { n: "Dice", p: "pepe.fail", ic: "dice", tag: "ORIGINAL", ac: "gold", href: "games/dice.html", img: "assets/img/games/dice.jpg" },
-  { n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "games/crash.html", img: "assets/img/games/crash.jpg" },
-  { n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo.html", img: "assets/img/games/limbo.jpg" },
-  { n: "Wheel", p: "pepe.fail", ic: "wheel", tag: "ORIGINAL", ac: "orange", href: "games/wheel.html", img: "assets/img/games/wheel.jpg" },
-  { n: "Blackjack", p: "pepe.fail", ic: "spade", tag: "ORIGINAL", ac: "gold", href: "games/blackjack.html", img: "assets/img/games/blackjack.jpg" },
+  { k: "plinko", n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "games/plinko.html", img: "assets/img/games/plinko.jpg" },
+  { k: "mines", n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines.html", img: "assets/img/games/mines.jpg" },
+  { k: "dice", n: "Dice", p: "pepe.fail", ic: "dice", tag: "ORIGINAL", ac: "gold", href: "games/dice.html", img: "assets/img/games/dice.jpg" },
+  { k: "crash", n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "games/crash.html", img: "assets/img/games/crash.jpg" },
+  { k: "limbo", n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo.html", img: "assets/img/games/limbo.jpg" },
+  { k: "wheel", n: "Wheel", p: "pepe.fail", ic: "wheel", tag: "ORIGINAL", ac: "orange", href: "games/wheel.html", img: "assets/img/games/wheel.jpg" },
+  { k: "blackjack", n: "Blackjack", p: "pepe.fail", ic: "spade", tag: "ORIGINAL", ac: "gold", href: "games/blackjack.html", img: "assets/img/games/blackjack.jpg" },
 ];
 
-const SLOTS = [
-  { n: "Golden Frog", p: "pepe.fail", ic: "frog", tag: "HOT", hot: true, ac: "gold" },
-  { n: "Sweet Bonanza", p: "Pragmatic", ic: "candy", ac: "orange" },
-  { n: "Gates of Olympus", p: "Pragmatic", ic: "bolt", ac: "gold" },
-  { n: "Duck Hunters", p: "Nolimit", ic: "target", tag: "NEW", ac: "orange" },
-  { n: "Ze Zeus", p: "Hacksaw", ic: "bolt", ac: "gold" },
-  { n: "Dusty Duel", p: "BGaming", ic: "cactus", ac: "orange" },
-  { n: "Blood Suckers", p: "Red Tiger", ic: "spade", ac: "gold" },
-  { n: "Lucky Caiman", p: "Peter & Sons", ic: "star", tag: "HOT", hot: true, ac: "gold" },
-  { n: "Sugar Rush", p: "Pragmatic", ic: "candy", ac: "orange" },
-  { n: "Wild West Gold", p: "Pragmatic", ic: "cactus", ac: "gold" },
-  { n: "Book of Frogs", p: "pepe.fail", ic: "book", tag: "NEW", ac: "gold" },
-  { n: "Diamond Rush", p: "Hacksaw", ic: "diamond", ac: "orange" },
-];
+/* Every playable game, keyed for history and favourites lookups. */
+const ALL_GAMES = ORIGINALS.slice();
 
-const LIVE_GAMES = [
-  { n: "Frog Baccarat", p: "pepe.fail", ic: "cards", tag: "LIVE", ac: "gold" },
-  { n: "Lightning Roulette", p: "Evolution", ic: "wheel", tag: "LIVE", hot: true, ac: "orange" },
-  { n: "Crazy Time", p: "Evolution", ic: "star", tag: "LIVE", hot: true, ac: "gold" },
-  { n: "Blackjack VIP", p: "pepe.fail", ic: "spade", tag: "LIVE", ac: "gold", href: "games/blackjack.html" },
-  { n: "Mega Wheel", p: "Pragmatic", ic: "wheel", tag: "LIVE", ac: "orange" },
-  { n: "Dream Catcher", p: "Evolution", ic: "sparkle", tag: "LIVE", ac: "gold" },
-  { n: "Monopoly Live", p: "Evolution", ic: "tophat", tag: "LIVE", ac: "gold" },
-  { n: "Gold Bar Roulette", p: "Evolution", ic: "coin", tag: "LIVE", ac: "orange" },
-];
+function gameByKey(k) {
+  for (let i = 0; i < ALL_GAMES.length; i++) if (ALL_GAMES[i].k === k) return ALL_GAMES[i];
+  return null;
+}
 
 /* --- Builds a single game thumbnail ---
    A game with `img` shows its poster; the others fall back to the icon
@@ -68,15 +54,28 @@ function gameCard(g, base) {
   return el;
 }
 
-/* --- Fills a container with thumbnails --- */
-function fillRow(id, list, base) {
+/* --- Fills a container with thumbnails ---
+   An empty list renders the empty-state message instead of nothing at
+   all, so a blank row never looks like a loading failure. */
+function fillRow(id, list, base, emptyMsg) {
   const row = document.getElementById(id);
   if (!row) return;
   row.innerHTML = "";
+
+  if (!list.length) {
+    row.classList.add("game-row--empty");
+    const box = document.createElement("div");
+    box.className = "row-empty";
+    box.innerHTML = emptyMsg || "Nothing here yet.";
+    row.appendChild(box);
+    return;
+  }
+
+  row.classList.remove("game-row--empty");
   list.forEach((g) => row.appendChild(gameCard(g, base)));
 }
 
-/* --- Injects the icons flagged with data-ico --- */
+/* --- Injects icons marked with data-ico --- */
 function hydrateIcons() {
   document.querySelectorAll("[data-ico]").forEach((el) => {
     el.innerHTML = icon(el.dataset.ico, el.dataset.sw || 1.9);
@@ -88,8 +87,7 @@ function bindScrollers() {
   document.querySelectorAll("[data-scroll]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const row = document.getElementById(btn.dataset.scroll);
-      if (!row) return;
-      row.scrollBy({ left: 360 * Number(btn.dataset.dir), behavior: "smooth" });
+      if (row) row.scrollBy({ left: 360 * Number(btn.dataset.dir), behavior: "smooth" });
     });
   });
 }

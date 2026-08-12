@@ -56,21 +56,22 @@
   max-width: 560px;
 }
 
-/* The coin is decoration: oversized, pinned to the right edge and clipped
-   by the block, so the crop reads as deliberate rather than as a mistake. */
+/* The coin fills the block from top to bottom and sits just past the right
+   edge. The block clips it, so it never spills outside its own border. */
 .tk-hero__art {
   position: absolute;
-  top: 50%;
-  right: -70px;
-  transform: translateY(-50%);
+  top: 0; bottom: 0; right: -46px;
+  width: min(52%, 480px);
+  display: grid;
+  place-items: center;
   z-index: 0;
   pointer-events: none;
 }
 .tk-hero__art img {
   display: block;
-  width: 560px;
+  height: 132%;
+  width: auto;
   max-width: none;
-  height: auto;
   opacity: .62;
 }
 
@@ -295,7 +296,7 @@
 }
 @media (max-width: 1100px) {
   .tk-hero { padding-right: 44px; }
-  .tk-hero__art img { width: 420px; opacity: .3; }
+  .tk-hero__art { right: -70px; opacity: .45; }
 }
 @media (max-width: 900px) {
   .tk-hero { padding: 30px 24px; }

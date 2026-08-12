@@ -172,6 +172,18 @@ html.pg-anim.pg-leaving body {
 .icon-btn:active,
 .section__nav button:active { transform: translateY(1px); transition-duration: 80ms; }
 
+/* Section tabs: the icon cross-fades into the padlock rather than popping. */
+.seg__tab {
+  transition:
+    background-color var(--dur-base) var(--ease-soft),
+    color var(--dur-base) var(--ease-soft),
+    box-shadow var(--dur-base) var(--ease-soft);
+}
+.seg__ico,
+.seg__lock {
+  transition: opacity var(--dur-base) var(--ease-soft);
+}
+
 /* Menu rows and footer links slide a touch on hover, same language as the
    game captions. */
 .nav__item:hover { transform: translateX(2px); }
@@ -322,6 +334,9 @@ input:focus-visible,
   .sfoot__col a,
   .sfoot__col a:hover,
   .section__all:hover,
+  .seg__tab,
+  .seg__ico,
+  .seg__lock,
   .btn,
   .btn:hover,
   .btn:active,
