@@ -34,7 +34,6 @@ const NAV_GROUPS = [
 
 const NAV_FOOT = [
   { k: "rewards", ic: "shield", t: "Rewards", href: B + "pages/promotions.html" },
-  { k: "landing", ic: "sparkle", t: "Landing", href: B + "index.html" },
 ];
 
 /* --- Single nav entry --- */
@@ -165,6 +164,15 @@ function renderShell() {
   const sidebar = document.createElement("aside");
   sidebar.className = "sidebar";
   sidebar.innerHTML = `
+    <a class="token-cta${PAGE.active === "token" ? " active" : ""}" href="${B}token.html">
+      <span class="token-cta__ico">${icon("coin", 2)}</span>
+      <span class="token-cta__txt">
+        <b>$FAIL</b>
+        <i>Token</i>
+      </span>
+      <span class="token-cta__go">${icon("arrowR", 2)}</span>
+    </a>
+
     <div class="promo-card">
       <div class="promo-card__ico">${icon("ticket")}</div>
       <div class="promo-card__amount">$0</div>

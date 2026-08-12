@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>$FAIL Token — pepe.fail</title>
+  <meta name="description" content="$FAIL is the token behind pepe.fail. Trading fees and house edge both feed buybacks and the casino bankroll." />
+  <link rel="icon" type="image/png" href="assets/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/css/glass.css" />
+  <link rel="stylesheet" href="assets/css/anim.css" />
+  <link rel="stylesheet" href="assets/css/modal.css" />
+  <link rel="stylesheet" href="assets/css/token.css" />
+</head>
+<body>
+  <div class="app">
+    <main class="main">
+      <div class="main__inner">
+
+        <!-- ===== HERO ===== -->
+        <section class="tk-hero">
+          <div class="tk-hero__body">
+            <span class="tk-badge">Launching on Pump.fun</span>
+            <h1 class="tk-hero__title">$FAIL<span>Token</span></h1>
+            <p class="tk-hero__sub">
+              The casino earns two ways: fees on every $FAIL trade, and the house edge on
+              every bet. Both feed the same two places — buybacks and the bankroll.
+            </p>
+
+            <div class="tk-ca" id="caBox">
+              <div class="tk-ca__label">Contract address</div>
+              <div class="tk-ca__row">
+                <code class="tk-ca__value" id="caValue" data-ca="">Not live yet</code>
+                <button class="btn btn--gold" id="caCopy" disabled>Copy</button>
+              </div>
+              <p class="tk-ca__note" id="caNote">
+                The address appears here the moment the coin is live. Do not trust a
+                $FAIL address from anywhere else.
+              </p>
+            </div>
+          </div>
+
+          <div class="tk-hero__art" aria-hidden="true">
+            <!-- drop the coin artwork at assets/img/coin.png; falls back to the logo -->
+            <img src="assets/img/coin.png" alt=""
+                 onerror="this.onerror=null;this.src='assets/img/logo.png'" />
+          </div>
+        </section>
+
+        <!-- ===== WHY THE TOKEN EXISTS ===== -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="diamond"></span>What the token is for</h2>
+          </div>
+
+          <div class="tk-grid tk-grid--3">
+            <div class="tk-card">
+              <div class="tk-card__ico" data-ico="coin"></div>
+              <h3>It funds the bankroll</h3>
+              <p>
+                A casino cannot pay a big win it does not hold. Part of every fee goes
+                into the bankroll, which is what sets the maximum bet and the biggest
+                payout the house can actually cover.
+              </p>
+            </div>
+            <div class="tk-card">
+              <div class="tk-card__ico" data-ico="chart"></div>
+              <h3>It turns volume into buybacks</h3>
+              <p>
+                Creator fees accrue on every trade, up or down. That revenue does not
+                depend on the price going up — it depends on the token being traded.
+              </p>
+            </div>
+            <div class="tk-card">
+              <div class="tk-card__ico" data-ico="crown"></div>
+              <h3>It pays players to hold</h3>
+              <p>
+                Holding $FAIL raises your rakeback and unlocks higher limits. The perk is
+                a discount on your own play, not a cut of anyone else's.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== THE FLYWHEEL ===== -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="wheel"></span>The flywheel</h2>
+          </div>
+
+          <div class="tk-flow">
+            <ol class="tk-flow__steps">
+              <li class="tk-step">
+                <span class="tk-step__n">1</span>
+                <h3>Trading generates fees</h3>
+                <p>Every buy and sell pays a fee. The creator share routes to the public treasury — on the bonding curve, then on the AMM after migration.</p>
+              </li>
+              <li class="tk-step">
+                <span class="tk-step__n">2</span>
+                <h3>Fees split in two</h3>
+                <p>Half is spent buying $FAIL back on the open market. The rest grows the bankroll and covers operations.</p>
+              </li>
+              <li class="tk-step">
+                <span class="tk-step__n">3</span>
+                <h3>A bigger bankroll means bigger games</h3>
+                <p>More reserves means higher max bets and larger top payouts. That is the product improving, not a marketing line.</p>
+              </li>
+              <li class="tk-step">
+                <span class="tk-step__n">4</span>
+                <h3>Players generate house edge</h3>
+                <p>Real wagering produces real revenue. A share of it is spent buying $FAIL back, on top of the buybacks already funded by trading fees.</p>
+              </li>
+              <li class="tk-step">
+                <span class="tk-step__n">5</span>
+                <h3>Buybacks bring attention</h3>
+                <p>Every buyback is published on-chain. Visible, recurring buy pressure is what pulls volume back to step one.</p>
+              </li>
+            </ol>
+
+            <div class="tk-flow__loop">
+              <span class="tk-flow__loopIco" data-ico="wheel"></span>
+              Step 5 feeds step 1 — that is the loop
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== FEE ROUTING ===== -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="ticket"></span>Where the money goes</h2>
+          </div>
+
+          <div class="tk-grid tk-grid--2">
+            <div class="tk-split">
+              <div class="tk-split__head">
+                <h3>Token trading fees</h3>
+                <span>Creator share</span>
+              </div>
+              <div class="tk-bar" data-rows="fees"></div>
+            </div>
+
+            <div class="tk-split">
+              <div class="tk-split__head">
+                <h3>Casino house edge</h3>
+                <span>Net gaming revenue</span>
+              </div>
+              <div class="tk-bar" data-rows="ggr"></div>
+            </div>
+          </div>
+
+          <p class="tk-fine">
+            These splits are the launch policy. Any change is announced before it takes
+            effect, never after.
+          </p>
+        </section>
+
+        <!-- ===== BUYBACKS ===== -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="shield"></span>How buybacks work</h2>
+          </div>
+
+          <div class="tk-grid tk-grid--2">
+            <div class="tk-card">
+              <h3>Bought, then locked</h3>
+              <p>
+                Buybacks are executed on the open market from the treasury wallet, on a
+                fixed daily schedule rather than at a discretionary moment. Tokens bought
+                are locked in the bankroll vault, where they back player payouts instead
+                of being resold.
+              </p>
+            </div>
+            <div class="tk-card">
+              <h3>Verifiable, not announced</h3>
+              <p>
+                The treasury address is public. Every buyback is a transaction anyone can
+                check, and the running total is published on this page. A buyback that
+                cannot be verified on-chain did not happen.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== HOLDER TIERS ===== -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="star"></span>Holder tiers</h2>
+          </div>
+          <div class="tk-tiers" id="tiers"></div>
+          <p class="tk-fine">
+            Tiers are read from your connected wallet balance. Rakeback is a rebate on
+            your own wagering — it is not a share of platform revenue or of other
+            players' losses.
+          </p>
+        </section>
+
+        <!-- ===== STATUS ===== -->
+        <section class="section">
+          <div class="tk-note">
+            <div class="tk-note__ico" data-ico="bomb"></div>
+            <div>
+              <h3>Honest status</h3>
+              <p>
+                The flywheel only spins if people actually play. Trading fees alone will
+                not carry it — without wagering volume, a buyback is just the treasury
+                spending its own money. The casino has to be worth using first; the token
+                compounds it, it does not replace it.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div class="foot"></div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>window.PAGE = { active: "token", base: "" };</script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/shell.js"></script>
+  <script src="assets/js/games-data.js"></script>
+  <script src="assets/js/modal.js"></script>
+  <script src="assets/js/wallet.js"></script>
+  <script src="assets/js/anim.js"></script>
+  <script src="assets/js/token.js"></script>
+</body>
+</html>

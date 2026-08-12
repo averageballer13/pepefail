@@ -1,0 +1,291 @@
+/* ===================================================================
+   pepe.fail — $FAIL token page
+   Loaded after styles.css / glass.css / anim.css / modal.css
+   =================================================================== */
+
+/* =========================== HERO =========================== */
+.tk-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 32px;
+  align-items: center;
+  padding: 44px 44px;
+  margin-bottom: 34px;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  background:
+    radial-gradient(90% 140% at 88% 20%, rgba(255, 200, 40, 0.09), transparent 62%),
+    linear-gradient(120deg, var(--panel-2), var(--bg-800));
+  overflow: hidden;
+}
+
+.tk-badge {
+  display: inline-block;
+  padding: 5px 11px;
+  border: 1px solid rgba(255, 210, 30, 0.3);
+  border-radius: 999px;
+  background: rgba(255, 210, 30, 0.07);
+  color: var(--gold);
+  font-size: 11px; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+
+.tk-hero__title {
+  display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+  margin: 16px 0 12px;
+  font-family: var(--font-display);
+  font-size: 54px; font-weight: 800; letter-spacing: -0.04em;
+  background: var(--grad-gold);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.tk-hero__title span {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  background: none; color: var(--text);
+}
+
+.tk-hero__sub {
+  color: var(--text-dim);
+  font-size: 15px; line-height: 1.7;
+  max-width: 560px;
+}
+
+.tk-hero__art { justify-self: center; }
+.tk-hero__art img {
+  width: 220px; height: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.55));
+}
+
+/* --- Contract address --- */
+.tk-ca {
+  margin-top: 26px;
+  padding: 16px 18px;
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  background: var(--bg-900);
+  max-width: 620px;
+}
+.tk-ca__label {
+  font-size: 10px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 9px;
+}
+.tk-ca__row { display: flex; align-items: center; gap: 12px; }
+.tk-ca__value {
+  flex: 1; min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13.5px;
+  color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tk-ca__value.is-empty { color: var(--text-mute); }
+.tk-ca__row .btn { flex: none; }
+.tk-ca__row .btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.tk-ca__note {
+  margin-top: 10px;
+  color: var(--text-mute);
+  font-size: 12px; line-height: 1.6;
+}
+
+/* =========================== CARDS =========================== */
+.tk-grid { display: grid; gap: 16px; }
+.tk-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.tk-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.tk-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+.tk-card__ico { width: 26px; height: 26px; color: var(--gold); margin-bottom: 14px; }
+.tk-card__ico svg { width: 100%; height: 100%; }
+.tk-card h3 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800; letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+.tk-card p { color: var(--text-dim); font-size: 13.5px; line-height: 1.7; }
+
+/* =========================== FLYWHEEL =========================== */
+.tk-flow {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+}
+.tk-flow__steps {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.tk-step {
+  position: relative;
+  padding: 18px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg-800);
+}
+/* connector between steps */
+.tk-step::after {
+  content: "";
+  position: absolute;
+  top: 50%; right: -9px;
+  width: 8px; height: 1px;
+  background: var(--line-2);
+}
+.tk-step:last-child::after { display: none; }
+
+.tk-step__n {
+  display: grid; place-items: center;
+  width: 24px; height: 24px;
+  margin-bottom: 11px;
+  border-radius: 50%;
+  background: var(--grad-gold);
+  color: #201800;
+  font-size: 12px; font-weight: 800;
+}
+.tk-step h3 {
+  font-size: 14px; font-weight: 700;
+  margin-bottom: 7px; line-height: 1.35;
+}
+.tk-step p { color: var(--text-mute); font-size: 12.5px; line-height: 1.65; }
+
+.tk-flow__loop {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin-top: 18px; padding-top: 16px;
+  border-top: 1px dashed var(--line-2);
+  color: var(--gold);
+  font-size: 13px; font-weight: 700;
+}
+.tk-flow__loopIco { width: 18px; height: 18px; }
+.tk-flow__loopIco svg { width: 100%; height: 100%; }
+
+/* =========================== SPLITS =========================== */
+.tk-split {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+.tk-split__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin-bottom: 18px;
+}
+.tk-split__head h3 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800; letter-spacing: -0.02em;
+}
+.tk-split__head span {
+  color: var(--text-mute);
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+
+.tk-row { margin-bottom: 15px; }
+.tk-row:last-child { margin-bottom: 0; }
+.tk-row__top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 10px; margin-bottom: 7px;
+}
+.tk-row__name { font-size: 13.5px; font-weight: 700; }
+.tk-row__pct {
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 800; color: var(--gold);
+}
+.tk-row__track {
+  height: 6px; border-radius: 999px;
+  background: var(--bg-900);
+  overflow: hidden;
+}
+.tk-row__fill { height: 100%; border-radius: 999px; background: var(--grad-gold); }
+.tk-row--orange .tk-row__pct { color: var(--orange-hi); }
+.tk-row--orange .tk-row__fill { background: var(--grad-orange); }
+.tk-row--mute .tk-row__pct { color: var(--text-dim); }
+.tk-row--mute .tk-row__fill { background: var(--bg-600); }
+.tk-row__desc { color: var(--text-mute); font-size: 12px; margin-top: 6px; line-height: 1.6; }
+
+/* =========================== TIERS =========================== */
+.tk-tiers {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.tk-tier {
+  padding: 20px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+.tk-tier--top { border-color: rgba(255, 210, 30, 0.34); }
+.tk-tier__ico { width: 24px; height: 24px; color: var(--gold); margin-bottom: 12px; }
+.tk-tier__ico svg { width: 100%; height: 100%; }
+.tk-tier__n {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 800; letter-spacing: -0.02em;
+}
+.tk-tier__hold {
+  color: var(--text-mute);
+  font-size: 11.5px; font-weight: 600;
+  margin: 3px 0 14px;
+}
+.tk-tier ul { list-style: none; }
+.tk-tier li {
+  position: relative;
+  padding-left: 16px;
+  color: var(--text-dim);
+  font-size: 12.5px; line-height: 1.6;
+  margin-bottom: 7px;
+}
+.tk-tier li::before {
+  content: "";
+  position: absolute; left: 0; top: 8px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--gold);
+}
+
+/* =========================== NOTE =========================== */
+.tk-note {
+  display: flex; gap: 16px;
+  padding: 22px;
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  background: var(--bg-700);
+}
+.tk-note__ico { width: 24px; height: 24px; flex: none; color: var(--orange-hi); }
+.tk-note__ico svg { width: 100%; height: 100%; }
+.tk-note h3 {
+  font-family: var(--font-display);
+  font-size: 17px; font-weight: 800; letter-spacing: -0.02em;
+  margin-bottom: 7px;
+}
+.tk-note p { color: var(--text-dim); font-size: 13.5px; line-height: 1.7; }
+
+.tk-fine {
+  margin-top: 14px;
+  color: var(--text-mute);
+  font-size: 12px; line-height: 1.65;
+}
+
+/* =========================== RESPONSIVE =========================== */
+@media (max-width: 1100px) {
+  .tk-flow__steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tk-step::after { display: none; }
+  .tk-tiers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+  .tk-hero { grid-template-columns: 1fr; padding: 30px 24px; }
+  .tk-hero__art { display: none; }
+  .tk-hero__title { font-size: 40px; }
+  .tk-grid--3, .tk-grid--2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .tk-flow__steps { grid-template-columns: 1fr; }
+  .tk-tiers { grid-template-columns: 1fr; }
+  .tk-ca__row { flex-wrap: wrap; }
+  .tk-ca__row .btn { width: 100%; }
+}
