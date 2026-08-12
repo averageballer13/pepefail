@@ -1,0 +1,17 @@
+# Fichiers sources / originaux (non déployés)
+_sources/
+*.mp4
+
+# Doublons d'images à la racine
+logo pepe.fail.png
+logo pepe.fail png.png
+banner pepe.fail.png
+
+# Système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Outils
+.vercel/
+node_modules/

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>pepe.fail — Casino</title>
+  <link rel="icon" type="image/png" href="assets/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <main class="main">
+      <div class="main__inner">
+
+        <!-- HERO -->
+        <section class="hero">
+          <div class="hero__banner">
+            <h1 class="hero__title">Jouez sans <b>Limites</b> avec la Frog</h1>
+            <p class="hero__sub">Machines à sous, jeux originaux et paris sportifs. Rejoignez la horde et tentez votre chance.</p>
+            <div class="hero__cta">
+              <button class="btn btn--orange btn--lg">S'inscrire →</button>
+              <span class="hero__or">ou</span>
+              <div class="pay-pills">
+                <span style="background:#f7931a;color:#2a1400">₿</span>
+                <span style="background:#627eea;color:#fff">Ξ</span>
+                <span style="background:#26a17b;color:#fff">₮</span>
+                <span style="background:#2775ca;color:#fff">$</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero__cards">
+            <a class="hero-card hero-card--casino" href="pages/slots.html">
+              <div class="hero-card__grid"></div>
+              <div class="hero-card__body">
+                <div class="hero-card__title" id="hcCasino">Casino <span class="hero-card__arrow">→</span></div>
+              </div>
+            </a>
+            <a class="hero-card hero-card--sport" href="pages/live.html">
+              <div class="hero-card__grid"></div>
+              <div class="hero-card__body">
+                <div class="hero-card__title" id="hcSport">Jeux en Direct <span class="hero-card__arrow">→</span></div>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- VICTOIRES EN DIRECT -->
+        <section class="section">
+          <div class="live-wrap">
+            <div class="live-badge"><span class="live-dot"></span>Victoires<br>en Direct</div>
+            <div class="live-track" id="liveTrack"></div>
+          </div>
+        </section>
+
+        <!-- ORIGINAUX -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="diamond"></span>Jeux Originaux</h2>
+            <a class="section__all" href="pages/nouveautes.html">Voir tout</a>
+            <div class="section__nav">
+              <button data-scroll="originals" data-dir="-1" data-ico="arrowL"></button>
+              <button data-scroll="originals" data-dir="1" data-ico="arrowR"></button>
+            </div>
+          </div>
+          <div class="game-row" id="originals"></div>
+        </section>
+
+        <!-- MACHINES À SOUS -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="slot"></span>Machines à sous</h2>
+            <a class="section__all" href="pages/slots.html">Voir tout</a>
+            <div class="section__nav">
+              <button data-scroll="slots" data-dir="-1" data-ico="arrowL"></button>
+              <button data-scroll="slots" data-dir="1" data-ico="arrowR"></button>
+            </div>
+          </div>
+          <div class="game-row" id="slots"></div>
+        </section>
+
+        <!-- CTA -->
+        <div class="cta-strip">
+          <img src="assets/img/logo.png" alt="" />
+          <div>
+            <div class="cta-strip__t">Rejoignez la horde de la Frog dorée</div>
+            <div class="cta-strip__s">Bonus de bienvenue jusqu'à 200% + 100 tours gratuits.</div>
+          </div>
+          <button class="btn btn--gold btn--lg">Réclamer mon bonus</button>
+        </div>
+
+        <!-- JEUX EN DIRECT -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="cards"></span>Jeux en Direct</h2>
+            <a class="section__all" href="pages/live.html">Voir tout</a>
+            <div class="section__nav">
+              <button data-scroll="live" data-dir="-1" data-ico="arrowL"></button>
+              <button data-scroll="live" data-dir="1" data-ico="arrowR"></button>
+            </div>
+          </div>
+          <div class="game-row" id="live"></div>
+        </section>
+
+        <div class="foot">
+          pepe.fail — Maquette de démonstration. Aucun jeu d'argent réel.<br>
+          Jouez de manière responsable · 18+ · <a href="#">Conditions</a> · <a href="#">Confidentialité</a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>window.PAGE = { active: "home", base: "" };</script>
+  <script src="assets/js/icons.js"></script>
+  <script src="assets/js/shell.js"></script>
+  <script src="assets/js/games-data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dice — pepe.fail</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <main class="main">
+      <div class="main__inner">
+        <div class="gh" id="gameHead"></div>
+        <div class="game-page">
+          <div class="bet" id="bet"></div>
+          <div class="stage" id="stage"></div>
+        </div>
+
+        <section class="section" style="margin-top:30px">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="diamond"></span>Autres Originaux</h2>
+            <a class="section__all" href="../index.html">Voir tout</a>
+          </div>
+          <div class="game-row" id="more"></div>
+        </section>
+
+        <div class="foot">
+          pepe.fail — Maquette de démonstration. Aucun jeu d'argent réel.<br>
+          Jouez de manière responsable · 18+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>window.PAGE = { active: "dice", base: "../" }; window.GAME = "dice";</script>
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/shell.js"></script>
+  <script src="../assets/js/games-data.js"></script>
+  <script src="../assets/js/game-page.js"></script>
+  <script>
+    hydrateIcons();
+    fillRow("more", ORIGINALS.filter(function (g) { return g.n.toLowerCase().indexOf("dice") === -1; }), "../");
+  </script>
+</body>
+</html>

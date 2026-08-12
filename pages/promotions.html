@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Promotions — pepe.fail</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,700;12..96,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <main class="main">
+      <div class="main__inner">
+
+        <div class="page-head">
+          <h1><span style="display:inline-grid;place-items:center;width:34px;height:34px;vertical-align:-6px;color:var(--gold);margin-right:6px" data-ico="gift"></span>Promotions</h1>
+          <p>Courses, défis et récompenses — il y a toujours quelque chose à gagner sur pepe.fail.</p>
+        </div>
+
+        <div class="promo-grid" id="promos"></div>
+
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="crown"></span>Paliers VIP</h2>
+          </div>
+          <div class="vip-row" id="vips"></div>
+        </section>
+
+        <div class="cta-strip" style="margin-top:30px">
+          <img src="../assets/img/logo.png" alt="" />
+          <div>
+            <div class="cta-strip__t">Bonus de bienvenue</div>
+            <div class="cta-strip__s">Jusqu'à 200% sur votre premier dépôt + 100 tours gratuits.</div>
+          </div>
+          <button class="btn btn--gold btn--lg">Réclamer</button>
+        </div>
+
+        <div class="foot">
+          pepe.fail — Maquette de démonstration. Aucun jeu d'argent réel.<br>
+          Jouez de manière responsable · 18+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>window.PAGE = { active: "vip", base: "../" };</script>
+  <script src="../assets/js/icons.js"></script>
+  <script src="../assets/js/shell.js"></script>
+  <script src="../assets/js/games-data.js"></script>
+  <script>
+    hydrateIcons();
+
+    const PROMOS = [
+      { ic: "trophy", t: "Course Quotidienne", s: "Grimpez au classement chaque jour et partagez la cagnotte.", amt: "$25 000", timer: "01:01:10", ac: "" },
+      { ic: "trophy", t: "Course Hebdomadaire", s: "Une semaine, un classement, une grosse cagnotte à partager.", amt: "$100 000", timer: "3j", ac: "orange" },
+      { ic: "diamond", t: "Course Mensuelle", s: "La plus grosse course du mois pour les joueurs les plus actifs.", amt: "$500 000", timer: "20j", ac: "" },
+      { ic: "ticket", t: "Tirage Hebdo", s: "Un ticket gagné tous les $100 misés. Tirage chaque dimanche.", amt: "$20 000", timer: "4j", ac: "orange" },
+      { ic: "target", t: "Défis", s: "Des objectifs quotidiens sur vos jeux préférés, des gains instantanés.", amt: "$5 000", timer: "Actif", ac: "" },
+      { ic: "coin", t: "Rakeback", s: "Récupérez un pourcentage de chaque mise, quel que soit le résultat.", amt: "Jusqu'à 20%", timer: "Permanent", ac: "orange" },
+    ];
+
+    document.getElementById("promos").innerHTML = PROMOS.map(function (p) {
+      return '<div class="pcard ' + (p.ac ? "pcard--orange" : "") + '">' +
+        '<div class="pcard__ico">' + icon(p.ic) + '</div>' +
+        '<div class="pcard__t">' + p.t + '</div>' +
+        '<div class="pcard__s">' + p.s + '</div>' +
+        '<div class="pcard__foot"><span class="pcard__amt">' + p.amt + '</span>' +
+        '<span class="pcard__timer">' + p.timer + '</span></div>' +
+      '</div>';
+    }).join("");
+
+    const VIPS = [
+      { n: "Têtard", w: "$0", ic: "chip" },
+      { n: "Grenouille", w: "$10K", ic: "frog" },
+      { n: "Frog d'Or", w: "$100K", ic: "star", cur: true },
+      { n: "Roi Pepe", w: "$1M", ic: "crown" },
+      { n: "Légende", w: "$10M", ic: "diamond" },
+    ];
+
+    document.getElementById("vips").innerHTML = VIPS.map(function (v) {
+      return '<div class="vip ' + (v.cur ? "cur" : "") + '">' +
+        '<div class="vip__ico">' + icon(v.ic) + '</div>' +
+        '<div class="vip__n">' + v.n + '</div>' +
+        '<div class="vip__w">' + v.w + ' misés</div>' +
+      '</div>';
+    }).join("");
+  </script>
+</body>
+</html>
