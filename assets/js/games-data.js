@@ -9,7 +9,7 @@ const ORIGINALS = [
   { n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines.html", img: "assets/img/games/mines.jpg" },
   { n: "Dice", p: "pepe.fail", ic: "dice", tag: "ORIGINAL", ac: "gold", href: "games/dice.html", img: "assets/img/games/dice.jpg" },
   { n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "games/crash.html", img: "assets/img/games/crash.jpg" },
-  { n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo.html" },
+  { n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo.html", img: "assets/img/games/limbo.jpg" },
   { n: "Wheel", p: "pepe.fail", ic: "wheel", tag: "ORIGINAL", ac: "orange", href: "games/wheel.html", img: "assets/img/games/wheel.jpg" },
   { n: "Blackjack", p: "pepe.fail", ic: "spade", tag: "ORIGINAL", ac: "gold", href: "games/blackjack.html", img: "assets/img/games/blackjack.jpg" },
 ];
