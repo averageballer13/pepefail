@@ -509,15 +509,25 @@ h1, h2, h3, .display {
 .cta-strip__s { color: var(--text-dim); font-size: 14px; margin-top: 4px; }
 .cta-strip .btn { margin-left: auto; }
 
+/* Support button: the mascot itself, on a dark disc with a gold rim —
+   the artwork is the icon, so no gold fill behind it. */
 .fab {
   position: fixed; right: 22px; bottom: 22px;
-  width: 54px; height: 54px; border-radius: 50%;
-  background: var(--grad-gold); display: grid; place-items: center;
-  box-shadow: var(--glow-gold), 0 8px 24px rgba(0,0,0,.4);
-  z-index: 50; transition: .18s;
+  width: 58px; height: 58px; border-radius: 50%;
+  display: grid; place-items: center;
+  overflow: hidden;
+  background: var(--bg-700);
+  border: 2px solid rgba(255, 210, 30, .55);
+  box-shadow: 0 0 18px rgba(255, 200, 40, .28), 0 8px 24px rgba(0,0,0,.45);
+  z-index: 50;
+  transition: transform .2s var(--ease-soft, ease), box-shadow .2s var(--ease-soft, ease), border-color .2s var(--ease-soft, ease);
 }
-.fab:hover { filter: brightness(1.08); transform: scale(1.05); }
-.fab svg { width: 24px; height: 24px; color: #201800; }
+.fab:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+  box-shadow: 0 0 26px rgba(255, 200, 40, .45), 0 10px 28px rgba(0,0,0,.5);
+}
+.fab img { width: 100%; height: 100%; object-fit: contain; }
 
 /* ===================================================================
    SITE FOOTER (markup injected by shell.js)

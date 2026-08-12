@@ -221,7 +221,7 @@ function renderShell() {
   fab.href = "https://x.com/pepebetsupport";
   fab.target = "_blank";
   fab.rel = "noopener noreferrer";
-  fab.innerHTML = icon("headset", 2);
+  fab.innerHTML = `<img src="${B}assets/img/support.png" alt="" />`;
   document.body.appendChild(fab);
 }
 
