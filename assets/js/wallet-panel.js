@@ -573,5 +573,85 @@
     });
   }
 
-  window.PepeWalletPanel = { open: open };
+  /* =========================== ACCOUNT ===========================
+     Opened from the topbar address chip. Deliberately not the
+     deposit/withdraw panel: just who you are and whether you are
+     signed in, with the one action that flips it. */
+
+  function accountBody() {
+    const a = addr();
+    const canReal = realEnabled();
+    const on = realOn();
+    return (
+      '<div class="wp">' +
+        '<div class="wp-block">' +
+          "<h4>Wallet address</h4>" +
+          '<div class="wp-addr"><code id="wpAddr">' + esc(a) + "</code>" +
+          '<button class="btn btn--gold" id="wpCopy">Copy</button></div>' +
+        "</div>" +
+        (canReal
+          ? '<div class="wp-block">' +
+              "<h4>Session</h4>" +
+              (on
+                ? '<p class="wp-lead">Signed in — your casino balance is open.</p>' +
+                  '<button class="btn btn--glass" id="wpAcctOut">Log out</button>'
+                : '<p class="wp-lead">Signed out. Sign a one-time message to reopen ' +
+                  "your casino balance. It costs nothing and moves nothing.</p>" +
+                  '<button class="btn btn--gold" id="wpAcctIn">Sign in with wallet</button>') +
+              statusSlot() +
+            "</div>"
+          : "") +
+      "</div>"
+    );
+  }
+
+  function mountAccount(h) {
+    const root = h && h.panel ? h.panel : document;
+    const box = root.querySelector("#wpAcct");
+
+    function paint() {
+      box.innerHTML = accountBody();
+      wireCopy(root);
+      const status = root.querySelector("#wpStatus");
+      const out = root.querySelector("#wpAcctOut");
+      if (out) {
+        out.addEventListener("click", function () {
+          real().signOut();
+          paint();
+        });
+      }
+      const sin = root.querySelector("#wpAcctIn");
+      if (sin) {
+        sin.addEventListener("click", function () {
+          sin.disabled = true;
+          real().signIn().then(paint, function (e) {
+            sin.disabled = false;
+            if (status) status.textContent = (e && e.message) || "Sign-in failed.";
+          });
+        });
+      }
+    }
+    paint();
+  }
+
+  function openAccount() {
+    if (!window.PepeModal) return;
+    if (!addr()) {
+      if (window.PepeWallet) window.PepeWallet.startCreateFlow();
+      return;
+    }
+    return window.PepeModal.open({
+      title: "Account",
+      subtitle: "Solana",
+      size: "md",
+      trust: true,
+      body: '<div id="wpAcct"></div>',
+      actions: [
+        { label: "Close", variant: "glass", onClick: function () { window.PepeModal.close(); } },
+      ],
+      onMount: mountAccount,
+    });
+  }
+
+  window.PepeWalletPanel = { open: open, account: openAccount };
 })();

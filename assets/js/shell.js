@@ -156,7 +156,10 @@ function renderAuth() {
     btn.textContent = "Create Wallet";
   }
   btn.addEventListener("click", function () {
-    if (addr) openWallet("deposit");
+    /* Address chip = who am I / session, not the money screens; those
+       live behind the balance chip. */
+    if (addr && window.PepeWalletPanel && window.PepeWalletPanel.account) window.PepeWalletPanel.account();
+    else if (addr) openWallet("deposit");
     else if (window.PepeWallet) window.PepeWallet.startCreateFlow();
   });
   slot.appendChild(btn);
