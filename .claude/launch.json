@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "5177"],
       "port": 5177
+    },
+    {
+      "name": "pepe-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/dev-api.mjs"],
+      "port": 5178
     }
   ]
 }

@@ -353,6 +353,16 @@
   var watchTimer = null;
   var watchFastUntil = 0;
 
+  /* On-chain lamports sitting in the browser wallet itself — shown so
+     the player can move them into the casino in one click. */
+  function chainBalance() {
+    var a = walletAddress();
+    if (!a) return Promise.resolve(0);
+    return rpc("getBalance", [a]).then(function (r) {
+      return r && typeof r.value === "number" ? r.value : 0;
+    });
+  }
+
   function depositAddress() {
     if (depositAddr) return Promise.resolve(depositAddr);
     return api("/api/wallet/deposit-address").then(function (r) {
@@ -436,6 +446,7 @@
     act: act,
     state: roundState,
     deposit: deposit,
+    chainBalance: chainBalance,
     depositAddress: depositAddress,
     sweepOnce: sweepOnce,
     watchDeposits: watchDeposits,

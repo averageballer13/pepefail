@@ -211,6 +211,18 @@
       '<div class="wp">' +
         balanceBlock() +
         '<div class="wp-block">' +
+          "<h4>In your wallet</h4>" +
+          '<div class="wp-bal"><span>' + ico("solana") + '</span><b id="wpChainBal">…</b></div>' +
+          '<div class="wp-amt" style="margin-top:10px">' +
+            '<input class="wp-input" id="wpDepAmt" type="text" inputmode="decimal" ' +
+            'placeholder="0.00" autocomplete="off" />' +
+            '<button class="btn btn--glass" id="wpDepMax">Max</button>' +
+            '<button class="btn btn--gold" id="wpDepGo">Deposit</button>' +
+          "</div>" +
+          '<div class="wp-note">Moves SOL from your in-browser wallet to your casino ' +
+          "balance. You confirm with your wallet password.</div>" +
+        "</div>" +
+        '<div class="wp-block">' +
           "<h4>Your deposit address</h4>" +
           '<div class="wp-addr"><code id="wpAddr">…</code>' +
           '<button class="btn btn--gold" id="wpCopy">Copy</button></div>' +
@@ -434,11 +446,72 @@
       real().watchDeposits(true);
       real().sweepOnce();
 
+      /* On-chain wallet balance + one-click move into the casino. */
+      const chainEl = root.querySelector("#wpChainBal");
+      let chainLamports = 0;
+      const FEE = 5000; /* network fee the wallet pays on the transfer */
+
+      function refreshChain() {
+        real().chainBalance().then(function (l) {
+          chainLamports = l;
+          if (chainEl && document.contains(chainEl)) {
+            chainEl.textContent = fmtSol(l / 1e9) + " SOL";
+          }
+        }, function () {
+          if (chainEl && document.contains(chainEl)) chainEl.textContent = "—";
+        });
+      }
+      refreshChain();
+
+      const depAmt = root.querySelector("#wpDepAmt");
+      const depMax = root.querySelector("#wpDepMax");
+      const depGo = root.querySelector("#wpDepGo");
+
+      if (depMax && depAmt) {
+        depMax.addEventListener("click", function () {
+          depAmt.value = String(Math.max(0, chainLamports - FEE) / 1e9);
+        });
+      }
+
+      if (depGo && depAmt) {
+        depGo.addEventListener("click", function () {
+          const v = parseFloat(String(depAmt.value).replace(",", "."));
+          if (!isFinite(v) || v <= 0) { setStatus("Enter an amount.", "err"); return; }
+          const lam = Math.round(v * 1e9);
+          if (lam + FEE > chainLamports) {
+            setStatus("Not enough SOL in the wallet — the network fee needs " +
+              fmtSol(FEE / 1e9) + " SOL on top.", "err");
+            return;
+          }
+          depGo.disabled = true;
+          setStatus("Confirm with your wallet password…");
+          real().depositAddress()
+            .then(function (to) {
+              return window.PepeWallet.signAndSendTransfer({ to: to, lamports: lam });
+            })
+            .then(function () {
+              depAmt.value = "";
+              setStatus("Sent — crediting in a few seconds…", "ok");
+              real().watchDeposits(true);
+              refreshChain();
+              window.setTimeout(refreshChain, 5000);
+            })
+            .catch(function (e) {
+              setStatus((e && e.message) || "Transfer failed.", "err");
+            })
+            .then(function () { depGo.disabled = false; });
+        });
+      }
+
       const onDeposit = function (e) {
         const amount = e.detail && e.detail.amountFloat;
         if (!(amount > 0)) return;
         setStatus("Credited " + fmtSol(amount) + " SOL.", "ok");
         refreshBal();
+        /* Public RPC reads at finalized commitment, which lags the sweep
+           by a few seconds — refresh now and again once it caught up. */
+        refreshChain();
+        window.setTimeout(refreshChain, 5000);
       };
       document.addEventListener("pepe:deposit", onDeposit);
       document.addEventListener("pepe:balance", refreshBal);
