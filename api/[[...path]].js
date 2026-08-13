@@ -2,43 +2,32 @@
    pepe.fail — the single serverless function
 
    Vercel's Hobby plan allows 12 functions per deployment; this project
-   needs 13 routes and will grow. One catch-all keeps every /api/* URL
-   exactly as documented while counting as a single function, and cold
-   starts get cheaper as a bonus: one bundle instead of thirteen.
+   needs more. One catch-all keeps every /api/* URL exactly as
+   documented while counting as a single function.
 
    Route files live in api/_handlers/ (underscore directories are never
-   treated as functions) and keep their original (req, res) signature,
-   so nothing else in the codebase knows this router exists.
+   treated as functions) and keep their original (req, res) signature.
+
+   Handlers are imported lazily, per request, through literal dynamic
+   imports: the bundler still traces them, but a module that fails to
+   load turns into a readable JSON error for that route instead of
+   killing the whole function at cold start.
    =================================================================== */
 
-import ping from "./_handlers/ping.js";
-import config from "./_handlers/config.js";
-import authChallenge from "./_handlers/auth/challenge.js";
-import authVerify from "./_handlers/auth/verify.js";
-import fairState from "./_handlers/fair/state.js";
-import fairClientSeed from "./_handlers/fair/client-seed.js";
-import fairRotate from "./_handlers/fair/rotate.js";
-import betPlace from "./_handlers/bet/place.js";
-import betAct from "./_handlers/bet/act.js";
-import betState from "./_handlers/bet/state.js";
-import walletBalance from "./_handlers/wallet/balance.js";
-import walletDeposit from "./_handlers/wallet/deposit.js";
-import walletWithdraw from "./_handlers/wallet/withdraw.js";
-
 const ROUTES = {
-  "ping": ping,
-  "config": config,
-  "auth/challenge": authChallenge,
-  "auth/verify": authVerify,
-  "fair/state": fairState,
-  "fair/client-seed": fairClientSeed,
-  "fair/rotate": fairRotate,
-  "bet/place": betPlace,
-  "bet/act": betAct,
-  "bet/state": betState,
-  "wallet/balance": walletBalance,
-  "wallet/deposit": walletDeposit,
-  "wallet/withdraw": walletWithdraw,
+  "ping": () => import("./_handlers/ping.js"),
+  "config": () => import("./_handlers/config.js"),
+  "auth/challenge": () => import("./_handlers/auth/challenge.js"),
+  "auth/verify": () => import("./_handlers/auth/verify.js"),
+  "fair/state": () => import("./_handlers/fair/state.js"),
+  "fair/client-seed": () => import("./_handlers/fair/client-seed.js"),
+  "fair/rotate": () => import("./_handlers/fair/rotate.js"),
+  "bet/place": () => import("./_handlers/bet/place.js"),
+  "bet/act": () => import("./_handlers/bet/act.js"),
+  "bet/state": () => import("./_handlers/bet/state.js"),
+  "wallet/balance": () => import("./_handlers/wallet/balance.js"),
+  "wallet/deposit": () => import("./_handlers/wallet/deposit.js"),
+  "wallet/withdraw": () => import("./_handlers/wallet/withdraw.js"),
 };
 
 export default async function handler(req, res) {
@@ -46,10 +35,25 @@ export default async function handler(req, res) {
   const url = new URL(req.url || "/", "http://internal");
   const route = url.pathname.replace(/^\/api\/?/, "").replace(/\/+$/, "");
 
-  const h = ROUTES[route];
-  if (!h) {
+  const load = ROUTES[route];
+  if (!load) {
     res.status(404).json({ error: "not found" });
     return;
   }
-  return h(req, res);
+
+  let mod;
+  try {
+    mod = await load();
+  } catch (e) {
+    /* Surface the real import failure instead of an opaque 500: this is
+       what turns "FUNCTION_INVOCATION_FAILED" into a fixable message. */
+    res.status(500).json({
+      error: "handler failed to load",
+      route,
+      message: String(e && e.message).slice(0, 300),
+    });
+    return;
+  }
+
+  return mod.default(req, res);
 }
