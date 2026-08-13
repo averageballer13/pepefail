@@ -1,0 +1,275 @@
+/* ===================================================================
+   pepe.fail — rewards page
+   Loaded after styles.css / glass.css / anim.css / play.css
+   =================================================================== */
+
+:root {
+  --slurp: #6fe3ff;
+  --slurp-deep: #1fa8dd;
+}
+
+/* =========================== RANK HERO =========================== */
+.rw-hero {
+  position: relative;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 34px;
+  background: var(--panel);
+}
+
+/* The same artwork as the sidebar card, held back so the numbers stay
+   the thing you read. */
+.rw-hero__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center 40%;
+  opacity: .42;
+}
+.rw-hero::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, var(--bg-900) 18%, rgba(13, 16, 23, .72) 62%, rgba(13, 16, 23, .35));
+  pointer-events: none;
+}
+
+.rw-hero__body {
+  position: relative;
+  z-index: 1;
+  padding: 30px 32px;
+}
+
+.rw-hero__top { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.rw-hero__ico {
+  display: grid; place-items: center;
+  width: 44px; height: 44px; flex: none;
+  border-radius: 12px;
+  background: rgba(111, 227, 255, .1);
+  border: 1px solid rgba(111, 227, 255, .3);
+  color: var(--slurp);
+}
+.rw-hero__ico svg { width: 24px; height: 24px; }
+
+.rw-hero__k {
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--text-mute);
+}
+.rw-hero__n {
+  font-family: var(--font-display);
+  font-size: 32px; font-weight: 800; letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+.rw-hero__pct {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 34px; font-weight: 800; letter-spacing: -0.035em;
+  color: var(--slurp);
+}
+
+/* --- the big bar --- */
+.rw-bar {
+  position: relative;
+  height: 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .55);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, .6);
+  overflow: hidden;
+}
+.rw-bar__fill {
+  position: relative;
+  height: 100%;
+  min-width: 22px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--slurp) 0%, var(--slurp-deep) 100%);
+  box-shadow:
+    0 0 16px rgba(111, 227, 255, .75),
+    0 0 34px rgba(31, 168, 221, .5),
+    inset 0 1px 0 rgba(255, 255, 255, .6);
+  transition: width 520ms cubic-bezier(.25, .6, .2, 1);
+  animation: slurp-breathe 2.8s ease-in-out infinite;
+}
+.rw-bar__fill::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, .15) 35%,
+    rgba(255, 255, 255, .85) 50%,
+    rgba(255, 255, 255, .15) 65%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 90px 100%;
+  animation: slurp-flow 2.2s linear infinite;
+  mix-blend-mode: screen;
+}
+
+.rw-hero__foot {
+  display: flex; justify-content: space-between; gap: 12px;
+  margin-top: 11px;
+  color: var(--text-dim);
+  font-size: 12px; font-weight: 700;
+}
+
+/* =========================== LADDER =========================== */
+.rw-lead {
+  color: var(--text-mute);
+  font-size: 13.5px; line-height: 1.7;
+  max-width: 620px;
+  margin-bottom: 18px;
+}
+
+.rw-ladder {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.rw-tier {
+  padding: 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  transition: border-color var(--dur-base, 260ms) var(--ease-soft, ease),
+              transform var(--dur-base, 260ms) var(--ease-soft, ease);
+}
+.rw-tier:hover { transform: translateY(-2px); border-color: var(--line-2); }
+.rw-tier.is-done { border-color: rgba(111, 227, 255, .22); }
+.rw-tier.is-current {
+  border-color: var(--slurp);
+  box-shadow: 0 0 0 1px rgba(111, 227, 255, .25), 0 0 26px rgba(31, 168, 221, .18);
+}
+
+.rw-tier__head { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; }
+.rw-tier__ico { display: grid; place-items: center; width: 20px; height: 20px; color: var(--text-mute); }
+.rw-tier__ico svg { width: 100%; height: 100%; }
+.rw-tier.is-done .rw-tier__ico,
+.rw-tier.is-current .rw-tier__ico { color: var(--slurp); }
+.rw-tier__n {
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 800; letter-spacing: -0.02em;
+}
+.rw-tier__tag {
+  margin-left: auto;
+  padding: 2px 7px; border-radius: 5px;
+  background: rgba(111, 227, 255, .14);
+  color: var(--slurp);
+  font-size: 9.5px; font-weight: 800;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+.rw-tier__req { color: var(--text-mute); font-size: 11.5px; font-weight: 700; margin-bottom: 14px; }
+
+.rw-tier__perks { display: flex; flex-direction: column; gap: 8px; }
+.rw-tier__perks div {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+.rw-tier__perks span { color: var(--text-mute); font-size: 11.5px; font-weight: 600; }
+.rw-tier__perks b {
+  font-family: var(--font-display);
+  font-size: 15px; font-weight: 800; color: var(--gold);
+}
+
+/* =========================== REFERRALS =========================== */
+.rw-ref {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+.rw-ref__main {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+}
+.rw-ref__main h3 {
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 10px;
+}
+
+.rw-copy {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 9px 9px 13px;
+  border-radius: 10px;
+  background: var(--bg-900);
+  border: 1px solid var(--line-2);
+}
+.rw-copy code {
+  flex: 1; min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.rw-copy .btn { flex: none; height: 34px; padding: 0 15px; }
+
+.rw-note { margin-top: 12px; color: var(--text-mute); font-size: 12.5px; line-height: 1.65; }
+
+.rw-ref__rate {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  padding: 22px 16px;
+  border: 1px solid rgba(255, 210, 30, .28);
+  border-radius: 14px;
+  background: radial-gradient(120% 100% at 50% 0%, rgba(255, 200, 40, .1), transparent 70%), var(--panel);
+  text-align: center;
+}
+.rw-ref__rate span {
+  font-size: 10.5px; font-weight: 800;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-mute);
+}
+.rw-ref__rate b {
+  font-family: var(--font-display);
+  font-size: 40px; font-weight: 800; letter-spacing: -0.04em;
+  background: var(--grad-gold);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.rw-ref__rate i { font-style: normal; font-size: 11.5px; color: var(--text-mute); font-weight: 600; }
+
+.rw-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.rw-stat {
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.rw-stat span {
+  display: block;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 5px;
+}
+.rw-stat b {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800; letter-spacing: -0.03em;
+  color: var(--gold);
+}
+
+/* =========================== RESPONSIVE =========================== */
+@media (max-width: 1100px) {
+  .rw-ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rw-ref { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .rw-hero__body { padding: 22px 20px; }
+  .rw-hero__n { font-size: 25px; }
+  .rw-hero__pct { font-size: 26px; }
+  .rw-ladder { grid-template-columns: 1fr; }
+  .rw-stats { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rw-bar__fill { transition: none; animation: none; }
+  .rw-bar__fill::after { animation: none; opacity: .18; }
+  .rw-tier:hover { transform: none; }
+}

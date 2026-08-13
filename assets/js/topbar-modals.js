@@ -137,6 +137,12 @@
     const code = refCode();
     const link = location.origin + "/?ref=" + code;
 
+    /* the share follows your rank, so it is read from the engine rather
+       than written twice */
+    const E = window.PepeEngine;
+    const rank = E && E.Rank ? E.Rank.current() : null;
+    const share = rank ? rank.ref : 25;
+
     window.PepeModal.open({
       title: "Referrals",
       subtitle: "Earn from the house edge your invites pay",
@@ -162,9 +168,12 @@
             '<ol class="rf-steps">' +
               "<li>Share your link. Anyone opening it is tied to your code on their device.</li>" +
               "<li>They play. Every wager pays the house a one percent edge.</li>" +
-              "<li>You take <b>25% of that edge</b>, for as long as they keep playing.</li>" +
+              "<li>You take <b>" + share + "% of that edge</b>, for as long as they keep playing.</li>" +
             "</ol>" +
-            '<p class="rf-note">You earn from the fee they already pay, not from their losses. ' +
+            '<p class="rf-note">Your share rises with your rank' +
+            (rank ? " — " + share + "% at " + esc(rank.n) : "") +
+            '. See the <a href="' + B + 'pages/promotions.html">rank ladder</a>.<br>' +
+            "You earn from the fee they already pay, not from their losses. " +
             "Nothing is taken out of their balance to fund it.</p>" +
           "</div>" +
         "</div>",

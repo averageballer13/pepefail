@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Promotions — pepe.fail</title>
+  <title>Rewards — pepe.fail</title>
+  <meta name="description" content="Your rank, what it pays back, and what you earn from referrals." />
   <link rel="icon" type="image/png" href="../assets/img/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,45 +14,89 @@
   <link rel="stylesheet" href="../assets/css/anim.css" />
   <link rel="stylesheet" href="../assets/css/play.css" />
   <link rel="stylesheet" href="../assets/css/modal.css" />
+  <link rel="stylesheet" href="../assets/css/rewards.css" />
 </head>
 <body>
   <div class="app">
     <main class="main">
       <div class="main__inner">
 
-        <div class="page-head">
-          <h1><span style="display:inline-grid;place-items:center;width:34px;height:34px;vertical-align:-6px;color:var(--gold);margin-right:6px" data-ico="gift"></span>Promotions</h1>
-          <p>Races, challenges and rewards — there is always something to win on pepe.fail.</p>
-        </div>
+        <!-- ===== RANK ===== -->
+        <section class="rw-hero">
+          <img class="rw-hero__bg" src="../assets/img/draw-banner.jpg" alt="" />
+          <div class="rw-hero__body">
+            <div class="rw-hero__top">
+              <span class="rw-hero__ico" id="rwIco"></span>
+              <div>
+                <div class="rw-hero__k">Your rank</div>
+                <h1 class="rw-hero__n" id="rwName">—</h1>
+              </div>
+              <div class="rw-hero__pct" id="rwPct">0%</div>
+            </div>
 
-        <div class="promo-grid" id="promos"></div>
+            <div class="rw-bar">
+              <div class="rw-bar__fill" id="rwFill"></div>
+            </div>
 
-        <section class="section">
-          <div class="section__head">
-            <h2 class="section__title"><span class="ico" data-ico="crown"></span>VIP Tiers</h2>
+            <div class="rw-hero__foot">
+              <span id="rwXp">0 XP</span>
+              <span id="rwNext">—</span>
+            </div>
           </div>
-          <div class="vip-row" id="vips"></div>
         </section>
 
-        <div class="cta-strip" style="margin-top:30px">
-          <img src="../assets/img/logo.png" alt="pepe.fail" />
-          <div>
-            <div class="cta-strip__t">Nothing running yet</div>
-            <div class="cta-strip__s">Races and rewards go live once the casino launches.</div>
+        <!-- ===== LADDER ===== -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="crown"></span>Ranks</h2>
           </div>
-          <a class="btn btn--gold btn--lg" href="../casino.html#originals">Play now</a>
-        </div>
+          <p class="rw-lead">
+            Progress is earned on the fees you pay the house, not on wins — so it tracks
+            what playing actually costs and cannot be farmed by a lucky streak.
+          </p>
+          <div class="rw-ladder" id="rwLadder"></div>
+        </section>
 
-        <div class="foot">
-          © 2026 pepe.fail — Casino<br>
-          Play responsibly · 18+
-        </div>
+        <!-- ===== REFERRALS ===== -->
+        <section class="section">
+          <div class="section__head">
+            <h2 class="section__title"><span class="ico" data-ico="gift"></span>Referrals</h2>
+          </div>
+
+          <div class="rw-ref">
+            <div class="rw-ref__main">
+              <h3>Your link</h3>
+              <div class="rw-copy">
+                <code id="rwLink">—</code>
+                <button class="btn btn--gold" id="rwCopy">Copy</button>
+              </div>
+              <p class="rw-note">
+                You earn a share of the house edge your invites pay — never a cut of their
+                losses. Nothing is taken out of their balance to fund it.
+              </p>
+            </div>
+
+            <div class="rw-ref__rate">
+              <span>Your share</span>
+              <b id="rwRefPct">25%</b>
+              <i id="rwRefNext">—</i>
+            </div>
+          </div>
+
+          <div class="rw-stats">
+            <div class="rw-stat"><span>Invited</span><b>0</b></div>
+            <div class="rw-stat"><span>Wagered by invites</span><b>0.00</b></div>
+            <div class="rw-stat"><span>Earned</span><b>0.00</b></div>
+          </div>
+        </section>
+
+        <div class="foot"></div>
 
       </div>
     </main>
   </div>
 
-  <script>window.PAGE = { active: "vip", base: "../" };</script>
+  <script>window.PAGE = { active: "rewards", base: "../" };</script>
   <script src="../assets/js/icons.js"></script>
   <script src="../assets/js/engine.js"></script>
   <script src="../assets/js/shell.js"></script>
@@ -61,46 +106,6 @@
   <script src="../assets/js/wallet-panel.js"></script>
   <script src="../assets/js/topbar-modals.js"></script>
   <script src="../assets/js/anim.js"></script>
-  <script>
-    hydrateIcons();
-
-    /* Promotion cards */
-    const PROMOS = [
-      { ic: "trophy", t: "Daily Race", s: "Climb the leaderboard every day and share the prize pool.", amt: "$0", timer: "Soon", ac: "" },
-      { ic: "trophy", t: "Weekly Race", s: "One week, one leaderboard, one big pool to share.", amt: "$0", timer: "Soon", ac: "orange" },
-      { ic: "diamond", t: "Monthly Race", s: "The biggest race of the month for the most active players.", amt: "$0", timer: "Soon", ac: "" },
-      { ic: "ticket", t: "Weekly Draw", s: "One ticket for every bet you place. Drawn every Sunday.", amt: "$0", timer: "Soon", ac: "orange" },
-      { ic: "target", t: "Challenges", s: "Daily objectives on your favorite games, instant payouts.", amt: "$0", timer: "Soon", ac: "" },
-      { ic: "coin", t: "Rakeback", s: "Get a share of every bet back, win or lose.", amt: "$0", timer: "Soon", ac: "orange" },
-    ];
-
-    document.getElementById("promos").innerHTML = PROMOS.map(function (p) {
-      return '<div class="pcard ' + (p.ac ? "pcard--orange" : "") + '">' +
-        '<div class="pcard__ico">' + icon(p.ic) + '</div>' +
-        '<div class="pcard__t">' + p.t + '</div>' +
-        '<div class="pcard__s">' + p.s + '</div>' +
-        '<div class="pcard__foot"><span class="pcard__amt">' + p.amt + '</span>' +
-        '<span class="pcard__timer">' + p.timer + '</span></div>' +
-      '</div>';
-    }).join("");
-
-    /* VIP ladder */
-    const VIPS = [
-      { n: "Tadpole", w: "$0", ic: "chip", cur: true },
-      { n: "Frog", w: "$0", ic: "frog" },
-      { n: "Golden Frog", w: "$0", ic: "star" },
-      { n: "King Pepe", w: "$0", ic: "crown" },
-      { n: "Legend", w: "$0", ic: "diamond" },
-    ];
-
-    document.getElementById("vips").innerHTML = VIPS.map(function (v) {
-      return '<div class="vip ' + (v.cur ? "cur" : "") + '">' +
-        '<div class="vip__ico">' + icon(v.ic) + '</div>' +
-        '<div class="vip__n">' + v.n + '</div>' +
-        '<div class="vip__w">' + v.w + ' wagered</div>' +
-      '</div>';
-    }).join("");
-
-  </script>
+  <script src="../assets/js/rewards.js"></script>
 </body>
 </html>

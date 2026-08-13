@@ -111,12 +111,15 @@
      it cannot be farmed by a lucky streak. */
   var XP_KEY = "pepe.xp";
 
+  /* at       = fees paid to reach the rank
+     rakeback = share of your own fees returned
+     ref      = share of an invite's fees you earn */
   var RANKS = [
-    { k: "tadpole", n: "Tadpole",     ic: "chip",    at: 0 },
-    { k: "frog", n: "Frog",           ic: "frog",    at: 10 },
-    { k: "golden", n: "Golden Frog",  ic: "star",    at: 100 },
-    { k: "king", n: "King Pepe",      ic: "crown",   at: 1000 },
-    { k: "legend", n: "Legend",       ic: "diamond", at: 10000 },
+    { k: "tadpole", n: "Tadpole",     ic: "chip",    at: 0,     rakeback: 5,  ref: 25 },
+    { k: "frog", n: "Frog",           ic: "frog",    at: 10,    rakeback: 10, ref: 28 },
+    { k: "golden", n: "Golden Frog",  ic: "star",    at: 100,   rakeback: 15, ref: 32 },
+    { k: "king", n: "King Pepe",      ic: "crown",   at: 1000,  rakeback: 20, ref: 36 },
+    { k: "legend", n: "Legend",       ic: "diamond", at: 10000, rakeback: 25, ref: 40 },
   ];
 
   /* Everyone starts with a sliver on the bar. A rank meter sitting at a
