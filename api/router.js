@@ -31,9 +31,18 @@ const ROUTES = {
 };
 
 export default async function handler(req, res) {
-  /* /api/foo/bar -> "foo/bar", tolerant of trailing slashes. */
-  const url = new URL(req.url || "/", "http://internal");
-  const route = url.pathname.replace(/^\/api\/?/, "").replace(/\/+$/, "");
+  /* Nested paths reach this function through the vercel.json rewrite,
+     which carries the original route in ?path=. Direct hits (local dev,
+     or /api/router itself) fall back to the pathname. */
+  let route = "";
+  const q = req.query && req.query.path;
+  if (q) {
+    route = Array.isArray(q) ? q.join("/") : String(q);
+  } else {
+    const url = new URL(req.url || "/", "http://internal");
+    route = url.pathname.replace(/^\/api\/?/, "");
+  }
+  route = route.replace(/^router\/?/, "").replace(/\/+$/, "");
 
   const load = ROUTES[route];
   if (!load) {
