@@ -800,12 +800,23 @@
           writeStore(address, blob);
           session = { address: address, secretKey: pair.secretKey };
           emit();
+          autoSignIn();
           screenBackup(handle, false);
         });
       })
       .catch(function (err) {
         showError(handle, describeError(err));
       });
+  }
+
+  /* A brand-new or freshly imported wallet is unlocked in this session,
+     so the casino sign-in signature costs no extra prompt — run it now
+     rather than making the user find the Sign In button. Demo mode (or
+     a failure) just leaves sign-in manual. */
+  function autoSignIn() {
+    if (window.PepeReal && typeof window.PepeReal.signIn === "function") {
+      window.PepeReal.signIn().catch(function () { /* stays manual */ });
+    }
   }
 
   /* --- 1b. Import an existing wallet ---
@@ -894,6 +905,7 @@
           writeStore(address, blob);
           session = { address: address, secretKey: pair.secretKey };
           emit();
+          autoSignIn();
           screenDeposit(handle);
         });
       })

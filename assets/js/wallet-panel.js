@@ -229,8 +229,10 @@
           "<h4>Your deposit address</h4>" +
           '<div class="wp-addr"><code id="wpAddr">…</code>' +
           '<button class="btn btn--gold" id="wpCopy">Copy</button></div>' +
-          '<div class="wp-note" style="margin-top:8px">Send SOL here from any wallet or ' +
-          "exchange. It is credited automatically — no second step.</div>" +
+          '<div class="wp-note" style="margin-top:8px">This is not your wallet address — ' +
+          "it is your personal top-up address at the casino, unique to your account. " +
+          "SOL sent here from any wallet or exchange is credited to your casino " +
+          "balance automatically.</div>" +
           '<p class="wp-warn">' + ico("shield") +
           "<span>Solana network only. Sending from another chain will lose the funds " +
           "permanently.</span></p>" +
