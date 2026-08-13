@@ -730,7 +730,8 @@
         '<label class="pm-label" for="pepe-pw2">Repeat password</label>' +
         '<input class="pm-input" type="password" id="pepe-pw2" autocomplete="new-password" spellcheck="false" />' +
         "</div>" +
-        '<p class="pm-note">There is no recovery. If you forget this password the wallet cannot be opened again — only the private key backup on the next screen can restore it.</p>'
+        '<p class="pm-note">There is no recovery. If you forget this password the wallet cannot be opened again — only the private key backup on the next screen can restore it.</p>' +
+        '<button type="button" class="pm-linkbtn" data-import-instead>I already have a wallet — import it</button>'
     );
 
     handle.setActions([
@@ -745,6 +746,10 @@
         },
       },
     ]);
+
+    handle.find("[data-import-instead]").addEventListener("click", function () {
+      screenImport(handle);
+    });
 
     var input = handle.find("#pepe-pw");
     var repeat = handle.find("#pepe-pw2");
@@ -796,6 +801,100 @@
           session = { address: address, secretKey: pair.secretKey };
           emit();
           screenBackup(handle, false);
+        });
+      })
+      .catch(function (err) {
+        showError(handle, describeError(err));
+      });
+  }
+
+  /* --- 1b. Import an existing wallet ---
+     For a key generated here on another device or session. The password
+     is per-device: it only encrypts the key in this browser, so it does
+     not need to match the one used where the wallet was created. */
+  function screenImport(handle) {
+    handle.setTitle("Import a wallet");
+    handle.setSubtitle("Paste the private key you backed up, then pick a password for this device.");
+    handle.setBody(
+      errorSlot() +
+        '<div class="pm-field" style="margin-top:12px">' +
+        '<label class="pm-label" for="pepe-imp-key">Private key</label>' +
+        '<input class="pm-input" type="password" id="pepe-imp-key" autocomplete="off" spellcheck="false" placeholder="Base58 private key" />' +
+        "</div>" +
+        '<div class="pm-field">' +
+        '<label class="pm-label" for="pepe-imp-pw">Password for this device</label>' +
+        '<input class="pm-input" type="password" id="pepe-imp-pw" autocomplete="new-password" spellcheck="false" placeholder="At least ' +
+        MIN_PASSWORD +
+        ' characters" />' +
+        "</div>" +
+        '<div class="pm-field">' +
+        '<label class="pm-label" for="pepe-imp-pw2">Repeat password</label>' +
+        '<input class="pm-input" type="password" id="pepe-imp-pw2" autocomplete="new-password" spellcheck="false" />' +
+        "</div>" +
+        '<p class="pm-note">The key is encrypted with this password and stored only in this browser. It never leaves this device.</p>' +
+        '<button type="button" class="pm-linkbtn" data-create-instead>Create a new wallet instead</button>'
+    );
+
+    handle.setActions([
+      { label: "Cancel", variant: "glass" },
+      {
+        label: "Import wallet",
+        variant: "gold",
+        name: "import",
+        keepOpen: true,
+        onClick: function (h) {
+          return doImport(h);
+        },
+      },
+    ]);
+
+    handle.find("[data-create-instead]").addEventListener("click", function () {
+      screenPassword(handle);
+    });
+    handle.find("#pepe-imp-key").focus();
+  }
+
+  function doImport(handle) {
+    clearError(handle);
+    var keyText = handle.find("#pepe-imp-key").value.trim();
+    var password = handle.find("#pepe-imp-pw").value;
+    var repeat = handle.find("#pepe-imp-pw2").value;
+
+    if (!keyText) {
+      showError(handle, "Paste your private key.");
+      return false;
+    }
+    if (password.length < MIN_PASSWORD) {
+      showError(handle, "Password must be at least " + MIN_PASSWORD + " characters.");
+      return false;
+    }
+    if (password !== repeat) {
+      showError(handle, "The two passwords do not match.");
+      return false;
+    }
+    if (!hasWebCrypto()) {
+      showError(handle, "This browser blocks WebCrypto here. Open the site over https and try again.");
+      return false;
+    }
+
+    return loadLibs()
+      .then(function (l) {
+        var decoded;
+        try {
+          decoded = l.bs58.decode(keyText);
+        } catch (e) {
+          throw makeError("bad-key", "That is not a valid base58 key.");
+        }
+        var pair;
+        if (decoded.length === 64) pair = l.nacl.sign.keyPair.fromSecretKey(decoded);
+        else if (decoded.length === 32) pair = l.nacl.sign.keyPair.fromSeed(decoded);
+        else throw makeError("bad-key", "A private key is 64 bytes (or a 32-byte seed) — this one decodes to " + decoded.length + ".");
+        var address = l.bs58.encode(pair.publicKey);
+        return encryptSecret(pair.secretKey, password).then(function (blob) {
+          writeStore(address, blob);
+          session = { address: address, secretKey: pair.secretKey };
+          emit();
+          screenDeposit(handle);
         });
       })
       .catch(function (err) {
@@ -1248,8 +1347,14 @@
     };
   }
 
+  function startImportFlow() {
+    if (readStore()) return openWallet();
+    return openWalletModal(screenImport, "Import a wallet", "Paste the private key you backed up, then pick a password for this device.");
+  }
+
   window.PepeWallet = {
     startCreateFlow: startCreateFlow,
+    startImportFlow: startImportFlow,
     get: get,
     open: openWallet,
     disconnect: confirmRemoval,

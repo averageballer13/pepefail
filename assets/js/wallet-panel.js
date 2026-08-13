@@ -117,7 +117,10 @@
     const bal = realOn() ? real().balance("sol") : 0;
     return (
       '<div class="wp-block">' +
-        "<h4>Casino balance</h4>" +
+        '<div style="display:flex;align-items:center;justify-content:space-between">' +
+          "<h4>Casino balance</h4>" +
+          '<button type="button" class="pm-linkbtn" id="wpLogout" style="margin:0">Log out</button>' +
+        "</div>" +
         '<div class="wp-bal"><span>' + ico("coin") + '</span><b id="wpRealBal">' + fmtSol(bal) + " SOL</b></div>" +
       "</div>"
     );
@@ -430,6 +433,16 @@
         if (window.PepeWallet) window.PepeWallet.startCreateFlow();
       });
       return;
+    }
+
+    /* Signed-in screens carry a Log out link next to the balance. It
+       drops the session token; the wallet itself stays on the device. */
+    const logoutBtn = root.querySelector("#wpLogout");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", function () {
+        real().signOut();
+        show(which);
+      });
     }
 
     if (which === "deposit") {
