@@ -26,6 +26,8 @@ const ICONS = {
   grid: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9.3h16M4 14.6h16M9.3 4v16M14.6 4v16"/>',
   lock: '<rect x="4.8" y="10.5" width="14.4" height="9.5" rx="2.2"/><path d="M8.2 10.5V7.8a3.8 3.8 0 0 1 7.6 0v2.7"/><circle cx="12" cy="15.2" r="1.5" fill="currentColor" stroke="none"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  sound: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/>',
+  soundOff: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/>',
   arrowDown: '<path d="M12 4v14"/><path d="m6 12.5 6 6 6-6"/>',
   arrowUp: '<path d="M12 20V6"/><path d="m6 11.5 6-6 6 6"/>',
   solana: '<path d="M6.4 15.6h12.2a.7.7 0 0 1 .5 1.2l-2.2 2.1a1 1 0 0 1-.7.3H4a.7.7 0 0 1-.5-1.2l2.2-2.1a1 1 0 0 1 .7-.3Z" fill="currentColor" stroke="none"/><path d="M6.4 4.8h12.2a.7.7 0 0 1 .5 1.2l-2.2 2.1a1 1 0 0 1-.7.3H4a.7.7 0 0 1-.5-1.2L5.7 5.1a1 1 0 0 1 .7-.3Z" fill="currentColor" stroke="none"/><path d="M17.6 10.2H5.4a1 1 0 0 0-.7.3l-2.2 2.1a.7.7 0 0 0 .5 1.2h12.2a1 1 0 0 0 .7-.3l2.2-2.1a.7.7 0 0 0-.5-1.2Z" fill="currentColor" stroke="none"/>',

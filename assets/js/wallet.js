@@ -1024,6 +1024,190 @@
   }
 
   /* ===================================================================
+     SIGNING (real mode)
+
+     The two entry points below let realmode.js authenticate and move
+     funds. Signing happens here so the secret key never crosses a file
+     boundary; all network access is delegated to window.PepeReal.rpc so
+     this file still performs no fetch of its own.
+     =================================================================== */
+
+  /* Compact unlock modal used when a signature is needed while the
+     session is locked. Resolves the decrypted 64-byte secret key. */
+  function promptUnlock(store) {
+    if (!hasModal()) return Promise.reject(makeError("no-modal", "Modal system unavailable."));
+    if (!hasWebCrypto()) return Promise.reject(makeError("crypto", "WebCrypto unavailable."));
+    return new Promise(function (resolve, reject) {
+      var done = false;
+      var handle = window.PepeModal.open({
+        title: "Unlock to sign",
+        subtitle: "Enter your password to sign with " + shorten(store.address) + ".",
+        size: "sm",
+        trust: true,
+        body:
+          errorSlot() +
+          '<div class="pm-field" style="margin-top:12px">' +
+          '<label class="pm-label" for="pepe-sign-pw">Password</label>' +
+          '<input class="pm-input" type="password" id="pepe-sign-pw" autocomplete="current-password" spellcheck="false" />' +
+          "</div>",
+        actions: [
+          { label: "Cancel", variant: "glass" },
+          {
+            label: "Unlock",
+            variant: "gold",
+            name: "unlock",
+            keepOpen: true,
+            onClick: function (h) {
+              clearError(h);
+              var pw = h.find("#pepe-sign-pw").value;
+              if (!pw) { showError(h, "Enter your password."); return false; }
+              return decryptSecret(store, pw)
+                .then(function (secretKey) {
+                  if (secretKey.length !== 64) throw makeError("decrypt", "Wrong password.");
+                  done = true;
+                  h.close();
+                  resolve(secretKey);
+                })
+                .catch(function (err) { showError(h, describeError(err)); });
+            },
+          },
+        ],
+        onClose: function () {
+          if (!done) reject(makeError("cancelled", "Unlock cancelled."));
+        },
+      });
+      var input = handle.find("#pepe-sign-pw");
+      if (input) {
+        input.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            var btn = handle.action("unlock");
+            if (btn) btn.click();
+          }
+        });
+      }
+    });
+  }
+
+  /* Runs fn(secretKey, address) with an unlocked key. A key decrypted
+     just for this call is zeroed once fn settles; a live session key is
+     left alone because the session owns its lifetime. */
+  function withSecretKey(fn) {
+    if (session && session.secretKey) {
+      return Promise.resolve().then(function () {
+        return fn(session.secretKey, session.address);
+      });
+    }
+    var store = readStore();
+    if (!store) return Promise.reject(makeError("no-wallet", "No wallet in this browser."));
+    return promptUnlock(store).then(function (secretKey) {
+      var wipe = function () { try { secretKey.fill(0); } catch (e) { /* ignore */ } };
+      return Promise.resolve()
+        .then(function () { return fn(secretKey, store.address); })
+        .then(
+          function (out) { wipe(); return out; },
+          function (err) { wipe(); throw err; }
+        );
+    });
+  }
+
+  /* --- Minimal Solana wire helpers (legacy tx format) --- */
+
+  function shortvec(n) {
+    var out = [];
+    do {
+      var b = n & 0x7f;
+      n >>>= 7;
+      if (n) b |= 0x80;
+      out.push(b);
+    } while (n);
+    return out;
+  }
+
+  function concatBytes(parts) {
+    var len = 0, i;
+    for (i = 0; i < parts.length; i++) len += parts[i].length;
+    var out = new Uint8Array(len);
+    var off = 0;
+    for (i = 0; i < parts.length; i++) { out.set(parts[i], off); off += parts[i].length; }
+    return out;
+  }
+
+  function u64le(value) {
+    /* Split on 2^32: safe for every amount below 2^53 lamports. */
+    var out = new Uint8Array(8);
+    var lo = value % 4294967296;
+    var hi = Math.floor(value / 4294967296);
+    for (var i = 0; i < 4; i++) { out[i] = lo & 0xff; lo = Math.floor(lo / 256); }
+    for (var j = 4; j < 8; j++) { out[j] = hi & 0xff; hi = Math.floor(hi / 256); }
+    return out;
+  }
+
+  /* Signs message bytes (or a UTF-8 string) with the wallet key.
+     Resolves the detached ed25519 signature in base58. */
+  function signMessage(message) {
+    return loadLibs().then(function (l) {
+      var bytes = typeof message === "string" ? new TextEncoder().encode(message) : message;
+      return withSecretKey(function (secretKey) {
+        return l.bs58.encode(l.nacl.sign.detached(bytes, secretKey));
+      });
+    });
+  }
+
+  /* Builds, signs and broadcasts a plain SOL transfer from this wallet.
+     Network calls go through window.PepeReal.rpc (blockhash + send) so
+     this file keeps its no-fetch promise. Resolves the tx signature. */
+  function signAndSendTransfer(opts) {
+    var to = opts && opts.to;
+    var lamports = opts && opts.lamports;
+    if (!to || !isFinite(lamports) || lamports <= 0 || lamports % 1 !== 0) {
+      return Promise.reject(makeError("bad-args", "signAndSendTransfer needs { to, lamports } with integer lamports."));
+    }
+    if (!window.PepeReal || typeof window.PepeReal.rpc !== "function") {
+      return Promise.reject(makeError("no-rpc", "Real mode is not active."));
+    }
+    return loadLibs().then(function (l) {
+      return withSecretKey(function (secretKey, address) {
+        return window.PepeReal.rpc("getLatestBlockhash", [{ commitment: "confirmed" }]).then(function (r) {
+          var blockhash = l.bs58.decode(r && r.value ? r.value.blockhash : r.blockhash);
+          var from = l.bs58.decode(address);
+          var dest = l.bs58.decode(to);
+          var system = new Uint8Array(32); /* all zeros = 11111111111111111111111111111111 */
+
+          /* Self-transfers collapse to two account keys. */
+          var self = to === address;
+          var keys = self ? [from, system] : [from, dest, system];
+          var programIndex = keys.length - 1;
+          var toIndex = self ? 0 : 1;
+
+          /* System program transfer: u32 instruction index 2 + u64 lamports. */
+          var data = concatBytes([Uint8Array.from([2, 0, 0, 0]), u64le(lamports)]);
+
+          var msg = concatBytes([
+            Uint8Array.from([1, 0, 1]),            /* 1 signature, 0 ro signed, 1 ro unsigned */
+            Uint8Array.from(shortvec(keys.length)),
+            concatBytes(keys),
+            blockhash,
+            Uint8Array.from(shortvec(1)),          /* one instruction */
+            Uint8Array.from([programIndex]),
+            Uint8Array.from(shortvec(2)),
+            Uint8Array.from([0, toIndex]),
+            Uint8Array.from(shortvec(data.length)),
+            data,
+          ]);
+
+          var sig = l.nacl.sign.detached(msg, secretKey);
+          var wire = concatBytes([Uint8Array.from(shortvec(1)), sig, msg]);
+          return window.PepeReal.rpc("sendTransaction", [
+            toBase64(wire),
+            { encoding: "base64", preflightCommitment: "confirmed" },
+          ]);
+        });
+      });
+    });
+  }
+
+  /* ===================================================================
      PUBLIC API
      =================================================================== */
 
@@ -1069,6 +1253,8 @@
     get: get,
     open: openWallet,
     disconnect: confirmRemoval,
+    signMessage: signMessage,
+    signAndSendTransfer: signAndSendTransfer,
     /* Convenience for the topbar label */
     exists: function () {
       return !!readStore();

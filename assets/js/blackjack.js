@@ -5,6 +5,11 @@
    crypto RNG as the rest of the site, dealer stands on soft 17,
    blackjack pays 3:2.
 
+   Demo mode plays the shoe locally. In real mode every action is a
+   server request and the dealer's hole card stays on the server until
+   the round settles — the client cannot peek at it because it never
+   receives it.
+
    Registers itself as window.BLACKJACK_GAME; game-page.js picks it up.
    =================================================================== */
 
@@ -82,6 +87,47 @@
       </div>`;
   }
 
+  /* --- Server card normalisation ----------------------------------
+     The server mirrors this game but its wire format for a card may be
+     an object, an index or a string. Everything collapses to the local
+     {r, su} shape so the painter stays unchanged. */
+  const SUIT_KEY = {
+    s: 0, spade: 0, spades: 0, "♠": 0,
+    h: 1, heart: 1, hearts: 1, "♥": 1,
+    d: 2, diamond: 2, diamonds: 2, "♦": 2,
+    c: 3, club: 3, clubs: 3, "♣": 3,
+  };
+
+  function suitOf(v) {
+    if (typeof v === "number") return SUITS[((v % 4) + 4) % 4];
+    if (typeof v === "string") {
+      const k = SUIT_KEY[v.toLowerCase()];
+      return SUITS[k !== undefined ? k : 0];
+    }
+    if (v && typeof v === "object" && v.ch) return v;
+    return SUITS[0];
+  }
+
+  function normCard(c) {
+    if (typeof c === "number") {
+      return { r: RANKS[((c % 13) + 13) % 13], su: SUITS[Math.floor(c / 13) % 4] };
+    }
+    if (typeof c === "string") {
+      const m = c.match(/^(10|[2-9]|[AJQKT])(.+)$/i);
+      if (m) {
+        const r = m[1].toUpperCase() === "T" ? "10" : m[1].toUpperCase();
+        return { r: r, su: suitOf(m[2]) };
+      }
+      return { r: "A", su: SUITS[0] };
+    }
+    if (c && typeof c === "object") {
+      const r = String(c.r || c.rank || "A");
+      const s = c.su !== undefined ? c.su : c.s !== undefined ? c.s : c.suit;
+      return { r: r === "T" ? "10" : r, su: suitOf(s) };
+    }
+    return { r: "A", su: SUITS[0] };
+  }
+
   window.BLACKJACK_GAME = {
     name: "Blackjack",
     ic: "spade",
@@ -134,9 +180,17 @@
       let stake = 0;
       let hole = true;      /* dealer's second card still face down */
       let over = true;
+      let realId = null;    /* server roundId in real mode */
+      let busy = false;     /* one action request at a time */
 
       function paint() {
-        dealerEl.innerHTML = dealer.map((c, i) => cardHTML(c, i, hole && i === 1)).join("");
+        let dealerHtml = dealer.map((c, i) => cardHTML(c, i, hole && i === 1)).join("");
+        /* Real mode: the hole card never reaches the client, so a face
+           down card is drawn in the slot the server keeps hidden. */
+        if (realId && hole && dealer.length === 1) {
+          dealerHtml += cardHTML(null, 1, true);
+        }
+        dealerEl.innerHTML = dealerHtml;
         playerEl.innerHTML = player.map((c, i) => cardHTML(c, i, false)).join("");
         dScore.textContent = hole ? (dealer.length ? score([dealer[0]]) : "—") : score(dealer);
         pScore.textContent = player.length ? score(player) : "—";
@@ -160,7 +214,9 @@
 
         const p = score(player);
         if (p <= 21) {
-          while (score(dealer) < 17 || (score(dealer) === 17 && isSoft(dealer))) {
+          /* S17: the dealer stands on every 17, soft included — the rule
+             printed under the table. */
+          while (score(dealer) < 17) {
             dealer.push(draw());
           }
           paint();
@@ -191,10 +247,93 @@
         return false;
       }
 
+      /* --- real mode ------------------------------------------------ */
+
+      function gameStateOf(r) {
+        if (r && r.state && typeof r.state === "object") return r.state;
+        if (r && r.data && typeof r.data === "object") return r.data;
+        return r || {};
+      }
+
+      function isSettledReal(r, s) {
+        if (r && typeof r.state === "string") return r.state === "settled";
+        return !!((r && r.settled === true) || s.settled === true || s.state === "settled");
+      }
+
+      /* Explains the outcome from what is on the table plus the payout,
+         when the server did not send a label of its own. */
+      function deriveLabel(ret) {
+        const p = score(player);
+        const d = score(dealer);
+        if (p > 21) return "Bust";
+        if (isBlackjack(player) && !isBlackjack(dealer) && ret > stake) return "Blackjack — 3:2";
+        if (isBlackjack(dealer) && !isBlackjack(player)) return "Dealer blackjack";
+        if (ret <= 0) return d >= p ? "Dealer wins" : "You lose";
+        if (Math.abs(ret - stake) < 1e-9) return "Push";
+        if (d > 21) return "Dealer busts";
+        return "You win";
+      }
+
+      /* Repaints from a server response; settles when the server says
+         the round is over (hole card revealed only then). */
+      function applyReal(r) {
+        const s = gameStateOf(r);
+        const p = s.player || s.playerHand;
+        const d = s.dealer || s.dealerHand;
+        if (Array.isArray(p)) player = p.map(normCard);
+        if (Array.isArray(d)) dealer = d.map(normCard);
+
+        const settled = isSettledReal(r, s);
+        hole = !settled;
+        paint();
+
+        if (settled) {
+          over = true;
+          realId = null;
+          setActions(false);
+          const ret = r.payoutFloat !== undefined ? r.payoutFloat : 0;
+          const label = s.result || r.result || deriveLabel(ret);
+          say(label, ret > stake ? "win" : ret > 0 && Math.abs(ret - stake) < 1e-9 ? "push" : "lose");
+          ui.settle(ret, ret > stake, null);
+          return;
+        }
+
+        const canDouble = s.canDouble !== undefined
+          ? !!s.canDouble
+          : player.length === 2 && E.Bank.canBet(stake);
+        setActions(true, canDouble);
+      }
+
       actions.querySelectorAll("[data-act]").forEach((b) => {
-        b.addEventListener("click", () => {
+        b.addEventListener("click", async () => {
           if (over) return;
           const act = b.dataset.act;
+
+          if (realId) {
+            if (busy) return;
+            busy = true;
+            setActions(false);
+            let r;
+            try {
+              r = await ui.act(realId, act);
+            } catch (e) {
+              busy = false;
+              if (!over && realId) {
+                setActions(true, false);
+                say((e && e.message) || "Action failed", "lose");
+              }
+              return;
+            }
+            busy = false;
+            if (act === "double") {
+              /* Server debited the second stake; mirror the doubled
+                 stake locally so labels and XP stay coherent. */
+              E.Rank.wager(stake);
+              stake = round2(stake * 2);
+            }
+            applyReal(r);
+            return;
+          }
 
           if (act === "hit") {
             player.push(draw());
@@ -218,13 +357,26 @@
 
       ui.setPayout("Blackjack pays", "3:2");
 
-      ui.onPlay((amount) => {
+      ui.onPlay(async (amount) => {
         stake = amount;
         dealer = [];
         player = [];
         hole = true;
         over = false;
+        realId = null;
+        busy = false;
         say("", null);
+
+        if (ui.real()) {
+          let r;
+          try {
+            r = await ui.place({});
+          } catch (e) { over = true; ui.fail(e); return; }
+          realId = r.roundId || null;
+          ui.hold();
+          applyReal(r);
+          return;
+        }
 
         player.push(draw());
         dealer.push(draw());

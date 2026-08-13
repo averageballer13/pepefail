@@ -1,0 +1,14 @@
+{
+  "name": "pepe-fail",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.95.0",
+    "tweetnacl": "^1.0.3",
+    "bs58": "^5.0.0"
+  }
+}

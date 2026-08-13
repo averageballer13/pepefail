@@ -33,7 +33,7 @@ const NAV_GROUPS = [
 ];
 
 const NAV_FOOT = [
-  { k: "rewards", ic: "shield", t: "Rewards", href: B + "pages/promotions.html" },
+  { k: "rewards", ic: "gift", t: "Rewards", href: B + "pages/promotions.html" },
   { k: "token", ic: "coin", t: "$FAIL Token", href: B + "token.html", mod: "token" },
 ];
 
@@ -248,6 +248,7 @@ function renderShell() {
     <div class="topbar__spacer"></div>
     <button class="icon-btn glass" title="Search" data-open="search">${icon("search", 2)}</button>
     <button class="icon-btn glass" title="Referrals" data-open="referrals">${icon("gift", 2)}</button>
+    <button class="icon-btn glass" title="Sound" id="sfxToggle"></button>
     <div class="topbar__auth" id="topbarAuth"></div>`;
 
   /* Sidebar */
@@ -351,8 +352,9 @@ function renderFooter() {
           '<img src="' + B + 'assets/img/logo.png" alt="" />' +
           '<span>pepe<b>.fail</b></span>' +
         "</a>" +
-        "<p>pepe.fail is a decentralised casino on Solana. Funds stay in your own " +
-        "non-custodial wallet — there is no operator account holding your balance.</p>" +
+        "<p>pepe.fail is a casino on Solana. Your wallet keys stay in your browser; " +
+        "your casino balance is held by the house while you play and can be " +
+        "withdrawn at any time.</p>" +
         "<p>Gambling can be addictive. Play responsibly and only stake what you can " +
         "afford to lose.</p>" +
         '<p class="sfoot__copy">&copy; 2026 pepe.fail. All rights reserved.</p>' +
@@ -382,6 +384,24 @@ document.addEventListener("pepe:wallet", renderAuth);
 document.querySelectorAll("[data-group] [data-toggle]").forEach((t) => {
   t.addEventListener("click", () => t.closest("[data-group]").classList.toggle("open"));
 });
+
+/* Sound toggle — sfx.js loads after this file, so the icon paints on
+   DOMContentLoaded and again on every change. */
+function paintSfx() {
+  const b = document.getElementById("sfxToggle");
+  if (!b) return;
+  const off = window.PepeSfx ? window.PepeSfx.muted() : false;
+  b.innerHTML = icon(off ? "soundOff" : "sound", 2);
+  b.title = off ? "Sound off" : "Sound on";
+}
+document.addEventListener("DOMContentLoaded", paintSfx);
+document.addEventListener("pepe:muted", paintSfx);
+document.addEventListener("click", (e) => {
+  if (e.target.closest && e.target.closest("#sfxToggle") && window.PepeSfx) {
+    window.PepeSfx.toggle();
+  }
+});
+paintSfx();
 
 /* Topbar panels. Ctrl/Cmd+K opens search, like every other search field
    a player already uses. */

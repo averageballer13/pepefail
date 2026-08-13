@@ -51,6 +51,13 @@
   var listeners = [];
   var balance = load();
 
+  /* Server mirror. When real mode is active, realmode.js attaches an
+     adapter here and the server becomes the source of truth: reads go
+     through it and local writes are ignored. Demo mode is untouched. */
+  var remote = null;
+
+  function current() { return remote ? remote.get() : balance; }
+
   function load() {
     try {
       var raw = window.localStorage.getItem(KEY);
@@ -67,22 +74,35 @@
   }
 
   function emit() {
-    for (var i = 0; i < listeners.length; i++) listeners[i](balance);
-    document.dispatchEvent(new CustomEvent("pepe:balance", { detail: { balance: balance } }));
+    var v = current();
+    for (var i = 0; i < listeners.length; i++) listeners[i](v);
+    document.dispatchEvent(new CustomEvent("pepe:balance", { detail: { balance: v } }));
   }
 
   var Bank = {
-    get: function () { return balance; },
+    get: function () { return current(); },
     set: function (v) {
+      /* With a remote attached the server owns the number: local writes
+         only re-broadcast the mirror instead of mutating anything. */
+      if (remote) { emit(); return current(); }
       balance = Math.max(0, round2(v));
       save(); emit();
       return balance;
     },
     add: function (v) { return Bank.set(balance + v); },
     sub: function (v) { return Bank.set(balance - v); },
-    canBet: function (v) { return v > 0 && v <= balance + 1e-9; },
+    canBet: function (v) { return v > 0 && v <= current() + 1e-9; },
     reset: function () { return Bank.set(START); },
-    onChange: function (fn) { listeners.push(fn); fn(balance); },
+    onChange: function (fn) { listeners.push(fn); fn(current()); },
+
+    /* adapter = { get: () -> float } or null to detach. Returns the
+       refresh function the adapter calls after every server update, so
+       the balance chip repaints without engine.js knowing about HTTP. */
+    attachRemote: function (adapter) {
+      remote = adapter || null;
+      emit();
+      return emit;
+    },
   };
 
   /* =========================== HELPERS =========================== */

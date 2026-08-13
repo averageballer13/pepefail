@@ -6,6 +6,11 @@
    round and the payout is credited after it. Nothing is scripted to
    win or lose.
 
+   Two paths share the same presentation:
+   - demo (default): outcomes are drawn locally, balance in localStorage.
+   - real: when PepeReal.on(), the server draws the outcome, debits and
+     credits; the client only animates what the server decided.
+
    Each page sets window.GAME = "<key>" before loading this script.
    =================================================================== */
 
@@ -54,6 +59,19 @@ function fieldBet() {
   </div>`;
 }
 
+/* Small helpers shared by the real paths: server responses are read
+   defensively so a field rename server-side degrades into a fallback
+   instead of a crash. */
+function srvOutcome(r) {
+  return (r && (r.outcome || r.state || r.data)) || r || {};
+}
+
+function srvWon(r, o) {
+  if (o && o.win !== undefined) return !!o.win;
+  if (o && o.won !== undefined) return !!o.won;
+  return !!(r && r.payout > 0);
+}
+
 /* ===================================================================
    GAMES
    Each entry exposes: meta, controls() and init(ui).
@@ -66,7 +84,7 @@ const GAMES = {};
    literally the size of the band you picked. */
 GAMES.dice = {
   name: "Dice", ic: "dice", sub: "pepe.fail Originals", ac: "gold",
-  stats: [["99%", "RTP"], ["9900×", "Max Win"]],
+  stats: [["99%", "RTP"], ["49.5×", "Max Win"]],
   action: "Roll Dice",
   hint: "Drag the slider to set your threshold — the narrower the band, the bigger the payout.",
   controls: () =>
@@ -127,12 +145,7 @@ GAMES.dice = {
 
     paint();
 
-    ui.onPlay((bet) => {
-      const roll = Math.floor(rnd() * 10000) / 100;
-      const t = threshold();
-      const won = dir === "Under" ? roll < t : roll > t;
-      const mult = payoutFor(chance / 100);
-
+    function show(roll, won, mult, ret) {
       val.textContent = roll.toFixed(2);
       val.className = "dice-result " + (won ? "is-win" : "is-lose");
 
@@ -142,7 +155,29 @@ GAMES.dice = {
       hist.prepend(b);
       while (hist.children.length > 8) hist.lastChild.remove();
 
-      ui.settle(won ? bet * mult : 0, won, won ? fmtMult(mult) : null);
+      ui.settle(ret, won, won ? fmtMult(mult) : null);
+    }
+
+    ui.onPlay(async (bet) => {
+      const mult = payoutFor(chance / 100);
+
+      if (ui.real()) {
+        ui.lock(true);
+        let r;
+        try {
+          r = await ui.place({ chance: round2(chance), dir: dir.toLowerCase() });
+        } catch (e) { ui.lock(false); ui.fail(e); return; }
+        ui.lock(false);
+        const o = srvOutcome(r);
+        const roll = Number(o.roll !== undefined ? o.roll : o.result);
+        show(isFinite(roll) ? roll : 0, srvWon(r, o), mult, r.payoutFloat || 0);
+        return;
+      }
+
+      const roll = Math.floor(rnd() * 10000) / 100;
+      const t = threshold();
+      const won = dir === "Under" ? roll < t : roll > t;
+      show(roll, won, mult, won ? bet * mult : 0);
     });
   },
 };
@@ -181,12 +216,7 @@ GAMES.limbo = {
     });
     paint();
 
-    ui.onPlay((bet) => {
-      /* draw = RTP / u  →  P(draw >= target) = RTP / target */
-      const u = Math.max(rnd(), 1e-9);
-      const draw = Math.max(1, Math.floor((RTP / u) * 100) / 100);
-      const won = draw >= target;
-
+    function show(draw, won, ret) {
       val.textContent = fmtMult(draw);
       val.className = "limbo-val " + (won ? "is-win" : "is-lose");
 
@@ -196,7 +226,28 @@ GAMES.limbo = {
       hist.prepend(b);
       while (hist.children.length > 8) hist.lastChild.remove();
 
-      ui.settle(won ? bet * target : 0, won, won ? fmtMult(target) : null);
+      ui.settle(ret, won, won ? fmtMult(target) : null);
+    }
+
+    ui.onPlay(async (bet) => {
+      if (ui.real()) {
+        ui.lock(true);
+        let r;
+        try {
+          r = await ui.place({ target: target });
+        } catch (e) { ui.lock(false); ui.fail(e); return; }
+        ui.lock(false);
+        const o = srvOutcome(r);
+        const draw = Number(o.result !== undefined ? o.result : o.draw);
+        show(isFinite(draw) ? draw : 1, srvWon(r, o), r.payoutFloat || 0);
+        return;
+      }
+
+      /* draw = RTP / u  →  P(draw >= target) = RTP / target */
+      const u = Math.max(rnd(), 1e-9);
+      const draw = Math.max(1, Math.floor((RTP / u) * 100) / 100);
+      const won = draw >= target;
+      show(draw, won, won ? bet * target : 0);
     });
   },
 };
@@ -253,21 +304,10 @@ GAMES.plinko = {
     ui.onChip("rows", (v) => { rows = parseInt(v, 10); build(); });
     build();
 
-    ui.onPlay((bet) => {
-      /* one fair coin flip per row: this is the whole game */
-      let right = 0;
-      const path = [];
-      for (let r = 0; r < rows; r++) {
-        const step = rnd() < 0.5 ? 0 : 1;
-        right += step;
-        path.push(step);
-      }
-
-      const t = table();
-      const mult = t[right];
+    /* Animates a full drop down `path` and settles with `ret`. The
+       path is either drawn locally (demo) or dictated by the server. */
+    function drop(path, bucket, mult, ret) {
       const won = mult >= 1;
-
-      /* animate the drop down the path it actually took */
       ui.lock(true);
       const board = pegs.getBoundingClientRect();
       const stage = pegs.parentElement.getBoundingClientRect();
@@ -286,26 +326,64 @@ GAMES.plinko = {
 
         if (step >= rows) {
           window.clearInterval(timer);
-          const cell = mults.querySelector('[data-i="' + right + '"]');
+          const cell = mults.querySelector('[data-i="' + bucket + '"]');
           if (cell) {
             cell.classList.add("is-hit");
             window.setTimeout(() => cell.classList.remove("is-hit"), 700);
           }
           ball.style.opacity = "0";
           ui.lock(false);
-          ui.settle(bet * mult, won, fmtMult(mult));
+          ui.settle(ret, won, fmtMult(mult));
         }
       }, 95);
+    }
+
+    ui.onPlay(async (bet) => {
+      if (ui.real()) {
+        ui.lock(true);
+        let r;
+        try {
+          r = await ui.place({ risk: risk, rows: rows });
+        } catch (e) { ui.lock(false); ui.fail(e); return; }
+        const o = srvOutcome(r);
+        const path = Array.isArray(o.path) ? o.path : [];
+        const bucket = o.bucket !== undefined ? o.bucket : path.reduce((a, s) => a + (s ? 1 : 0), 0);
+        const mult = o.mult !== undefined ? o.mult : table()[bucket];
+        if (path.length !== rows) {
+          /* Server disagreed on geometry: settle without an animation
+             rather than animating a lie. */
+          ui.lock(false);
+          ui.settle(r.payoutFloat || 0, srvWon(r, o), fmtMult(mult || 0));
+          return;
+        }
+        drop(path, bucket, mult, r.payoutFloat || 0);
+        return;
+      }
+
+      /* one fair coin flip per row: this is the whole game */
+      let right = 0;
+      const path = [];
+      for (let r = 0; r < rows; r++) {
+        const step = rnd() < 0.5 ? 0 : 1;
+        right += step;
+        path.push(step);
+      }
+
+      const t = table();
+      const mult = t[right];
+      drop(path, right, mult, bet * mult);
     });
   },
 };
 
 /* --------------------------- MINES -------------------------------
    Mines are placed before the first click and never moved. The
-   multiplier is the fair price of the risk already survived. */
+   multiplier is the fair price of the risk already survived. In real
+   mode the layout lives on the server and each pick is a request — the
+   client never knows where the mines are until the round ends. */
 GAMES.mines = {
   name: "Mines", ic: "bomb", sub: "pepe.fail Originals", ac: "orange",
-  stats: [["99%", "RTP"], ["24,610×", "Max Win"]],
+  stats: [["99%", "RTP"], ["3.2M×", "Max Win"]],
   action: "Bet",
   hint: "Reveal tiles without hitting a mine, then cash out whenever you want.",
   controls: () => fieldBet() + fieldSelect("Mines", "mines", ["1", "3", "5", "10", "24"], 1),
@@ -317,6 +395,8 @@ GAMES.mines = {
     let field = [];
     let picked = 0;
     let running = false;
+    let realId = null;   /* server roundId when playing for real */
+    let busy = false;    /* one pick request at a time */
 
     const grid = document.getElementById("minesGrid");
 
@@ -347,11 +427,16 @@ GAMES.mines = {
       t.innerHTML = kind === "mine" ? icon("bomb") : icon("diamond");
     }
 
-    function endRound(hitMine) {
+    /* mines: indices to dim-reveal at the end of the round. Demo mode
+       reads them from the local field, real mode from the server. */
+    function endRound(hitMine, mines) {
       running = false;
+      realId = null;
       ui.setCashout(null);
+      const list = mines || [];
       for (let i = 0; i < SIZE; i++) {
-        if (field[i] && !grid.children[i].classList.contains("mine")) {
+        const isMine = mines ? list.indexOf(i) !== -1 : field[i];
+        if (isMine && !grid.children[i].classList.contains("mine")) {
           grid.children[i].classList.add("mine", "is-dim");
           grid.children[i].innerHTML = icon("bomb");
         }
@@ -359,10 +444,52 @@ GAMES.mines = {
       if (hitMine) ui.settle(0, false, null);
     }
 
-    function pick(i) {
-      if (!running) return;
+    function srvMines(r, o) {
+      if (Array.isArray(o.mines)) return o.mines;
+      if (Array.isArray(r.mines)) return r.mines;
+      if (r.data && Array.isArray(r.data.mines)) return r.data.mines;
+      return [];
+    }
+
+    async function pick(i) {
+      if (!running || busy) return;
       const t = grid.children[i];
       if (t.classList.contains("gem") || t.classList.contains("mine")) return;
+
+      if (realId) {
+        busy = true;
+        let r;
+        try {
+          r = await ui.act(realId, "pick", { index: i });
+        } catch (e) { busy = false; return; }
+        busy = false;
+        if (!running) return;
+        const o = srvOutcome(r);
+        const isMine = o.result === "mine" || o.mine === true || (o.gem === false && o.result === undefined);
+
+        if (isMine) {
+          reveal(i, "mine");
+          endRound(true, srvMines(r, o));
+          return;
+        }
+
+        reveal(i, "gem");
+        picked++;
+        const m = o.mult !== undefined ? o.mult : multFor(picked);
+        ui.setPayout("Next Payout", fmtMult(multFor(picked + 1)));
+        ui.setCashout(m);
+
+        /* Server auto-settles once every safe tile is open. */
+        if (r.settled || o.settled || picked === SIZE - mineCount) {
+          if (r.payout !== undefined) {
+            endRound(false, srvMines(r, o));
+            ui.settle(r.payoutFloat || 0, true, fmtMult(m));
+          } else {
+            cashout();
+          }
+        }
+        return;
+      }
 
       if (field[i]) {
         reveal(i, "mine");
@@ -379,8 +506,23 @@ GAMES.mines = {
       if (picked === SIZE - mineCount) cashout();
     }
 
-    function cashout() {
-      if (!running || picked === 0) return;
+    async function cashout() {
+      if (!running || picked === 0 || busy) return;
+
+      if (realId) {
+        busy = true;
+        let r;
+        try {
+          r = await ui.act(realId, "cashout");
+        } catch (e) { busy = false; return; }
+        busy = false;
+        const o = srvOutcome(r);
+        const m = o.mult !== undefined ? o.mult : multFor(picked);
+        endRound(false, srvMines(r, o));
+        ui.settle(r.payoutFloat || 0, true, fmtMult(m));
+        return;
+      }
+
       const m = multFor(picked);
       const stake = ui.stake();
       endRound(false);
@@ -394,12 +536,29 @@ GAMES.mines = {
     ui.onCashout(cashout);
     build();
 
-    ui.onPlay(() => {
+    ui.onPlay(async () => {
+      if (ui.real()) {
+        let r;
+        try {
+          r = await ui.place({ mines: mineCount });
+        } catch (e) { ui.fail(e); return; }
+        realId = r.roundId;
+        field = [];
+        picked = 0;
+        running = true;
+        busy = false;
+        build();
+        ui.setCashout(0);
+        ui.hold();
+        return;
+      }
+
       /* place the mines up front, then never touch them again */
       field = new Array(SIZE).fill(false);
       const spots = E.shuffle(Array.from({ length: SIZE }, (_, i) => i)).slice(0, mineCount);
       spots.forEach((s) => (field[s] = true));
 
+      realId = null;
       picked = 0;
       running = true;
       build();
@@ -411,7 +570,9 @@ GAMES.mines = {
 
 /* --------------------------- CRASH -------------------------------
    The crash point is drawn before the round starts. Cashing out is a
-   race against a number that is already fixed. */
+   race against a number that is already fixed. In real mode the point
+   lives on the server; the client animates the same curve and learns
+   the truth from the cashout response or a resolve poll. */
 GAMES.crash = {
   name: "Crash", ic: "rocket", sub: "pepe.fail Originals", ac: "orange",
   stats: [["99%", "RTP"], ["1,000,000×", "Max Win"]],
@@ -449,6 +610,9 @@ GAMES.crash = {
     let crashAt = 0;
     let started = 0;
     let stake = 0;
+    let realId = null;
+    let pollClock = 0;
+    let polling = false;
 
     const out = document.getElementById("crashMult");
     const line = document.getElementById("crashLine");
@@ -470,9 +634,13 @@ GAMES.crash = {
       fillP.setAttribute("d", d + " L590 290 L0 290 Z");
     }
 
-    function stop(cashedAt) {
+    /* cashedAt: 0 means the round crashed. payoutOverride: in real mode
+       the exact credited amount comes from the server, not stake*mult. */
+    function stop(cashedAt, payoutOverride) {
       running = false;
+      realId = null;
       window.clearInterval(clock);
+      window.clearInterval(pollClock);
       ui.setCashout(null);
       ui.lock(false);
 
@@ -484,7 +652,7 @@ GAMES.crash = {
 
       if (cashedAt) {
         out.className = "crash-mult is-win";
-        ui.settle(stake * cashedAt, true, fmtMult(cashedAt));
+        ui.settle(payoutOverride !== undefined ? payoutOverride : stake * cashedAt, true, fmtMult(cashedAt));
       } else {
         out.textContent = fmtMult(crashAt);
         out.className = "crash-mult is-lose";
@@ -503,7 +671,25 @@ GAMES.crash = {
       if (!running) return;
       const m = curveAt((Date.now() - started) / 1000);
 
-      if (m >= crashAt) { drawCurve(crashAt); stop(0); return; }
+      if (realId) {
+        /* No local crash point: display the curve (held at the auto
+           target if reached) and let the server end the round. */
+        const shown = auto && m >= auto ? auto : m;
+        out.textContent = fmtMult(shown);
+        drawCurve(shown);
+        return;
+      }
+
+      /* The curve is monotonic, so an auto target below the crash point
+         is always reached first in game time — even when one coarse tick
+         jumps past both thresholds at once. Checking the crash first
+         used to eat those wins. */
+      if (m >= crashAt) {
+        drawCurve(crashAt);
+        if (auto && auto < crashAt) stop(auto);
+        else stop(0);
+        return;
+      }
 
       out.textContent = fmtMult(m);
       drawCurve(m);
@@ -511,18 +697,87 @@ GAMES.crash = {
       if (auto && m >= auto) { drawCurve(auto); stop(auto); return; }
     }
 
-    ui.onCashout(() => {
+    function finishReal(r) {
+      const o = srvOutcome(r);
+      if (r.payout > 0) {
+        /* auto cashout reached server-side */
+        const m = o.mult !== undefined ? o.mult : (ui.stake() > 0 ? (r.payoutFloat || 0) / ui.stake() : auto);
+        crashAt = o.crashAt !== undefined ? o.crashAt : m;
+        drawCurve(m);
+        stop(m, r.payoutFloat);
+      } else {
+        crashAt = Number(o.crashAt !== undefined ? o.crashAt : o.crashedAt) || 1;
+        drawCurve(crashAt);
+        stop(0);
+      }
+    }
+
+    async function poll() {
+      if (!running || !realId || polling) return;
+      polling = true;
+      let r;
+      try {
+        r = await ui.act(realId, "resolve");
+      } catch (e) { polling = false; return; }
+      polling = false;
+      if (!running || !realId) return;
+      if (r && (r.settled || (r.state && r.state === "settled") || srvOutcome(r).settled)) finishReal(r);
+    }
+
+    ui.onCashout(async () => {
       if (!running) return;
+
+      if (realId) {
+        const id = realId;
+        let r;
+        try {
+          r = await ui.act(id, "cashout");
+        } catch (e) { return; /* too late: the resolve poll will close it */ }
+        if (!running) return;
+        const o = srvOutcome(r);
+        if (r.payout > 0) {
+          const m = o.mult !== undefined ? o.mult : (ui.stake() > 0 ? (r.payoutFloat || 0) / ui.stake() : 1);
+          crashAt = o.crashAt !== undefined ? o.crashAt : m;
+          drawCurve(m);
+          stop(m, r.payoutFloat);
+        } else {
+          finishReal(r);
+        }
+        return;
+      }
+
       const m = curveAt((Date.now() - started) / 1000);
       stop(Math.min(m, crashAt));
     });
 
-    ui.onPlay((bet) => {
+    ui.onPlay(async (bet) => {
       stake = bet;
+
+      if (ui.real()) {
+        let r;
+        try {
+          r = await ui.place({ auto: auto || 0 });
+        } catch (e) { ui.fail(e); return; }
+        realId = r.roundId;
+        crashAt = 0;
+        running = true;
+        started = Date.now();
+        out.className = "crash-mult";
+        ui.lock(true);
+        ui.setCashout(1);
+        ui.hold();
+        window.clearInterval(clock);
+        window.clearInterval(pollClock);
+        clock = window.setInterval(tick, 45);
+        pollClock = window.setInterval(poll, 1000);
+        return;
+      }
+
       /* 1% of rounds crash instantly at 1.00×: that is the house edge */
       const u = rnd();
       crashAt = u < E.HOUSE_EDGE ? 1 : Math.max(1, Math.floor((RTP / (1 - u)) * 100) / 100);
 
+      realId = null;
       running = true;
       started = Date.now();
       out.className = "crash-mult";
@@ -536,9 +791,12 @@ GAMES.crash = {
 };
 
 /* --------------------------- WHEEL -------------------------------- */
+/* Every table sums to 9.9 over 10 uniform segments: 99% RTP on all
+   three risk levels, matching the figure printed on the page. Must stay
+   identical to api/_lib/games.js. */
 const WHEEL_TABLE = {
-  Low:    [1.2, 0, 1.2, 1.5, 1.2, 0, 1.2, 1.5, 1.2, 0],
-  Medium: [1.5, 0, 2, 0, 3, 0, 1.5, 0, 2, 0],
+  Low:    [0, 1.2, 1.2, 1.2, 1.2, 0, 1.2, 1.2, 1.5, 1.2],
+  Medium: [1.5, 0, 1.9, 0, 3, 0, 1.5, 0, 2, 0],
   High:   [0, 0, 0, 0, 0, 0, 0, 0, 0, 9.9],
 };
 
@@ -589,11 +847,9 @@ GAMES.wheel = {
     ui.onChip("risk", (v) => { risk = v; build(); });
     build();
 
-    ui.onPlay((bet) => {
+    function spinTo(idx, mult, ret) {
       const t = WHEEL_TABLE[risk];
       const N = t.length;
-      const idx = rndInt(0, N - 1);
-      const mult = t[idx];
 
       /* land the pointer in the middle of the drawn segment */
       const segAngle = 360 / N;
@@ -607,8 +863,29 @@ GAMES.wheel = {
       window.setTimeout(() => {
         out.textContent = fmtMult(mult);
         ui.lock(false);
-        ui.settle(bet * mult, mult >= 1, mult ? fmtMult(mult) : null);
+        ui.settle(ret, mult >= 1, mult ? fmtMult(mult) : null);
       }, 3050);
+    }
+
+    ui.onPlay(async (bet) => {
+      const t = WHEEL_TABLE[risk];
+
+      if (ui.real()) {
+        ui.lock(true);
+        let r;
+        try {
+          r = await ui.place({ risk: risk });
+        } catch (e) { ui.lock(false); ui.fail(e); return; }
+        const o = srvOutcome(r);
+        const idx = clamp(Number(o.index !== undefined ? o.index : o.idx) || 0, 0, t.length - 1);
+        const mult = o.mult !== undefined ? o.mult : t[idx];
+        spinTo(idx, mult, r.payoutFloat || 0);
+        return;
+      }
+
+      const idx = rndInt(0, t.length - 1);
+      const mult = t[idx];
+      spinTo(idx, mult, bet * mult);
     });
   },
 };
@@ -661,8 +938,13 @@ if (window.BLACKJACK_GAME) GAMES.blackjack = window.BLACKJACK_GAME;
   let playFn = null;
   let cashFn = null;
   let counted = false;      /* history is recorded once per page visit */
+  let roundReal = false;    /* this round is settled by the server */
 
   Bank.onChange((v) => { if (balOut) balOut.textContent = fmt(v); });
+
+  function realNow() {
+    return !!(window.PepeReal && window.PepeReal.on());
+  }
 
   function readBet() {
     const v = parseFloat(String(betInput.value).replace(",", "."));
@@ -728,19 +1010,47 @@ if (window.BLACKJACK_GAME) GAMES.blackjack = window.BLACKJACK_GAME;
       );
     },
 
+    /* --- real-mode bridge, used by the games --- */
+
+    /* true while the current round is server-settled */
+    real: () => roundReal,
+
+    place(params) {
+      return window.PepeReal.place(window.GAME, params, stake);
+    },
+
+    act(roundId, action, payload) {
+      return window.PepeReal.act(roundId, action, payload);
+    },
+
+    /* Aborts a round that could not start (usually a rejected place):
+       nothing was debited locally, so only the UI needs resetting. */
+    fail(err) {
+      holding = false;
+      roundReal = false;
+      playBtn.hidden = false;
+      playBtn.disabled = false;
+      locked = false;
+      cashBtn.hidden = true;
+      flash((err && err.message) || "Something went wrong", "lose");
+    },
+
     /* Credits the return and closes the round. `amount` is the total
-       returned, stake included — 0 means the stake is lost. */
+       returned, stake included — 0 means the stake is lost. In real
+       mode the server already moved the money; the mirror repaints on
+       its own, so no local credit happens. */
     settle(amount, won, multText) {
       holding = false;
       playBtn.hidden = false;
       playBtn.disabled = false;
       cashBtn.hidden = true;
 
-      if (amount > 0) Bank.add(amount);
+      if (amount > 0 && !roundReal) Bank.add(amount);
 
       const net = round2(amount - stake);
       if (won) flash("+" + fmt(net) + (multText ? "  ·  " + multText : ""), "win");
       else flash("−" + fmt(stake), "lose");
+      roundReal = false;
     },
   };
 
@@ -761,8 +1071,11 @@ if (window.BLACKJACK_GAME) GAMES.blackjack = window.BLACKJACK_GAME;
     if (amount <= 0) { flash("Enter a bet amount", "lose"); return; }
     if (!Bank.canBet(amount)) { flash("Not enough balance", "lose"); return; }
 
+    roundReal = realNow();
     stake = amount;
-    Bank.sub(amount);
+    /* Real mode: the server debits at place(); a local debit on top
+       would double-count against the mirror. */
+    if (!roundReal) Bank.sub(amount);
     E.Rank.wager(amount);
     flash("", null);
 
