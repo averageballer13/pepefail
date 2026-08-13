@@ -322,7 +322,7 @@ const FOOT_COLS = [
   {
     t: "Community",
     links: [
-      { t: "X — @pepefail", href: "https://x.com/pepefail", ext: true },
+      { t: "X — @pepedotfail", href: "https://x.com/pepedotfail", ext: true },
       { t: "Support — @pepebetsupport", href: "https://x.com/pepebetsupport", ext: true },
     ],
   },
