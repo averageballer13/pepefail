@@ -17,6 +17,15 @@ const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || "";
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || "";
 const useUpstash = !!(UPSTASH_URL && UPSTASH_TOKEN);
 
+/* Every key is namespaced by network so devnet test balances can never
+   leak into mainnet as real-SOL liabilities — flipping NETWORK is enough
+   to start from a clean ledger, even on the same Redis database. */
+const NS = (process.env.NETWORK || "devnet") + ":";
+
+function k(key) {
+  return NS + key;
+}
+
 /* ================= Upstash REST ================= */
 
 async function upstash(command) {
@@ -96,7 +105,7 @@ function memIncr(key, n) {
 
 export async function get(key) {
   if (useUpstash) {
-    const raw = await upstash(["GET", key]);
+    const raw = await upstash(["GET", k(key)]);
     if (raw === null || raw === undefined) return null;
     try {
       return JSON.parse(raw);
@@ -104,46 +113,46 @@ export async function get(key) {
       return raw; /* value written outside JSON conventions */
     }
   }
-  return memGet(key);
+  return memGet(k(key));
 }
 
 export async function set(key, value, ttlSec) {
   if (useUpstash) {
-    const cmd = ["SET", key, JSON.stringify(value)];
+    const cmd = ["SET", k(key), JSON.stringify(value)];
     if (ttlSec) cmd.push("EX", String(ttlSec));
     await upstash(cmd);
     return;
   }
-  memSet(key, value, ttlSec);
+  memSet(k(key), value, ttlSec);
 }
 
 export async function del(key) {
   if (useUpstash) {
-    await upstash(["DEL", key]);
+    await upstash(["DEL", k(key)]);
     return;
   }
-  memory.delete(key);
+  memory.delete(k(key));
 }
 
 /* Set only if absent. Returns true when this call won the key. */
 export async function setnx(key, value, ttlSec) {
   if (useUpstash) {
-    const cmd = ["SET", key, JSON.stringify(value), "NX"];
+    const cmd = ["SET", k(key), JSON.stringify(value), "NX"];
     if (ttlSec) cmd.push("EX", String(ttlSec));
     const r = await upstash(cmd);
     return r === "OK";
   }
-  if (memGet(key) !== null) return false;
-  memSet(key, value, ttlSec);
+  if (memGet(k(key)) !== null) return false;
+  memSet(k(key), value, ttlSec);
   return true;
 }
 
 export async function incrBy(key, n) {
   if (!Number.isSafeInteger(n)) throw new Error("incrBy: integer required");
   if (useUpstash) {
-    return Number(await upstash(["INCRBY", key, String(n)]));
+    return Number(await upstash(["INCRBY", k(key), String(n)]));
   }
-  return memIncr(key, n);
+  return memIncr(k(key), n);
 }
 
 function balKey(addr, asset) {
@@ -163,8 +172,8 @@ export async function credit(addr, asset, amount, refId) {
   if (!Number.isSafeInteger(amount) || amount <= 0) {
     return { ok: false, code: "bad-amount" };
   }
-  const bKey = balKey(addr, asset);
-  const rKey = refId ? "ref:" + refId : null;
+  const bKey = k(balKey(addr, asset));
+  const rKey = refId ? k("ref:" + refId) : null;
 
   if (useUpstash) {
     if (!rKey) {
@@ -192,8 +201,8 @@ export async function debitIfEnough(addr, asset, amount, refId) {
     return { ok: false, code: "bad-amount" };
   }
   if (!refId) return { ok: false, code: "missing-ref" };
-  const bKey = balKey(addr, asset);
-  const rKey = "ref:" + refId;
+  const bKey = k(balKey(addr, asset));
+  const rKey = k("ref:" + refId);
 
   if (useUpstash) {
     const r = await upstash([

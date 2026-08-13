@@ -47,6 +47,11 @@ export default async function handler(req, res) {
       network: network(),
       vault,
       assets,
+      /* Browser-side RPC (balance reads, one-click deposit sends). Set
+         PUBLIC_RPC_URL to a domain-restricted key — NEVER the server's
+         RPC_URL, which must stay secret. Unset, the client falls back
+         to the public cluster endpoint. */
+      rpcUrl: process.env.PUBLIC_RPC_URL || null,
       maxBet: intEnv("MAX_BET_LAMPORTS", FALLBACK.maxBet),
       maxPayout: intEnv("MAX_PAYOUT_LAMPORTS", FALLBACK.maxPayout),
       minWithdraw: intEnv("MIN_WITHDRAW_LAMPORTS", FALLBACK.minWithdraw),

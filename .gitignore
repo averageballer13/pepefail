@@ -33,3 +33,6 @@ POST X 1.png
 banner post2.png
 .env
 .env.local
+
+# Secrets mainnet générés localement — à coller dans Vercel puis SUPPRIMER
+mainnet-secrets.txt
