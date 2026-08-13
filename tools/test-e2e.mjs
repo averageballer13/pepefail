@@ -260,7 +260,9 @@ async function main() {
   const addr = bs58.encode(kp.publicKey);
   record("joueur", "OK", addr);
 
-  /* 2) devnet airdrop — the faucet rate-limits hard; not fatal. */
+  /* 2) fund the player. The faucet rate-limits hard, so when it says
+     no, fall back to a plain transfer from the house wallet: once the
+     house holds devnet SOL, the test funds itself forever after. */
   let funded = false;
   try {
     const sig = await rpcCall(RPC, "requestAirdrop", [addr, AIRDROP_LAMPORTS]);
@@ -269,7 +271,35 @@ async function main() {
     funded = true;
     record("airdrop 1 SOL", "OK");
   } catch (e) {
-    record("airdrop 1 SOL", "SKIP", "faucet indisponible (" + (e.rpc ? "rate limit" : e.message) + ") — les etapes on-chain seront sautees");
+    record("airdrop 1 SOL", "SKIP", "faucet indisponible — repli sur le wallet maison");
+    try {
+      const secret = process.env.HOUSE_WALLET_SECRET;
+      if (!secret) throw new Error("HOUSE_WALLET_SECRET absent de l'environnement");
+      const house = Keypair.fromSecretKey(bs58.decode(secret));
+      const conn = new Connection(RPC, "confirmed");
+
+      const houseBal = await conn.getBalance(house.publicKey);
+      const need = AIRDROP_LAMPORTS / 2 + 10_000_000; /* 0.5 SOL + fees */
+      if (houseBal < need) {
+        throw new Error(
+          "maison a " + houseBal + " lamports; alimentez " + house.publicKey.toBase58() +
+          " via https://faucet.solana.com"
+        );
+      }
+
+      const tx = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: house.publicKey,
+          toPubkey: new PublicKey(addr),
+          lamports: AIRDROP_LAMPORTS / 2,
+        })
+      );
+      await sendAndConfirmTransaction(conn, tx, [house], { commitment: "confirmed" });
+      funded = true;
+      record("financement via maison (0.5 SOL)", "OK");
+    } catch (e2) {
+      record("financement via maison", "SKIP", e2.message + " — les etapes on-chain seront sautees");
+    }
   }
 
   /* 3) challenge + verify: sign the exact message returned. */
