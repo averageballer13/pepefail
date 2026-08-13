@@ -1,23 +1,12 @@
-/* Zero-dependency canary. If this answers, the runtime and the ESM setup
-   are fine and any 500 elsewhere comes from imports or environment. */
-export default async function handler(req, res) {
-  let deps = {};
-  for (const name of ["@solana/web3.js", "tweetnacl", "bs58"]) {
-    try {
-      await import(name);
-      deps[name] = "ok";
-    } catch (e) {
-      deps[name] = String(e && e.message).slice(0, 120);
-    }
-  }
-  let lib = {};
-  for (const name of ["respond", "db", "auth", "rpc", "fair", "games"]) {
-    try {
-      await import("./_lib/" + name + ".js");
-      lib[name] = "ok";
-    } catch (e) {
-      lib[name] = String(e && e.message).slice(0, 160);
-    }
-  }
-  res.status(200).json({ node: process.version, deps, lib });
+/* Zero-dependency canary: no imports at all, so if this answers, the
+   Node runtime and the ESM setup are fine and any 500 elsewhere comes
+   from a specific module, not the platform. */
+export default function handler(req, res) {
+  res.status(200).json({
+    ok: true,
+    node: process.version,
+    hasSession: !!process.env.SESSION_SECRET,
+    hasHouse: !!process.env.HOUSE_WALLET_SECRET,
+    hasUpstash: !!process.env.UPSTASH_REDIS_REST_URL,
+  });
 }
