@@ -129,7 +129,7 @@ function renderAuth() {
     bal.className = "bal-chip";
     bal.title = "Balance — open wallet";
     bal.innerHTML =
-      '<span class="bal-chip__ico">' + icon("coin", 2) + "</span>" +
+      '<img class="bal-chip__coin" src="' + B + 'assets/img/coin.png" alt="" />' +
       '<span class="bal-chip__v" id="balValue">' + E.fmt(E.Bank.get()) + "</span>" +
       '<span class="bal-chip__plus">' + icon("plus", 2) + "</span>";
     bal.addEventListener("click", () => openWallet("deposit"));

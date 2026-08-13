@@ -18,20 +18,23 @@
   background: var(--panel);
 }
 
-/* The same artwork as the sidebar card, held back so the numbers stay
-   the thing you read. */
+/* The poker table sits behind the numbers, held back hard so it never
+   competes with them. Anchored low: the players are in the upper half,
+   so the crop keeps faces rather than felt. */
 .rw-hero__bg {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  object-position: center 40%;
-  opacity: .42;
+  object-position: center 30%;
+  opacity: .5;
 }
 .rw-hero::after {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(100deg, var(--bg-900) 18%, rgba(13, 16, 23, .72) 62%, rgba(13, 16, 23, .35));
+  background:
+    linear-gradient(100deg, var(--bg-900) 14%, rgba(13, 16, 23, .82) 52%, rgba(13, 16, 23, .5)),
+    linear-gradient(to top, rgba(13, 16, 23, .8), transparent 55%);
   pointer-events: none;
 }
 
