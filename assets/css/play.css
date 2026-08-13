@@ -330,6 +330,31 @@
   padding-top: 4px;
 }
 
+/* Live deposit watcher line */
+.wp-watch {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--bg-800);
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  font-size: 13px; font-weight: 600;
+}
+.wp-watch__dot {
+  width: 8px; height: 8px; flex: none;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(255, 200, 40, .7);
+  animation: wp-watch-pulse 1.6s ease-in-out infinite;
+}
+@keyframes wp-watch-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wp-watch__dot { animation: none; }
+}
+
 /* =========================== SEARCH =========================== */
 .sr-field {
   position: relative;

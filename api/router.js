@@ -27,6 +27,8 @@ const ROUTES = {
   "bet/state": () => import("./_handlers/bet/state.js"),
   "wallet/balance": () => import("./_handlers/wallet/balance.js"),
   "wallet/deposit": () => import("./_handlers/wallet/deposit.js"),
+  "wallet/deposit-address": () => import("./_handlers/wallet/deposit-address.js"),
+  "wallet/sweep": () => import("./_handlers/wallet/sweep.js"),
   "wallet/withdraw": () => import("./_handlers/wallet/withdraw.js"),
 };
 

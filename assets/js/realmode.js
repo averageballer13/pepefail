@@ -342,6 +342,67 @@
     });
   }
 
+  /* --- live deposits ------------------------------------------------
+     Each player has a house-derived deposit address; funds sent there
+     from anywhere are swept and credited automatically. The watcher
+     polls while the player is signed in and the tab is visible, so an
+     arriving deposit surfaces within seconds without any click. */
+
+  var depositAddr = null;
+  var sweepInFlight = false;
+  var watchTimer = null;
+  var watchFastUntil = 0;
+
+  function depositAddress() {
+    if (depositAddr) return Promise.resolve(depositAddr);
+    return api("/api/wallet/deposit-address").then(function (r) {
+      depositAddr = r && r.address;
+      return depositAddr;
+    });
+  }
+
+  function sweepOnce() {
+    if (!on() || sweepInFlight) return Promise.resolve(null);
+    sweepInFlight = true;
+    return api("/api/wallet/sweep", {}).then(
+      function (r) {
+        sweepInFlight = false;
+        if (r && r.credited > 0) {
+          syncBalance(r);
+          document.dispatchEvent(new CustomEvent("pepe:deposit", {
+            detail: {
+              amountFloat: toFloat("sol", r.credited),
+              signature: r.signature || null,
+            },
+          }));
+        }
+        return r;
+      },
+      function () { sweepInFlight = false; return null; }
+    );
+  }
+
+  /* 8s at rest, 4s for two minutes after the deposit panel opens. */
+  function watchDeposits(fast) {
+    if (fast) watchFastUntil = Date.now() + 120000;
+    if (watchTimer) return;
+    var tick = function () {
+      var period = Date.now() < watchFastUntil ? 4000 : 8000;
+      watchTimer = setTimeout(function () {
+        if (on() && document.visibilityState === "visible") {
+          sweepOnce().then(tick, tick);
+        } else {
+          tick();
+        }
+      }, period);
+    };
+    tick();
+  }
+
+  document.addEventListener("pepe:real", function () {
+    if (on()) watchDeposits(false);
+  });
+
   /* --- misc --------------------------------------------------------- */
 
   function explorerTx(signature) {
@@ -375,6 +436,9 @@
     act: act,
     state: roundState,
     deposit: deposit,
+    depositAddress: depositAddress,
+    sweepOnce: sweepOnce,
+    watchDeposits: watchDeposits,
     withdraw: withdraw,
     explorerTx: explorerTx,
     toUnits: toUnits,

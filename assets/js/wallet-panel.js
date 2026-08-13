@@ -211,23 +211,25 @@
       '<div class="wp">' +
         balanceBlock() +
         '<div class="wp-block">' +
-          "<h4>1 · Fund your wallet</h4>" +
-          '<div class="wp-addr"><code id="wpAddr">' + esc(a) + "</code>" +
+          "<h4>Your deposit address</h4>" +
+          '<div class="wp-addr"><code id="wpAddr">…</code>' +
           '<button class="btn btn--gold" id="wpCopy">Copy</button></div>' +
+          '<div class="wp-note" style="margin-top:8px">Send SOL here from any wallet or ' +
+          "exchange. It is credited automatically — no second step.</div>" +
           '<p class="wp-warn">' + ico("shield") +
-          "<span>Send SOL on the Solana network to this address first. Sending from " +
-          "another chain will lose the funds permanently.</span></p>" +
+          "<span>Solana network only. Sending from another chain will lose the funds " +
+          "permanently.</span></p>" +
         "</div>" +
         '<div class="wp-block">' +
-          "<h4>2 · Move it to your casino balance</h4>" +
-          '<div class="wp-amt"><input class="wp-input" id="wpDepAmt" type="text" ' +
-          'inputmode="decimal" placeholder="0.00" autocomplete="off" />' +
-          '<button class="btn btn--gold" id="wpDepGo">Deposit</button></div>' +
+          '<div class="wp-watch" id="wpWatch">' +
+            '<span class="wp-watch__dot"></span>' +
+            "<span>Watching for your deposit…</span>" +
+          "</div>" +
           statusSlot() +
         "</div>" +
         '<div class="wp-block"><h4>Network</h4>' + chainRows() + "</div>" +
         '<div class="wp-block"><h4>Accepted assets</h4>' + assetRows() + "</div>" +
-        '<div class="wp-note">Minimum deposit ' + MIN_DEPOSIT + ". The transfer is signed in your browser.</div>" +
+        '<div class="wp-note">Minimum deposit ' + MIN_DEPOSIT + ".</div>" +
       "</div>"
     );
   }
@@ -421,35 +423,25 @@
     if (which === "deposit") {
       wireCopy(root);
 
-      const amt = root.querySelector("#wpDepAmt");
-      const go = root.querySelector("#wpDepGo");
-      if (!amt || !go) return;
+      /* Fill in the house-derived deposit address, then let the global
+         watcher do the work — sped up while this panel is open. */
+      const addrEl = root.querySelector("#wpAddr");
+      real().depositAddress().then(
+        function (a) { if (addrEl && document.contains(addrEl)) addrEl.textContent = a; },
+        function () { if (addrEl) addrEl.textContent = "unavailable — try again"; }
+      );
 
-      go.addEventListener("click", async function () {
-        const v = parseFloat(String(amt.value).replace(",", "."));
-        if (!isFinite(v) || v <= 0) { setStatus("Enter an amount.", "err"); return; }
+      real().watchDeposits(true);
+      real().sweepOnce();
 
-        const cfg = real().config();
-        if (!cfg || !cfg.vault) { setStatus("Vault address unavailable.", "err"); return; }
-
-        go.disabled = true;
-        try {
-          setStatus("Waiting for signature…");
-          const lamports = real().toUnits("sol", v);
-          const signature = await window.PepeWallet.signAndSendTransfer({ to: cfg.vault, lamports: lamports });
-
-          setStatus("Confirming on-chain… this takes a few seconds.");
-          const r = await real().deposit(signature);
-
-          const credited = r && r.credited !== undefined ? real().toFloat(r.asset || "sol", r.credited) : v;
-          setStatus("Credited " + fmtSol(credited) + " SOL.", "ok");
-          refreshBal();
-          amt.value = "";
-        } catch (e) {
-          setStatus((e && e.message) || "Deposit failed.", "err");
-        }
-        go.disabled = false;
-      });
+      const onDeposit = function (e) {
+        const amount = e.detail && e.detail.amountFloat;
+        if (!(amount > 0)) return;
+        setStatus("Credited " + fmtSol(amount) + " SOL.", "ok");
+        refreshBal();
+      };
+      document.addEventListener("pepe:deposit", onDeposit);
+      document.addEventListener("pepe:balance", refreshBal);
       return;
     }
 
