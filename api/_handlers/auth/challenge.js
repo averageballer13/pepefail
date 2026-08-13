@@ -4,8 +4,8 @@
    public key so garbage input never reaches the database. */
 
 import bs58 from "bs58";
-import { ok, bad, readBody, methodGuard } from "../_lib/respond.js";
-import { makeChallenge } from "../_lib/auth.js";
+import { ok, bad, readBody, methodGuard } from "../../_lib/respond.js";
+import { makeChallenge } from "../../_lib/auth.js";
 
 export default async function handler(req, res) {
   if (!methodGuard(req, res, "POST")) return;

@@ -2,9 +2,9 @@
    fresh pair. Revealing ends the seed's life: every draw made under
    it can now be verified by the player. */
 
-import { ok, bad, methodGuard } from "../_lib/respond.js";
-import { requireAuth } from "../_lib/auth.js";
-import { rotate } from "../_lib/fair.js";
+import { ok, bad, methodGuard } from "../../_lib/respond.js";
+import { requireAuth } from "../../_lib/auth.js";
+import { rotate } from "../../_lib/fair.js";
 
 export default async function handler(req, res) {
   if (!methodGuard(req, res, "POST")) return;

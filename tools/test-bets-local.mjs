@@ -24,12 +24,12 @@ try {
 } catch {}
 
 const db = await import("../api/_lib/db.js");
-const challenge = (await import("../api/auth/challenge.js")).default;
-const verify = (await import("../api/auth/verify.js")).default;
-const place = (await import("../api/bet/place.js")).default;
-const act = (await import("../api/bet/act.js")).default;
-const stateEp = (await import("../api/bet/state.js")).default;
-const balanceEp = (await import("../api/wallet/balance.js")).default;
+const challenge = (await import("../api/_handlers/auth/challenge.js")).default;
+const verify = (await import("../api/_handlers/auth/verify.js")).default;
+const place = (await import("../api/_handlers/bet/place.js")).default;
+const act = (await import("../api/_handlers/bet/act.js")).default;
+const stateEp = (await import("../api/_handlers/bet/state.js")).default;
+const balanceEp = (await import("../api/_handlers/wallet/balance.js")).default;
 
 /* --- req/res shim --- */
 function call(handler, { method = "POST", body = null, query = {}, token = null } = {}) {

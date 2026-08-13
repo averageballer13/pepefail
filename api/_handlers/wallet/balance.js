@@ -2,9 +2,9 @@
 // Returns the player's off-chain balances. "fail" is always present in the
 // payload (0 when the FAIL asset is not enabled) so the client never has to
 // branch on a missing key.
-import { ok, bad, methodGuard } from "../_lib/respond.js";
-import { requireAuth } from "../_lib/auth.js";
-import { getBalance } from "../_lib/db.js";
+import { ok, bad, methodGuard } from "../../_lib/respond.js";
+import { requireAuth } from "../../_lib/auth.js";
+import { getBalance } from "../../_lib/db.js";
 
 function realModeEnabled() {
   // Real mode stays off until both secrets are configured; demo mode is

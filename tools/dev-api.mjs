@@ -71,7 +71,9 @@ function safeApiParts(pathname) {
 async function resolveHandlerFile(pathname) {
   const parts = safeApiParts(pathname);
   if (!parts || parts[0] !== "api") return null;
-  const base = path.join(ROOT, ...parts);
+  /* Route files live under api/_handlers/ since the Hobby-plan function
+     cap forced everything behind one catch-all; URLs are unchanged. */
+  const base = path.join(ROOT, "api", "_handlers", ...parts.slice(1));
   const candidates = [
     base + ".js",
     base + ".mjs",

@@ -2,9 +2,9 @@
    randomness. Bounded to 64 chars because the seed is hashed into
    every draw and stored verbatim. */
 
-import { ok, bad, readBody, methodGuard } from "../_lib/respond.js";
-import { requireAuth } from "../_lib/auth.js";
-import { setClientSeed } from "../_lib/fair.js";
+import { ok, bad, readBody, methodGuard } from "../../_lib/respond.js";
+import { requireAuth } from "../../_lib/auth.js";
+import { setClientSeed } from "../../_lib/fair.js";
 
 export default async function handler(req, res) {
   if (!methodGuard(req, res, "POST")) return;

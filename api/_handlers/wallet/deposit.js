@@ -2,10 +2,10 @@
 // Verifies a confirmed on-chain transfer to the vault and credits the
 // player's off-chain balance. Idempotent per transaction signature so a
 // client can safely retry until the transaction is confirmed.
-import { ok, bad, methodGuard, readBody } from "../_lib/respond.js";
-import { requireAuth } from "../_lib/auth.js";
-import { credit } from "../_lib/db.js";
-import { getTransactionParsed } from "../_lib/rpc.js";
+import { ok, bad, methodGuard, readBody } from "../../_lib/respond.js";
+import { requireAuth } from "../../_lib/auth.js";
+import { credit } from "../../_lib/db.js";
+import { getTransactionParsed } from "../../_lib/rpc.js";
 import nacl from "tweetnacl";
 import bs58 from "bs58";
 

@@ -4,8 +4,8 @@
    and silently falls back to demo mode, so a misconfigured deployment has
    to answer { enabled: false } instead of erroring. */
 
-import { ok, methodGuard } from "./_lib/respond.js";
-import { network, vaultAddress } from "./_lib/rpc.js";
+import { ok, methodGuard } from "../_lib/respond.js";
+import { network, vaultAddress } from "../_lib/rpc.js";
 
 const FALLBACK = {
   enabled: false,

@@ -9,10 +9,10 @@
    All amounts are integers (lamports for SOL, raw units for FAIL).
    =================================================================== */
 
-import { ok, bad, readBody, methodGuard } from "../_lib/respond.js";
-import * as db from "../_lib/db.js";
-import { requireAuth } from "../_lib/auth.js";
-import * as games from "../_lib/games.js";
+import { ok, bad, readBody, methodGuard } from "../../_lib/respond.js";
+import * as db from "../../_lib/db.js";
+import { requireAuth } from "../../_lib/auth.js";
+import * as games from "../../_lib/games.js";
 
 function envInt(name, def) {
   const v = Number(process.env[name]);

@@ -3,8 +3,8 @@
    stored nonce and mint a stateless session token. All failure paths are
    one generic 401 so a caller cannot probe which check tripped. */
 
-import { ok, bad, readBody, methodGuard } from "../_lib/respond.js";
-import { verifySignature } from "../_lib/auth.js";
+import { ok, bad, readBody, methodGuard } from "../../_lib/respond.js";
+import { verifySignature } from "../../_lib/auth.js";
 
 export default async function handler(req, res) {
   if (!methodGuard(req, res, "POST")) return;

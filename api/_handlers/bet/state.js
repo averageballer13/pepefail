@@ -7,10 +7,10 @@
    full stored result.
    =================================================================== */
 
-import { ok, bad, methodGuard } from "../_lib/respond.js";
-import * as db from "../_lib/db.js";
-import { requireAuth } from "../_lib/auth.js";
-import * as games from "../_lib/games.js";
+import { ok, bad, methodGuard } from "../../_lib/respond.js";
+import * as db from "../../_lib/db.js";
+import { requireAuth } from "../../_lib/auth.js";
+import * as games from "../../_lib/games.js";
 
 async function rateLimited(addr) {
   const key = "rate:" + addr;

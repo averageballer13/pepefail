@@ -9,11 +9,11 @@
    All amounts are integers (lamports for SOL, raw units for FAIL).
    =================================================================== */
 
-import { ok, bad, readBody, methodGuard } from "../_lib/respond.js";
-import * as db from "../_lib/db.js";
-import { requireAuth } from "../_lib/auth.js";
-import * as fair from "../_lib/fair.js";
-import * as games from "../_lib/games.js";
+import { ok, bad, readBody, methodGuard } from "../../_lib/respond.js";
+import * as db from "../../_lib/db.js";
+import { requireAuth } from "../../_lib/auth.js";
+import * as fair from "../../_lib/fair.js";
+import * as games from "../../_lib/games.js";
 
 /* Must match the client HOUSE_EDGE = 0.01 in assets/js/engine.js. */
 const RTP = 0.99;
