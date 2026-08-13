@@ -496,17 +496,23 @@ async function main() {
     if (!state.roundId && !settledOf(state)) throw new Error("pas de roundId: " + JSON.stringify(state));
     const roundId = state.roundId;
     expected -= BJ_BET;
-    await checkBalance("blackjack place");
 
-    let actions = 0;
-    while (!settledOf(state) && actions < 12) {
-      const score = bjPlayerScore(state);
-      const action = score !== null && score < 17 ? "hit" : "stand";
-      state = await api("POST", "/api/bet/act", { roundId, action, payload: {} });
-      actions++;
-      await sleep(150);
+    /* A natural on either side settles AT the deal, payout already
+       credited — checking the balance before counting it would flag the
+       server as wrong when it is the test that is behind. */
+    if (!settledOf(state)) {
+      await checkBalance("blackjack place");
+
+      let actions = 0;
+      while (!settledOf(state) && actions < 12) {
+        const score = bjPlayerScore(state);
+        const action = score !== null && score < 17 ? "hit" : "stand";
+        state = await api("POST", "/api/bet/act", { roundId, action, payload: {} });
+        actions++;
+        await sleep(150);
+      }
+      if (!settledOf(state)) throw new Error("round toujours ouvert apres " + actions + " actions");
     }
-    if (!settledOf(state)) throw new Error("round toujours ouvert apres " + actions + " actions");
 
     const got = await settleLedger("blackjack", payoutOf(state));
     // with an even stake the only legal returns are integers
