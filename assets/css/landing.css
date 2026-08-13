@@ -77,16 +77,22 @@ body {
   object-fit: contain;
 }
 
+/* Same treatment as the in-app brand (.brand__name): tight display face,
+   lowercase, ".fail" in the gold gradient — one logotype everywhere. */
 .landing__wordmark {
   margin-top: 22px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(21px, 4.4vw, 26px);
-  letter-spacing: 0.26em;
-  text-indent: 0.26em; /* keeps the block optically centred */
+  font-size: clamp(30px, 5.4vw, 38px);
+  letter-spacing: -0.04em;
   color: var(--text);
 }
-.landing__wordmark span { color: var(--gold); }
+.landing__wordmark span {
+  background: var(--grad-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 
 /* =========================== COPY =========================== */
 .landing__eyebrow {
