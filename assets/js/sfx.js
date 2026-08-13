@@ -174,6 +174,10 @@
   document.addEventListener("pepe:balance", function (e) {
     var v = e.detail && e.detail.balance;
     if (typeof v !== "number") return;
+    /* Signing out swaps the bank mirror for the demo bank, which looks
+       like a jump to 1,000 — re-baseline silently, no coin on logout. */
+    var R = window.PepeReal;
+    if (R && R.enabled && R.enabled() && !R.on()) { lastBal = v; return; }
     if (lastBal !== null && v > lastBal + 0.001) play("coin");
     lastBal = v;
   });

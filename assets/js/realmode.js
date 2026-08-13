@@ -132,11 +132,19 @@
 
     return fetch(path, init).then(function (res) {
       return res.json().catch(function () { return null; }).then(function (json) {
-        if (res.status === 401 && !opts.noAuth && !opts.retried) {
+        if (res.status === 401 && !opts.noAuth && !opts.retried && !opts.noRetry) {
           signOut(true);
-          return signIn().then(function () {
-            return api(path, body, { retried: true });
-          });
+          return signIn().then(
+            function () {
+              return api(path, body, { retried: true });
+            },
+            function (e) {
+              /* Re-auth declined or failed: cut fully, so the topbar and
+                 the bank mirror stop claiming a session that is gone. */
+              signOut(false);
+              throw e;
+            }
+          );
         }
         if (!res.ok) {
           var code = (json && (json.error || json.code)) || "http_" + res.status;
@@ -179,7 +187,11 @@
       .then(function (r) { return r.json(); })
       .then(function (json) {
         cfg = json && json.ok === true && json.data !== undefined ? json.data : json;
-        if (!cfg || !cfg.enabled) { cfg = cfg || { enabled: false }; return cfg; }
+        if (!cfg || !cfg.enabled) { cfg = cfg || { enabled: false }; }
+        /* Remembered so the next page load renders the right topbar
+           before this fetch resolves — no demo-balance flash. */
+        try { localStorage.setItem("pepe.realmode", cfg.enabled ? "1" : "0"); } catch (e) { /* ignore */ }
+        if (!cfg.enabled) return cfg;
 
         /* Resume a previous session when the stored token matches the
            wallet currently in this browser. */
@@ -189,10 +201,26 @@
           token = stored.token;
           addr = stored.addr;
           attach();
-          return refreshBalance()
-            .catch(function () { /* balance comes on next action */ })
-            .then(function () { announce(); return cfg; });
+          /* noRetry: a 401 here must NOT re-enter signIn(), which waits
+             on this very init() — that would deadlock the page. */
+          return refreshBalance({ noRetry: true }).then(
+            function () { announce(); return cfg; },
+            function (e) {
+              if (/401|unauthorized|token/i.test(String(e && e.code))) {
+                /* Server rejected the stored token — cut to signed-out. */
+                signOut(false);
+              } else {
+                /* Transient failure: keep the session, balance comes on
+                   the next action. */
+                announce();
+              }
+              return cfg;
+            }
+          );
         }
+        /* No session to resume — still announce, so the topbar knows
+           real mode is live and renders its signed-out state. */
+        announce();
         return cfg;
       })
       .catch(function () {
@@ -263,8 +291,8 @@
     return !!(cfg && cfg.enabled);
   }
 
-  function refreshBalance() {
-    return api("/api/wallet/balance").then(function (b) {
+  function refreshBalance(opts) {
+    return api("/api/wallet/balance", undefined, opts).then(function (b) {
       if (b && typeof b.sol === "number") balances.sol = b.sol;
       if (b && typeof b.fail === "number") balances.fail = b.fail;
       if (refreshBank) refreshBank();

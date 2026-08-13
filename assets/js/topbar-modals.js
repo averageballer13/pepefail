@@ -172,7 +172,7 @@
             "</ol>" +
             '<p class="rf-note">Your share rises with your rank' +
             (rank ? " — " + share + "% at " + esc(rank.n) : "") +
-            '. See the <a href="' + B + 'pages/promotions.html">rank ladder</a>.<br>' +
+            '. See the <a href="' + B + 'pages/promotions">rank ladder</a>.<br>' +
             "You earn from the fee they already pay, not from their losses. " +
             "Nothing is taken out of their balance to fund it.</p>" +
           "</div>" +

@@ -9,13 +9,13 @@
    =================================================================== */
 
 const ORIGINALS = [
-  { k: "plinko", n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "games/plinko.html", img: "assets/img/games/plinko.jpg" },
-  { k: "mines", n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines.html", img: "assets/img/games/mines.jpg" },
-  { k: "dice", n: "Dice", p: "pepe.fail", ic: "dice", tag: "ORIGINAL", ac: "gold", href: "games/dice.html", img: "assets/img/games/dice.jpg" },
-  { k: "crash", n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "games/crash.html", img: "assets/img/games/crash.jpg" },
-  { k: "limbo", n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo.html", img: "assets/img/games/limbo.jpg" },
-  { k: "wheel", n: "Wheel", p: "pepe.fail", ic: "wheel", tag: "ORIGINAL", ac: "orange", href: "games/wheel.html", img: "assets/img/games/wheel.jpg" },
-  { k: "blackjack", n: "Blackjack", p: "pepe.fail", ic: "spade", tag: "ORIGINAL", ac: "gold", href: "games/blackjack.html", img: "assets/img/games/blackjack.jpg" },
+  { k: "plinko", n: "Frog Plinko", p: "pepe.fail", ic: "plinko", tag: "ORIGINAL", hot: true, ac: "gold", href: "games/plinko", img: "assets/img/games/plinko.jpg" },
+  { k: "mines", n: "Mines", p: "pepe.fail", ic: "bomb", tag: "ORIGINAL", ac: "orange", href: "games/mines", img: "assets/img/games/mines.jpg" },
+  { k: "dice", n: "Dice", p: "pepe.fail", ic: "dice", tag: "ORIGINAL", ac: "gold", href: "games/dice", img: "assets/img/games/dice.jpg" },
+  { k: "crash", n: "Crash", p: "pepe.fail", ic: "rocket", tag: "ORIGINAL", hot: true, ac: "orange", href: "games/crash", img: "assets/img/games/crash.jpg" },
+  { k: "limbo", n: "Limbo", p: "pepe.fail", ic: "chart", tag: "ORIGINAL", ac: "gold", href: "games/limbo", img: "assets/img/games/limbo.jpg" },
+  { k: "wheel", n: "Wheel", p: "pepe.fail", ic: "wheel", tag: "ORIGINAL", ac: "orange", href: "games/wheel", img: "assets/img/games/wheel.jpg" },
+  { k: "blackjack", n: "Blackjack", p: "pepe.fail", ic: "spade", tag: "ORIGINAL", ac: "gold", href: "games/blackjack", img: "assets/img/games/blackjack.jpg" },
 ];
 
 /* Every playable game, keyed for history and favourites lookups. */

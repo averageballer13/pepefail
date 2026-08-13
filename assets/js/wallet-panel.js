@@ -441,6 +441,7 @@
     if (logoutBtn) {
       logoutBtn.addEventListener("click", function () {
         real().signOut();
+        if (window.PepeWallet && window.PepeWallet.lock) window.PepeWallet.lock();
         show(which);
       });
     }
@@ -595,10 +596,19 @@
               (on
                 ? '<p class="wp-lead">Signed in — your casino balance is open.</p>' +
                   '<button class="btn btn--glass" id="wpAcctOut">Log out</button>'
-                : '<p class="wp-lead">Signed out. Sign a one-time message to reopen ' +
-                  "your casino balance. It costs nothing and moves nothing.</p>" +
+                : '<p class="wp-lead">Signed out. Signing in asks for your wallet ' +
+                  "password, then signs a one-time message. It costs nothing and moves nothing.</p>" +
                   '<button class="btn btn--gold" id="wpAcctIn">Sign in with wallet</button>') +
               statusSlot() +
+            "</div>"
+          : "") +
+        (canReal && !on
+          ? '<div class="wp-block">' +
+              "<h4>Different account</h4>" +
+              '<p class="wp-lead">Switching removes this wallet from the browser — ' +
+              "make sure its private key is backed up first.</p>" +
+              '<button type="button" class="pm-linkbtn" id="wpAcctSwitch" style="margin:0;display:block">Import a different wallet</button>' +
+              '<button type="button" class="pm-linkbtn" id="wpAcctNew" style="margin:4px 0 0;display:block">Create a new wallet</button>' +
             "</div>"
           : "") +
       "</div>"
@@ -617,6 +627,9 @@
       if (out) {
         out.addEventListener("click", function () {
           real().signOut();
+          /* Full cut: also drop the unlocked key, so signing back in
+             always asks for the password before the signature. */
+          if (window.PepeWallet && window.PepeWallet.lock) window.PepeWallet.lock();
           paint();
         });
       }
@@ -630,8 +643,30 @@
           });
         });
       }
+
+      /* Switching accounts: the stored wallet is removed (with its own
+         scary confirmation), then the import or create flow opens. */
+      function switchTo(startFlow) {
+        window.PepeWallet.disconnect().then(function (removed) {
+          if (!removed) return;
+          window.PepeModal.close();
+          startFlow();
+        });
+      }
+      const sw = root.querySelector("#wpAcctSwitch");
+      if (sw) sw.addEventListener("click", function () { switchTo(window.PepeWallet.startImportFlow); });
+      const nw = root.querySelector("#wpAcctNew");
+      if (nw) nw.addEventListener("click", function () { switchTo(window.PepeWallet.startCreateFlow); });
     }
     paint();
+
+    /* Config still in flight when the modal opened: repaint once it
+       lands, so the Session block appears without a close/reopen. */
+    if (real() && !real().config()) {
+      real().init().then(function () {
+        if (document.contains(box)) paint();
+      });
+    }
   }
 
   function openAccount() {

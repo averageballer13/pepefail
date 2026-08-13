@@ -11,8 +11,8 @@ const MONO_STACK = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
 
 /* --- Navigation tree --- */
 const NAV_MAIN = [
-  { k: "home", ic: "home", t: "Home", href: B + "casino.html" },
-  { k: "recent", ic: "clock", t: "Recently Played", href: B + "pages/recent.html" },
+  { k: "home", ic: "home", t: "Home", href: B + "casino" },
+  { k: "recent", ic: "clock", t: "Recently Played", href: B + "pages/recent" },
 ];
 
 /* One group, listing every game mode that has a page of its own.
@@ -21,20 +21,20 @@ const NAV_GROUPS = [
   {
     k: "casino", ic: "chip", t: "Casino", open: true,
     items: [
-      { k: "plinko", ic: "plinko", t: "Plinko", href: B + "games/plinko.html" },
-      { k: "mines", ic: "bomb", t: "Mines", href: B + "games/mines.html" },
-      { k: "dice", ic: "dice", t: "Dice", href: B + "games/dice.html" },
-      { k: "crash", ic: "rocket", t: "Crash", href: B + "games/crash.html" },
-      { k: "limbo", ic: "chart", t: "Limbo", href: B + "games/limbo.html" },
-      { k: "wheel", ic: "wheel", t: "Wheel", href: B + "games/wheel.html" },
-      { k: "blackjack", ic: "spade", t: "Blackjack", href: B + "games/blackjack.html" },
+      { k: "plinko", ic: "plinko", t: "Plinko", href: B + "games/plinko" },
+      { k: "mines", ic: "bomb", t: "Mines", href: B + "games/mines" },
+      { k: "dice", ic: "dice", t: "Dice", href: B + "games/dice" },
+      { k: "crash", ic: "rocket", t: "Crash", href: B + "games/crash" },
+      { k: "limbo", ic: "chart", t: "Limbo", href: B + "games/limbo" },
+      { k: "wheel", ic: "wheel", t: "Wheel", href: B + "games/wheel" },
+      { k: "blackjack", ic: "spade", t: "Blackjack", href: B + "games/blackjack" },
     ],
   },
 ];
 
 const NAV_FOOT = [
-  { k: "rewards", ic: "gift", t: "Rewards", href: B + "pages/promotions.html" },
-  { k: "token", ic: "coin", t: "$FAIL Token", href: B + "token.html", mod: "token" },
+  { k: "rewards", ic: "gift", t: "Rewards", href: B + "pages/promotions" },
+  { k: "token", ic: "coin", t: "$FAIL Token", href: B + "token", mod: "token" },
 ];
 
 /* --- Single nav entry --- */
@@ -122,6 +122,31 @@ function renderAuth() {
   slot.innerHTML = "";
 
   const E = window.PepeEngine;
+  const R = window.PepeReal;
+  /* Until /api/config answers, fall back to what last load learned, so
+     a real deployment never flashes the demo balance while waiting. */
+  let realEnabled = !!(R && R.enabled && R.enabled());
+  if (!(R && R.config && R.config())) {
+    try { realEnabled = localStorage.getItem("pepe.realmode") === "1"; } catch (e) { /* ignore */ }
+  }
+  const signedIn = !!(R && R.on && R.on());
+  const addr = walletAddress();
+
+  /* Real mode, signed out: the session is fully cut — no balance, no
+     address. One button: sign back in with a signature, or start a
+     fresh wallet if none is stored on this device. */
+  if (realEnabled && !signedIn) {
+    const btn = document.createElement("button");
+    btn.className = "btn btn--gold";
+    btn.textContent = addr ? "Sign In" : "Create Wallet";
+    btn.addEventListener("click", function () {
+      if (addr && window.PepeWalletPanel && window.PepeWalletPanel.account) window.PepeWalletPanel.account();
+      else if (window.PepeWallet) window.PepeWallet.startCreateFlow();
+    });
+    slot.appendChild(btn);
+    wireAuthEvents();
+    return;
+  }
 
   /* --- balance --- */
   if (E) {
@@ -134,20 +159,14 @@ function renderAuth() {
       '<span class="bal-chip__plus">' + icon("plus", 2) + "</span>";
     bal.addEventListener("click", () => openWallet("deposit"));
     slot.appendChild(bal);
-
-    document.addEventListener("pepe:balance", function () {
-      const el = document.getElementById("balValue");
-      if (el) el.textContent = E.fmt(E.Bank.get());
-    });
   }
 
   /* --- wallet --- */
-  const addr = walletAddress();
   const btn = document.createElement("button");
 
   if (addr) {
     btn.className = "btn btn--glass";
-    btn.title = "Manage wallet";
+    btn.title = "Account";
     btn.style.fontFamily = MONO_STACK;
     btn.style.letterSpacing = ".01em";
     btn.textContent = shortAddress(addr);
@@ -163,6 +182,23 @@ function renderAuth() {
     else if (window.PepeWallet) window.PepeWallet.startCreateFlow();
   });
   slot.appendChild(btn);
+
+  wireAuthEvents();
+}
+
+/* The auth slot re-renders whenever the session or the wallet changes;
+   the listeners are attached once, the render reads fresh state. */
+let authEventsWired = false;
+function wireAuthEvents() {
+  if (authEventsWired) return;
+  authEventsWired = true;
+  document.addEventListener("pepe:balance", function () {
+    const E = window.PepeEngine;
+    const el = document.getElementById("balValue");
+    if (el && E) el.textContent = E.fmt(E.Bank.get());
+  });
+  document.addEventListener("pepe:real", renderAuth);
+  document.addEventListener("pepe:wallet", renderAuth);
 }
 
 /* ===================================================================
@@ -234,7 +270,7 @@ function renderShell() {
   const brand = document.createElement("div");
   brand.className = "brand";
   brand.innerHTML = `
-    <a href="${B}casino.html" style="display:flex;align-items:center;gap:10px">
+    <a href="${B}casino" style="display:flex;align-items:center;gap:10px">
       <img class="brand__logo" src="${B}assets/img/logo.png" alt="pepe.fail" />
       <div class="brand__name">pepe<b>.fail</b></div>
     </a>`;
@@ -308,19 +344,19 @@ const FOOT_COLS = [
   {
     t: "Platform",
     links: [
-      { t: "Originals", href: B + "casino.html#originals" },
-      { t: "Blackjack", href: B + "games/blackjack.html" },
-      { t: "Rewards", href: B + "pages/promotions.html" },
-      { t: "$FAIL Token", href: B + "token.html" },
+      { t: "Originals", href: B + "casino#originals" },
+      { t: "Blackjack", href: B + "games/blackjack" },
+      { t: "Rewards", href: B + "pages/promotions" },
+      { t: "$FAIL Token", href: B + "token" },
     ],
   },
   {
     t: "Legal",
     links: [
-      { t: "Terms and Conditions", href: B + "pages/terms.html" },
-      { t: "Privacy Policy", href: B + "pages/privacy.html" },
-      { t: "Responsible Gaming", href: B + "pages/responsible.html" },
-      { t: "Provably Fair", href: B + "pages/provably-fair.html" },
+      { t: "Terms and Conditions", href: B + "pages/terms" },
+      { t: "Privacy Policy", href: B + "pages/privacy" },
+      { t: "Responsible Gaming", href: B + "pages/responsible" },
+      { t: "Provably Fair", href: B + "pages/provably-fair" },
     ],
   },
   {
@@ -351,7 +387,7 @@ function renderFooter() {
   foot.innerHTML =
     '<div class="sfoot__grid">' +
       '<div class="sfoot__brand">' +
-        '<a class="sfoot__logo" href="' + B + 'casino.html">' +
+        '<a class="sfoot__logo" href="' + B + 'casino">' +
           '<img src="' + B + 'assets/img/logo.png" alt="" />' +
           '<span>pepe<b>.fail</b></span>' +
         "</a>" +

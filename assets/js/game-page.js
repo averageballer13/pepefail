@@ -940,11 +940,24 @@ if (window.BLACKJACK_GAME) GAMES.blackjack = window.BLACKJACK_GAME;
   let counted = false;      /* history is recorded once per page visit */
   let roundReal = false;    /* this round is settled by the server */
 
-  Bank.onChange((v) => { if (balOut) balOut.textContent = fmt(v); });
-
   function realNow() {
     return !!(window.PepeReal && window.PepeReal.on());
   }
+
+  /* Real deployment with no session: the games are cut too, not just
+     the topbar — otherwise a signed-out player quietly bets play money. */
+  function sessionCut() {
+    const R = window.PepeReal;
+    return !!(R && R.enabled && R.enabled() && !R.on());
+  }
+
+  function paintBalance() {
+    if (balOut) balOut.textContent = sessionCut() ? "—" : fmt(Bank.get());
+  }
+
+  Bank.onChange(paintBalance);
+  document.addEventListener("pepe:real", paintBalance);
+  paintBalance();
 
   function readBet() {
     const v = parseFloat(String(betInput.value).replace(",", "."));
@@ -1066,6 +1079,12 @@ if (window.BLACKJACK_GAME) GAMES.blackjack = window.BLACKJACK_GAME;
 
   playBtn.addEventListener("click", () => {
     if (locked || holding || !playFn) return;
+
+    if (sessionCut()) {
+      flash("Sign in to play", "lose");
+      if (window.PepeWalletPanel && window.PepeWalletPanel.account) window.PepeWalletPanel.account();
+      return;
+    }
 
     const amount = readBet();
     if (amount <= 0) { flash("Enter a bet amount", "lose"); return; }

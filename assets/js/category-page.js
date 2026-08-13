@@ -23,7 +23,7 @@ const CATS = {
     list: () => History.favorites().map(gameByKey).filter(Boolean),
     empty:
       "You have not pinned anything yet.<br>" +
-      '<a href="../casino.html#originals">Browse the games</a> and hit the star on a tile.',
+      '<a href="../casino#originals">Browse the games</a> and hit the star on a tile.',
   },
   recent: {
     title: "Recently Played",
@@ -32,7 +32,7 @@ const CATS = {
     list: () => History.recent().map((e) => gameByKey(e.k)).filter(Boolean),
     empty:
       "You have not played anything yet.<br>" +
-      '<a href="../casino.html#originals">Pick a game</a> — it shows up here after your first round.',
+      '<a href="../casino#originals">Pick a game</a> — it shows up here after your first round.',
   },
 };
 
@@ -46,7 +46,7 @@ CATS.slots = {
   list: () => [],
   empty:
     "No slots yet.<br>" +
-    'In the meantime, the <a href="../casino.html#originals">originals</a> are all playable.',
+    'In the meantime, the <a href="../casino#originals">originals</a> are all playable.',
 };
 
 CATS.live = {
@@ -56,7 +56,7 @@ CATS.live = {
   list: () => [],
   empty:
     "No live tables yet.<br>" +
-    'Try <a href="../games/blackjack.html">Blackjack</a> in the meantime.',
+    'Try <a href="../games/blackjack">Blackjack</a> in the meantime.',
 };
 
 (function mountCategory() {

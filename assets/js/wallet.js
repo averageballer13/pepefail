@@ -1355,6 +1355,9 @@
   window.PepeWallet = {
     startCreateFlow: startCreateFlow,
     startImportFlow: startImportFlow,
+    /* Drops any in-memory unlocked key, so the next signature always
+       asks for the password again. Used on casino log-out. */
+    lock: wipeSession,
     get: get,
     open: openWallet,
     disconnect: confirmRemoval,
