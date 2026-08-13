@@ -252,6 +252,9 @@ async function handleStatic(req, res, url) {
   res.statusCode = 200;
   res.setHeader("Content-Type", MIME[path.extname(found.file).toLowerCase()] || "application/octet-stream");
   res.setHeader("Content-Length", found.size);
+  /* Dev server: never let the browser cache anything. Stale JS has
+     burned hours of "the fix does not work" that was never the fix. */
+  res.setHeader("Cache-Control", "no-store");
   res.setHeader("Cache-Control", "no-store"); // dev: always fresh
   const stream = createReadStream(found.file);
   stream.on("error", () => {
