@@ -36,8 +36,7 @@
       </p>
 
       <div class="landing__actions" data-rise>
-        <button class="btn btn--gold btn--lg" type="button" id="createWallet">Create Wallet</button>
-        <a class="btn btn--glass btn--lg" href="casino.html">Enter Casino</a>
+        <a class="btn btn--gold btn--lg" href="casino.html">Enter Casino</a>
       </div>
 
       <a class="landing__social" data-rise href="https://x.com/pepefail" target="_blank" rel="noopener noreferrer">
@@ -54,20 +53,11 @@
     </footer>
   </main>
 
+  <!-- The landing has one job: get you into the casino. The wallet, modal
+       and search bundles only load once you are inside. -->
   <script>window.PAGE = { active: "landing", base: "" };</script>
   <script src="assets/js/icons.js"></script>
-  <script src="assets/js/modal.js"></script>
-  <script src="assets/js/wallet.js"></script>
-  <script src="assets/js/wallet-panel.js"></script>
-  <script src="assets/js/topbar-modals.js"></script>
   <script src="assets/js/anim.js"></script>
   <script src="assets/js/fx-fall.js"></script>
-  <script>
-    document.getElementById("createWallet").addEventListener("click", function () {
-      if (window.PepeWallet && typeof window.PepeWallet.startCreateFlow === "function") {
-        window.PepeWallet.startCreateFlow();
-      }
-    });
-  </script>
 </body>
 </html>

@@ -278,19 +278,41 @@ h1, h2, h3, .display {
 
 .rankbar__track {
   position: relative;
-  height: 8px;
+  height: 11px;
   border-radius: 999px;
   background: var(--bg-900);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .6);
   overflow: hidden;
 }
 .rankbar__fill {
   position: relative;
   height: 100%;
+  /* a hairline of progress still needs room for the shine to read */
+  min-width: 16px;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--slurp-deep), var(--slurp));
-  box-shadow: 0 0 10px rgba(111, 227, 255, .55), 0 0 20px rgba(31, 168, 221, .3);
+  background: linear-gradient(180deg, var(--slurp) 0%, var(--slurp-deep) 100%);
+  box-shadow:
+    0 0 12px rgba(111, 227, 255, .7),
+    0 0 26px rgba(31, 168, 221, .45),
+    inset 0 1px 0 rgba(255, 255, 255, .55);
   transition: width 420ms cubic-bezier(.25, .6, .2, 1);
+  animation: slurp-breathe 2.8s ease-in-out infinite;
+}
+
+/* the liquid glows a little on its own, so the bar is alive at any width */
+@keyframes slurp-breathe {
+  0%, 100% {
+    box-shadow:
+      0 0 12px rgba(111, 227, 255, .7),
+      0 0 26px rgba(31, 168, 221, .45),
+      inset 0 1px 0 rgba(255, 255, 255, .55);
+  }
+  50% {
+    box-shadow:
+      0 0 18px rgba(111, 227, 255, .95),
+      0 0 38px rgba(31, 168, 221, .6),
+      inset 0 1px 0 rgba(255, 255, 255, .75);
+  }
 }
 /* pointer-tracked highlight; shell.js writes --mx on pointermove */
 .rankbar__fill::before {
@@ -308,18 +330,28 @@ h1, h2, h3, .display {
 }
 .rankbar__track { cursor: crosshair; }
 
-/* a slow highlight travelling inside the liquid, nothing outside it */
+/* A shine sweeping across the filled part. It is sized in pixels rather
+   than percent so it reads the same whether the fill is 16px or 200px. */
 .rankbar__fill::after {
   content: "";
   position: absolute; inset: 0;
   border-radius: 999px;
-  background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.42) 50%, transparent 80%);
-  background-size: 220% 100%;
-  animation: slurp-flow 3.4s linear infinite;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 255, 255, .15) 35%,
+    rgba(255, 255, 255, .85) 50%,
+    rgba(255, 255, 255, .15) 65%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 70px 100%;
+  animation: slurp-flow 2.2s linear infinite;
+  mix-blend-mode: screen;
 }
 @keyframes slurp-flow {
-  from { background-position: 120% 0; }
-  to   { background-position: -120% 0; }
+  from { background-position: -70px 0; }
+  to   { background-position: calc(100% + 70px) 0; }
 }
 
 .rankbar__foot {
@@ -331,7 +363,7 @@ h1, h2, h3, .display {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .rankbar__fill { transition: none; }
+  .rankbar__fill { transition: none; animation: none; }
   .rankbar__fill::after { animation: none; opacity: .18; }
   .rankbar__fill::before { transition: none; }
 }
