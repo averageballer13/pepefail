@@ -9,7 +9,7 @@
 /* ------------------------------------------------------------------
    EDIT THIS ONE LINE AT LAUNCH
    ------------------------------------------------------------------ */
-const TOKEN_CA = "";
+const TOKEN_CA = "24cU8fvQaAvfPotpMH7mSEf7w4wHGqCZRt1LCkispump";
 
 hydrateIcons();
 
