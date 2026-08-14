@@ -1,0 +1,120 @@
+================================================================================
+PEPE.FAIL — PROMPT DE PASSATION COMPLET
+Colle ce fichier (ou dis "lis PROMPT-PROJET.txt") au début de toute nouvelle
+conversation Claude : il contient tout le contexte du projet.
+================================================================================
+
+CE QUE C'EST
+------------
+pepe.fail est un casino crypto sur Solana, thème grenouille dorée (Pepe), 100 %
+fonctionnel en argent réel (mainnet). Site statique vanilla HTML/CSS/JS + API
+serverless Vercel. Pas de framework, pas de build step. Tout le site est en
+anglais, réponses à l'utilisateur en français, COURTES et droit au but.
+
+- Domaine : https://pepe.fail (IONOS) — aussi https://pepefail.vercel.app
+- GitHub : averageballer13/pepefail (branche main = prod, chaque push déploie)
+- Hébergement : Vercel (projet "pepefail" — ATTENTION un doublon "pepe-fail"
+  avec tiret existe, ne pas l'utiliser)
+- X : @pepedotfail (principal), @pepebetsupport (support, seul canal)
+- L'owner est ANONYME. Pas de KYC, pas d'inscription. Légal : pages Terms /
+  Privacy / Responsible / Provably-Fair existent.
+
+ARCHITECTURE
+------------
+Frontend (racine du dossier) :
+- index.html = landing (logo, wordmark, Enter Casino) ; casino.html = lobby ;
+  games/*.html = 7 jeux jouables (plinko, mines, dice, crash, limbo, wheel,
+  blackjack) ; token.html = page $FAIL ; pages/*.html = legal + rewards + recent.
+- URLs propres : cleanUrls Vercel, aucun lien interne ne porte .html.
+- assets/js/ : engine.js (Bank/Rank/XP démo), wallet.js (wallet Solana in-browser,
+  clé chiffrée PBKDF2+AES-GCM dans localStorage, create/import/export/remove,
+  auto sign-in après create/import), realmode.js (pont vers l'API : config, auth,
+  balance mirror, paris, watcher de dépôts), wallet-panel.js (panel Deposit/
+  Withdraw + modal Account), game-page.js (moteur UI des jeux, démo + réel),
+  toast.js (popup top-middle), sfx.js (sons WebAudio), shell.js (topbar/sidebar/
+  footer), token.js (page $FAIL).
+- Icônes 100 % custom SVG (icons.js), pas d'emoji, pas d'effets "AI slop".
+  Boutons : or = action principale, orange fluo = secondaire forte, glass =
+  secondaire. Fond navy assorti au logo.
+
+Backend (api/) — LIMITE VERCEL HOBBY : 12 fonctions max, donc UNE seule
+fonction api/router.js + handlers dans api/_handlers/ (les dossiers _ ne
+comptent pas) + rewrite vercel.json /api/:path* -> router.
+- Auth : challenge/verify par signature ed25519 -> token HMAC 24 h.
+- Provably fair : commit-reveal (hash de seed serveur publié, seed client,
+  nonce atomique).
+- Paris server-side : lamports entiers, BigInt, idempotence par refId, une
+  seule manche ouverte par (adresse, jeu), infos cachées jamais renvoyées
+  avant règlement. Champ de statut = "phase" (PAS "state", collision client).
+- Dépôts : adresse dérivée PAR JOUEUR = HMAC-SHA512(secret maison,
+  "deposit-v1:"+adresse) -> Keypair. Le client poll /api/wallet/sweep (4-8 s) ;
+  le serveur balaie vers le VAULT et crédite le montant PLEIN (frais 5000
+  lamports absorbés). Toast + son à l'arrivée.
+- Retraits : débit d'abord (idempotent), transfert signé par le hot wallet,
+  refund seulement si l'envoi n'a certainement pas été diffusé.
+- DB : Upstash Redis REST (Lua EVAL atomique), fallback mémoire en dev.
+  TOUTES les clés sont préfixées par réseau ("mainnet-beta:", "devnet:") —
+  les soldes devnet ne peuvent JAMAIS devenir des dettes mainnet.
+- House edge 1 % partout (RTP 99 %), source unique HOUSE_EDGE dans
+  api/_lib/games.js, miroir exact du client. Blackjack S17 3:2.
+
+ENV VERCEL (les valeurs ne sont PAS dans le repo)
+-------------------------------------------------
+NETWORK=mainnet-beta ; RPC_URL=Helius mainnet (clé serveur, secrète) ;
+HOUSE_WALLET_SECRET (hot wallet, signe les retraits — JAMAIS partagé, même
+avec l'IA) ; SESSION_SECRET ; UPSTASH_REDIS_REST_URL/TOKEN ;
+VAULT_ADDRESS=3CE4aPdzboK4ZQP5u285k7JduFSDeDvbtETFksceBsV1 (wallet perso du
+boss : les dépôts y sont balayés) ; MAX_BET_LAMPORTS / MAX_PAYOUT_LAMPORTS /
+MIN_WITHDRAW_LAMPORTS (actuellement illimités sur demande du boss — risque
+de solvabilité signalé) ; PUBLIC_RPC_URL (optionnel, 2e clé Helius restreinte
+au domaine, envoyée au navigateur) ; FAIL_MINT (à poser au launch du token
+pour activer $FAIL comme asset de jeu).
+Hot wallet public : 3ZtA6tJBUvVTb4bC6Qzr4a4fypvTG6zs1ttyA4KxUQDS — il paie
+les retraits, le boss doit y maintenir un float depuis le vault.
+IMPORTANT : les changements d'env ne sont pris qu'après un PUSH (le Redeploy
+manuel ne suffit pas toujours) — git commit --allow-empty au besoin.
+
+TOKEN $FAIL (Pump.fun)
+----------------------
+- token.html/token.js : TOUT se déclenche en éditant UNE ligne dans
+  assets/js/token.js : const TOKEN_CA = "..." ; -> CA affiché + Copy actif,
+  badge "Live on Pump.fun", chart LIVE intégrée via DexScreener embed
+  (pump.fun INTERDIT l'iframe ; DexScreener indexe les tokens pump en
+  secondes), boutons Trade on Pump.fun / DexScreener.
+- Flywheel affiché : fees de trade + house edge -> buybacks + bankroll ->
+  plus gros paris -> plus de volume. Buybacks vérifiables on-chain.
+- Un premier launch a eu lieu (CA 24cU8fvQaAvfPotpMH7mSEf7w4wHGqCZRt1LCkispump)
+  puis la page a été RESET (TOKEN_CA vide) — prêt pour un relaunch.
+
+OUTILS / TESTS (tools/)
+-----------------------
+- dev-api.mjs : serveur local :5178 (statique + API, no-store, .env.local).
+- test-games.mjs (19 maths), test-bets-local.mjs (20 flux), test-e2e.mjs
+  (15 étapes bout en bout sur devnet), test-sweep.mjs (dépôts dérivés).
+  TOUJOURS tester avant de pousser ; vérifier la prod après déploiement.
+- gen-mainnet-secrets.mjs : écrit les secrets dans mainnet-secrets.txt
+  (gitignoré, JAMAIS affiché à l'écran) et n'imprime que l'adresse publique.
+- .env.local (gitignoré) : secrets DEVNET uniquement — le secret devnet a
+  circulé en clair, il est GRILLÉ pour le mainnet.
+
+RÈGLES DE TRAVAIL AVEC LE BOSS
+------------------------------
+- Réponses courtes, droit au but, en français. Pas de pavés.
+- Il ne connaît pas les terminaux : lui donner des étapes cliquables, faire
+  soi-même tout ce qui est faisable (code, push, tests, vérifs).
+- Toujours : coder -> tester en local -> pousser -> vérifier la prod -> lui
+  dire quoi tester.
+- Jamais de secrets dans le chat, le code ou les commits. L'IA ne doit JAMAIS
+  connaître HOUSE_WALLET_SECRET mainnet.
+- Design : crédible, pro, pas d'effets IA cheap ; animations douces.
+- Le jour d'un launch token : il envoie le CA, on édite TOKEN_CA, push,
+  vérif prod — le tout en ~1 minute, c'est critique.
+
+EN ATTENTE / IDÉES
+------------------
+- Incohérence 18+/21+ entre textes et badge footer (jamais tranchée).
+- Article X de launch rédigé (X Premium requis) ; tweets de launch prêts.
+- pages/slots.html, live.html, nouveautes.html peu/pas utilisées.
+- Monitoring solde hot wallet, file de retraits, multisig : pas faits.
+- Rakeback/tiers $FAIL côté serveur : à brancher quand FAIL_MINT sera posé.
+================================================================================
