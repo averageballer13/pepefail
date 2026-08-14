@@ -14,24 +14,52 @@ const TOKEN_CA = "";
 hydrateIcons();
 
 /* =========================== LIVE CHART ===========================
-   Swaps the placeholder for the Pump.fun embed as soon as TOKEN_CA is
-   set. Nothing else to change at launch. */
+   Swaps the placeholder for a live chart as soon as TOKEN_CA is set.
+   Pump.fun forbids being iframed (frame-ancestors 'self'), so the
+   chart itself comes from DexScreener — which indexes Pump.fun
+   bonding-curve tokens within seconds and allows embedding — while a
+   button links out to the Pump.fun page for trading. */
 (function () {
   const host = document.getElementById("tkChart");
   const state = document.getElementById("chartState");
   const ca = TOKEN_CA.trim();
   if (!host || !ca) return;
 
+  const pumpUrl = "https://pump.fun/coin/" + encodeURIComponent(ca);
+
   const frame = document.createElement("iframe");
-  frame.src = "https://pump.fun/coin/" + encodeURIComponent(ca) + "?embed=1";
+  frame.src =
+    "https://dexscreener.com/solana/" + encodeURIComponent(ca) +
+    "?embed=1&theme=dark&trades=0&info=0";
   frame.title = "$FAIL live chart";
   frame.loading = "lazy";
-  frame.allow = "clipboard-write";
   frame.referrerPolicy = "no-referrer";
 
   host.innerHTML = "";
   host.appendChild(frame);
   if (state) state.textContent = "Live";
+
+  /* Trade link under the chart — the chart shows, Pump.fun trades. */
+  const row = document.createElement("div");
+  row.style.cssText = "display:flex;gap:10px;justify-content:center;margin-top:12px";
+  row.innerHTML =
+    '<a class="btn btn--gold" href="' + pumpUrl + '" target="_blank" rel="noopener noreferrer">' +
+      "Trade on Pump.fun</a>" +
+    '<a class="btn btn--glass" href="https://dexscreener.com/solana/' + encodeURIComponent(ca) +
+      '" target="_blank" rel="noopener noreferrer">DexScreener</a>';
+  host.insertAdjacentElement("afterend", row);
+
+  /* The hero badge flips from "Launching" to a live link. */
+  const badge = document.querySelector(".tk-badge");
+  if (badge) {
+    const link = document.createElement("a");
+    link.className = badge.className;
+    link.href = pumpUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.innerHTML = badge.innerHTML.replace("Launching on Pump.fun", "Live on Pump.fun");
+    badge.replaceWith(link);
+  }
 })();
 
 /* =========================== CONTRACT ADDRESS =========================== */
